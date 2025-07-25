@@ -13,3 +13,40 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Chart {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tracks    Track[]
+  country   Country? @relation(fields: [countryId], references: [id])
+  countryId String?
+}
+
+model Track {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Chart     Chart    @relation(fields: [chartId], references: [id])
+  chartId   String
+  title     String
+  artist    String
+  album     String
+  imageUrl  String?
+  rank      Int
+}
+
+model Country {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  charts    Chart[]
+}
+
+//album, genre, user
