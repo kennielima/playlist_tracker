@@ -15,14 +15,15 @@ datasource db {
 }
 
 model Chart {
-  id        String   @id @default(uuid())
-  name      String
-  slug      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  tracks    Track[]
-  country   Country? @relation(fields: [countryId], references: [id])
-  countryId String?
+  id         String      @id @default(uuid())
+  name       String
+  slug       String      @unique
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  tracks     Track[]
+  country    Country?    @relation(fields: [countryId], references: [id])
+  countryId  String?
+  chartTimes ChartTime[]
 }
 
 model Track {
@@ -47,6 +48,17 @@ model Country {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   charts    Chart[]
+}
+
+model ChartTime {
+  id        String   @id @default(uuid())
+  chart     Chart    @relation(fields: [chartId], references: [id])
+  chartId   String
+  date      DateTime
+  month     Int
+  year      Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 //album, genre, user
