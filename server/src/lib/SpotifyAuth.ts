@@ -3,7 +3,7 @@ let client_id = process.env.SPOTIFY_CLIENT_ID || 'CLIENT_ID';
 let client_secret = process.env.SPOTIFY_CLIENT_SECRET || 'CLIENT_SECRET';
 
 async function getSpotifyToken() {
-    const response = await fetch('https://accounts.spotify.com/api/token', {
+    const response = await fetch(`${process.env.TOKEN_API}`, {
         method: 'POST',
         body: new URLSearchParams({
             'grant_type': 'client_credentials',
@@ -17,7 +17,6 @@ async function getSpotifyToken() {
     });
 
     const token = await response.json();
-    console.log(token);
     return token;
 }
 

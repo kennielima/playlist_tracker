@@ -3,16 +3,23 @@ import cors from "cors";
 import dotenv from "dotenv";
 import prisma from './lib/prisma.ts';
 import chartRoutes from "./routes/chart.route.ts";
-
+import authRoutes from "./routes/auth.route.ts";
+import cookieParser from "cookie-parser";
 
 const app = express();
 const PORT = process.env.PORT || 4001;
 dotenv.config();
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true
+}));
+
+app.use(cookieParser())
 
 app.use("/api/charts", chartRoutes);
+app.use("/api/auth", authRoutes);
 
 async function main() { console.log("Prisma Client initialized") }
 main()
