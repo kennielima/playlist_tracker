@@ -14,51 +14,63 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Chart {
-  id         String      @id @default(uuid())
-  name       String
-  slug       String      @unique
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  tracks     Track[]
-  country    Country?    @relation(fields: [countryId], references: [id])
-  countryId  String?
-  chartTimes ChartTime[]
+model User {
+  id        String     @id @default(uuid())
+  email     String     @unique
+  name      String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  playlists Playlist[]
+  spotifyId String?    @unique
+}
+
+model Playlist {
+  id             String         @id @default(uuid())
+  name           String
+  slug           String         @unique
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  tracks         Track[]
+  SnapshotDates  SnapshotDate[]
+  User           User?          @relation(fields: [userId], references: [id])
+  chartCountry   ChartCountry?  @relation(fields: [chartCountryId], references: [id])
+  chartCountryId String?
+  userId         String?
 }
 
 model Track {
-  id        String   @id @default(uuid())
+  id         String   @id @default(uuid())
+  name       String
+  slug       String   @unique
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  Playlist   Playlist @relation(fields: [playlistId], references: [id])
+  playlistId String
+  title      String
+  artist     String
+  album      String
+  imageUrl   String?
+  rank       Int
+}
+
+model SnapshotDate {
+  id         String   @id @default(uuid())
+  playlist   Playlist @relation(fields: [playlistId], references: [id])
+  playlistId String
+  date       DateTime
+  month      Int
+  year       Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model ChartCountry {
+  id        String     @id @default(uuid())
   name      String
-  slug      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Chart     Chart    @relation(fields: [chartId], references: [id])
-  chartId   String
-  title     String
-  artist    String
-  album     String
-  imageUrl  String?
-  rank      Int
+  slug      String     @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  playlist  Playlist[]
 }
 
-model Country {
-  id        String   @id @default(uuid())
-  name      String
-  slug      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  charts    Chart[]
-}
-
-model ChartTime {
-  id        String   @id @default(uuid())
-  chart     Chart    @relation(fields: [chartId], references: [id])
-  chartId   String
-  date      DateTime
-  month     Int
-  year      Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-//album, genre, user
+//enum charts source
