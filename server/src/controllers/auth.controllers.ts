@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import { generateRandomString } from "../lib/utils";
 import queryString from "query-string";
 import prisma from "../lib/prisma";
+import jwt from 'jsonwebtoken';
 
 async function login(req: Request, res: Response) {
     let state = generateRandomString(16);
@@ -48,12 +49,6 @@ async function callback(req: Request, res: Response) {
             return res.status(400).json({ error: 'token_exchange_failed' + errorData });
         }
         const tokenData = await tokenResponse.json();
-        res.cookie("spotify_refresh_token", tokenData.refresh_token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'PRODUCTION',
-            sameSite: 'strict',
-            maxAge: tokenData.expires_in * 1000
-        })
 
         const userResponse = await fetch(`${process.env.SPOTIFY_URL}/me`, {
             method: 'GET',
@@ -70,6 +65,7 @@ async function callback(req: Request, res: Response) {
                 email: userData.email
             }
         })
+
         if (!existingUser) {
             await prisma.user.create({
                 data: {
@@ -79,11 +75,27 @@ async function callback(req: Request, res: Response) {
                 }
             })
         }
-        res.status(200).json({
+
+        const token = jwt.sign({
+            id: userData.id,
+        },
+            process.env.JWT_SECRET!,
+            { expiresIn: '1d' }
+        )
+
+        res.cookie("spotify_refresh_token", tokenData.refresh_token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'PRODUCTION',
+            sameSite: 'strict',
+            maxAge: tokenData.expires_in * 1000
+        })
+
+        return res.status(200).json({
             access_token: tokenData.access_token,
             expires_in: tokenData.expires_in,
             refresh_token: tokenData.refresh_token,
             user: userData,
+            jwttoken: token
         });
     } catch (error) {
         console.error("Error fetching Spotify token:", error);
