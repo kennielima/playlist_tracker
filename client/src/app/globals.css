@@ -1,2 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+
+
+body {
+  color: #ffffff;
+  /* background: linear-gradient(135deg, #000000 0%, #111111 50%, #000000 100%); */
+}
