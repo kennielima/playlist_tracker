@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import prisma from './lib/prisma.ts';
 import chartRoutes from "./routes/chart.route.ts";
 import authRoutes from "./routes/auth.route.ts";
+import userRoutes from "./routes/user.route.ts";
 import cookieParser from "cookie-parser";
 
 const app = express();
@@ -21,6 +22,7 @@ app.use(cookieParser())
 
 app.use("/api/charts", chartRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
 
 async function main() { console.log("Prisma Client initialized") }
 main()

@@ -15,13 +15,18 @@ datasource db {
 }
 
 model User {
-  id        String     @id @default(uuid())
-  email     String     @unique
-  name      String?
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  playlists Playlist[]
-  spotifyId String?    @unique
+  id                  String     @id @default(uuid())
+  email               String     @unique
+  name                String?
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+  playlists           Playlist[]
+  spotifyId           String?    @unique
+  spotifyaccessToken  String?
+  spotifyrefreshToken String?
+  tokenExpiry         Int?
+
+  @@map("users")
 }
 
 model Playlist {
@@ -36,6 +41,8 @@ model Playlist {
   chartCountry   ChartCountry?  @relation(fields: [chartCountryId], references: [id])
   chartCountryId String?
   userId         String?
+
+  @@map("playlists")
 }
 
 model Track {
@@ -51,6 +58,8 @@ model Track {
   album      String
   imageUrl   String?
   rank       Int
+
+  @@map("tracks")
 }
 
 model SnapshotDate {
@@ -62,6 +71,8 @@ model SnapshotDate {
   year       Int
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+
+  @@map("snapshotDates")
 }
 
 model ChartCountry {
@@ -71,6 +82,8 @@ model ChartCountry {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   playlist  Playlist[]
+
+  @@map("chartCountries")
 }
 
 //enum charts source

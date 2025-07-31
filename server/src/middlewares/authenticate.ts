@@ -14,6 +14,7 @@ declare global {
 async function authenticate(req: Request, res: Response, next: NextFunction) {
     const authHeader = req.headers.authorization;
     const token = authHeader?.split(' ')[1];
+    const tokenkey = req.cookies.token;
 
     if (!token) {
         return res.status(401).json({ error: "Unauthorized" });

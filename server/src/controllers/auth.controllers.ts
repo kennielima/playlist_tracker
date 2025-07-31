@@ -15,7 +15,7 @@ async function login(req: Request, res: Response) {
         redirect_uri: process.env.SPOTIFY_REDIRECT_URI!,
         state: state
     })
-    res.redirect('https://accounts.spotify.com/authorize?' + params);
+    res.redirect(`${process.env.SPOTIFY_AUTH_URI}?${params}`);
 };
 
 async function callback(req: Request, res: Response) {
@@ -23,10 +23,10 @@ async function callback(req: Request, res: Response) {
     var state = req.query.state || null;
 
     if (state === null) {
-        res.redirect('/#' + queryString.stringify({ error: 'state_mismatch' }));
+        return res.status(500).json({ error: 'state_mismatch' })
     }
     if (!code) {
-        res.redirect('/#' + queryString.stringify({ error: 'no_code' }));
+        return res.status(500).json({ error: 'no_code' })
     }
 
     try {
@@ -57,7 +57,7 @@ async function callback(req: Request, res: Response) {
             }
         })
         const userData = await userResponse.json();
-        console.log('user', userData, tokenResponse);
+        console.log('spotifyuser-token', userData, tokenResponse);
 
         const existingUser = await prisma.user.findUnique({
             where: {
@@ -65,38 +65,34 @@ async function callback(req: Request, res: Response) {
                 email: userData.email
             }
         })
-
+        let newUser;
         if (!existingUser) {
-            await prisma.user.create({
+            newUser = await prisma.user.create({
                 data: {
                     spotifyId: userData.id,
                     name: userData.display_name,
-                    email: userData.email
+                    email: userData.email,
+                    spotifyaccessToken: tokenData.access_token,
+                    spotifyrefreshToken: tokenData.refresh_token,
+                    tokenExpiry: tokenData.expires_in
                 }
             })
         }
-
+        let user = existingUser || newUser;
         const token = jwt.sign({
-            id: userData.id,
+            id: user?.id,
         },
             process.env.JWT_SECRET!,
             { expiresIn: '1d' }
         )
-
-        res.cookie("spotify_refresh_token", tokenData.refresh_token, {
+        console.log('user', user, 'jwttoken', token);
+        res.cookie("token", token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'PRODUCTION',
             sameSite: 'strict',
-            maxAge: tokenData.expires_in * 1000
+            maxAge: 24 * 60 * 60 * 1000
         })
-
-        return res.status(200).json({
-            access_token: tokenData.access_token,
-            expires_in: tokenData.expires_in,
-            refresh_token: tokenData.refresh_token,
-            user: userData,
-            jwttoken: token
-        });
+        res.redirect(`${process.env.BASE_URL}/spotify/callback`);
     } catch (error) {
         console.error("Error fetching Spotify token:", error);
         return res.status(500).json({ error: "Internal server error while fetching Spotify token" });

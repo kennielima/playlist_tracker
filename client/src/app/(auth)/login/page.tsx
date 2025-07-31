@@ -2,30 +2,6 @@ import { Card } from "@/components/ui/card"
 import React from 'react'
 
 const page = () => {
-    // const [isLoading, setIsLoading] = useState(false);
-
-    // const handleSpotifyLogin = async () => {
-    //     setIsLoading(true);
-    //     try {
-    //         const response = await fetch(`${process.env.API_URL}/api/auth/spotify/login`, {
-    //             method: 'GET',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //             }
-    //         })
-    //         if (!response || !response.ok) {
-    //             throw new Error('Failed to login to Spotify');
-    //         }
-    //         const data = response.url;
-    //         return window.location.href = data;
-    //     }
-    //     catch (error) {
-    //         console.error('Error during Spotify login:', error);
-    //     } finally {
-    //         setIsLoading(false);
-    //     }
-    // };
-
     return (
         <div className='flex flex-col gap-12 my-20 items-center min-h-screen'>
             <h3 className="text-3xl font-bold text-white">Welcome Back</h3>
@@ -38,7 +14,7 @@ const page = () => {
 
                     {/* Spotify Login Button */}
                     <a
-                        href={'/api/auth/spotify/login'}
+                        href={`${process.env.API_URL}/api/auth/spotify/login`}
                         className="w-full"
                     >
                         <div
