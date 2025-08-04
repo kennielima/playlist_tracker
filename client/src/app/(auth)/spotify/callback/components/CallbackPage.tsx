@@ -8,10 +8,9 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import React from 'react'
 
-const CallbackPage = ({ userData }: { userData: { user: User } }) => {
+const CallbackPage = ({ user }: { user: User }) => {
     const router = useRouter();
     // const [progress, setProgress] = React.useState(13)
-    const { user } = userData
 
     // React.useEffect(() => {
     //     const timer = setTimeout(() => setProgress(66), 500)

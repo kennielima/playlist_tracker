@@ -20,4 +20,27 @@ async function getSpotifyToken() {
     return token;
 }
 
-export default getSpotifyToken;
+async function getRefreshToken() {
+    const { refresh_token } = await getSpotifyToken();
+
+    const response = await fetch(`${process.env.TOKEN_API}`, {
+        method: 'POST',
+        body: new URLSearchParams({
+            'grant_type': 'refresh_token',
+            'client_id': client_id,
+            // 'client_secret': client_secret,
+            refresh_token: refresh_token,
+
+        }),
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': 'Basic ' + (Buffer.from(client_id + ':' + client_secret).toString('base64')),
+        },
+    });
+
+    const token = await response.json();
+    console.log(token)
+    return token;
+}
+
+export { getSpotifyToken, getRefreshToken };
