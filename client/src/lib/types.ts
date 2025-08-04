@@ -9,6 +9,7 @@ export type User = {
     spotifyaccessToken?: string
     spotifyrefreshToken?: string
     tokenExpiry: number
+    userImage: string
 }
 
 type Playlist = {

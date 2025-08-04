@@ -57,7 +57,6 @@ async function callback(req: Request, res: Response) {
             }
         })
         const userData = await userResponse.json();
-        console.log('spotifyuser-token', userData, tokenResponse);
 
         const existingUser = await prisma.user.findUnique({
             where: {
@@ -72,6 +71,7 @@ async function callback(req: Request, res: Response) {
                     spotifyId: userData.id,
                     name: userData.display_name,
                     email: userData.email,
+                    userImage: userData.images[0],
                     spotifyaccessToken: tokenData.access_token,
                     spotifyrefreshToken: tokenData.refresh_token,
                     tokenExpiry: tokenData.expires_in
@@ -85,7 +85,7 @@ async function callback(req: Request, res: Response) {
             process.env.JWT_SECRET!,
             { expiresIn: '1d' }
         )
-        console.log('user', user, 'jwttoken', token);
+        // console.log('user', user, 'jwttoken', token, userData, tokenResponse);
         res.cookie("token", token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'PRODUCTION',

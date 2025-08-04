@@ -6,7 +6,7 @@ const page = () => {
         <div className='flex flex-col gap-12 my-20 items-center min-h-screen'>
             <h3 className="text-3xl font-bold text-white">Welcome Back</h3>
 
-            <Card className="w-full max-w-sm backdrop-blur-xl mt-20 shadow-2xl p-8">
+            <Card className="w-full max-w-sm bg-white/10 backdrop-blur-xl mt-20 shadow-2xl p-8">
                 <div className="text-center space-y-6">
                     <div className="space-y-2">
                         <p className="text-slate-300">Connect with Spotify to get started</p>
