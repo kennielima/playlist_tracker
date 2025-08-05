@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import prisma from './lib/prisma.ts';
+import chartRoutes from "./routes/chart.route.ts";
 import authRoutes from "./routes/auth.route.ts";
 import userRoutes from "./routes/user.route.ts";
 import cookieParser from "cookie-parser";
@@ -19,6 +20,7 @@ app.use(cors({
 
 app.use(cookieParser())
 
+app.use("/api/charts", chartRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 

@@ -12,7 +12,7 @@ export const GET = async () => {
     }
 
     try {
-        const response = await fetch(`${process.env.API_URL}/api/charts`, {
+        const response = await fetch(`${process.env.API_URL}/api/users/playlists`, {
             method: 'GET',
             headers: {
                 'authorization': `Bearer ${token}`,

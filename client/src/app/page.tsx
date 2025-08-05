@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 export default async function Home() {
   const cookieHeader = cookies().toString();
 
-  const res = await fetch(`${process.env.BASE_URL}/api/getplaylist`, {
+  const res = await fetch(`${process.env.BASE_URL}/api/getuserplaylists`, {
     method: "GET",
     headers: {
       cookie: cookieHeader
@@ -13,7 +13,7 @@ export default async function Home() {
   });
 
   if (!res.ok) {
-    throw new Error('Failed to fetch user data');
+    throw new Error('Failed to fetch data');
   }
 
   const { data } = await res.json();

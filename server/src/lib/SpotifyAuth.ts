@@ -17,11 +17,11 @@ async function getSpotifyToken() {
     });
 
     const token = await response.json();
+    // console.log("tokenauth", token)
     return token;
 }
 
-async function getRefreshToken() {
-    const { refresh_token } = await getSpotifyToken();
+async function getRefreshToken(refreshToken: string) {
 
     const response = await fetch(`${process.env.TOKEN_API}`, {
         method: 'POST',
@@ -29,7 +29,7 @@ async function getRefreshToken() {
             'grant_type': 'refresh_token',
             'client_id': client_id,
             // 'client_secret': client_secret,
-            refresh_token: refresh_token,
+            refresh_token: refreshToken,
 
         }),
         headers: {
@@ -39,7 +39,7 @@ async function getRefreshToken() {
     });
 
     const token = await response.json();
-    console.log(token)
+    // console.log('rtoken', token)
     return token;
 }
 
