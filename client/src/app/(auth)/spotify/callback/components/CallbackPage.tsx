@@ -28,7 +28,7 @@ const CallbackPage = ({ user }: { user: User }) => {
     }
 
     return (
-        <div className='min-h-screen m-20 backdrop-blur-xl'>
+        <div className='m-20 backdrop-blur-xl'>
             <Card className='m-auto w-1/3 p-8 backdrop-blur-xl bg-white/10 min-w-xs'>
                 <div className='flex flex-col justify-center w-full gap-4'>
                     <div className='flex flex-col gap-5 justify-center items-center'>

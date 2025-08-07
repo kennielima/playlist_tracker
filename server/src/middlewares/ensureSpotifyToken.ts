@@ -36,7 +36,6 @@ const ensureSpotifyToken = async (req: TokenRequest, res: Response, next: NextFu
                         spotifyrefreshToken: refresh_token
                     }
                 })
-                console.log("updateUser", updateUser);
             } else {
                 accessToken = spotifyaccessToken;
                 refreshToken = spotifyrefreshToken;

@@ -12,6 +12,16 @@ export type User = {
     userImage: string
 }
 
-type Playlist = {
-    id: string
+export type Playlist = {
+    id: string,
+    name: string
+    createdAt: string
+    updatedAt: string
+    description: string
+    userId: string
+    chartCountryId: string
+    image: string
+    url: string
+    playlistId: string
+    snapshotId: string
 }

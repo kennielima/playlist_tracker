@@ -2,8 +2,6 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 export const GET = async () => {
-    console.log('Inside /api/getUser');
-
     const cookie = await cookies();
     const token = cookie.get('token')?.value;
 
@@ -12,7 +10,7 @@ export const GET = async () => {
     }
 
     try {
-        const response = await fetch(`${process.env.API_URL}/api/users/playlists`, {
+        const response = await fetch(`${process.env.API_URL}/api/playlists/myplaylists`, {
             method: 'GET',
             headers: {
                 'authorization': `Bearer ${token}`,

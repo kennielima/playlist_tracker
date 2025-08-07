@@ -3,7 +3,7 @@ import React from 'react'
 
 const page = () => {
     return (
-        <div className='flex flex-col gap-12 my-20 items-center min-h-screen'>
+        <div className='flex flex-col gap-12 my-20 items-center'>
             <h3 className="text-3xl font-bold text-white">Welcome Back</h3>
 
             <Card className="w-full max-w-sm bg-white/10 backdrop-blur-xl mt-20 shadow-2xl p-8">

@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Playlists" ALTER COLUMN "image" SET NOT NULL,
+ALTER COLUMN "image" SET DATA TYPE TEXT;
