@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react'
 
-const page = ({ user }: { user: User }) => {
+const HeaderComponent = ({ user }: { user: User }) => {
     return (
         <div className='w-full h-24 shadow-md flex items-center justify-between px-6 bg-purple-950'>
             {/* logo */}
@@ -38,4 +38,4 @@ const page = ({ user }: { user: User }) => {
     )
 }
 
-export default page
+export default HeaderComponent

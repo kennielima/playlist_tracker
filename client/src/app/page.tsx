@@ -1,5 +1,5 @@
 import { QueryClient, useQuery } from '@tanstack/react-query'
-import fetchMyPlaylists from "./hooks/getMyPlaylists";
+import fetchMyPlaylists from "../services/getMyPlaylists";
 
 export default async function Home() {
   return (

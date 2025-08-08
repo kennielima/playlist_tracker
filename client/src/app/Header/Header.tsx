@@ -1,5 +1,5 @@
-import HeaderComponent from './components/HeaderComponent';
-import fetchCurrentUser from '../hooks/getMe';
+import HeaderComponent from './HeaderComponent';
+import fetchCurrentUser from '../../services/getMe';
 
 const Header = async () => {
     const user = await fetchCurrentUser();

@@ -1,7 +1,7 @@
 import React from 'react'
 import UserComponent from './components/UserComponent'
-import fetchCurrentUser from '@/app/hooks/getMe'
-import fetchMyPlaylists from '@/app/hooks/getMyPlaylists'
+import fetchCurrentUser from '@/services/getMe'
+import fetchMyPlaylists from '@/services/getMyPlaylists'
 
 type Params = Promise<{
     id: string

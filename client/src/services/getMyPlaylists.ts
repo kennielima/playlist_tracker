@@ -1,8 +1,8 @@
+"use server"
 import { cookies } from "next/headers";
 
 const fetchMyPlaylists = async () => {
     const cookieHeader = await cookies().toString();
-    //   const queryClient = new QueryClient();
 
     const fetchUserPlaylist = await fetch(`${process.env.BASE_URL}/api/getmyplaylists`, {
         method: "GET",
