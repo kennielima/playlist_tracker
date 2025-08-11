@@ -10,7 +10,7 @@ export const GET = async () => {
     }
 
     try {
-        const response = await fetch(`${process.env.API_URL}/api/users/me/playlists`, {
+        const response = await fetch(`${process.env.API_URL}/api/playlists/get-featured`, {
             method: 'GET',
             headers: {
                 'authorization': `Bearer ${token}`,
@@ -22,7 +22,7 @@ export const GET = async () => {
             throw new Error('Failed to fetch chart data');
         }
         const data = await response.json();
-        // console.log('CHART', data);
+        // console.log(data);
 
         return NextResponse.json({ data })
     } catch (error) {

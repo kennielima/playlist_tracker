@@ -1,9 +1,9 @@
 import express from "express";
 import ensureSpotifyToken from "../middlewares/ensureSpotifyToken";
-import { getFeaturedPlaylists } from "../controllers/playlist.controller";
+import { searchPlaylists } from "../controllers/search.controller";
 
 const router = express.Router();
 
-router.get("/get-featured", ensureSpotifyToken, getFeaturedPlaylists);
+router.get("/search", ensureSpotifyToken, searchPlaylists);
 
 export default router;

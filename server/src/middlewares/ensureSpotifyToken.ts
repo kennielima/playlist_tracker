@@ -47,7 +47,7 @@ const ensureSpotifyToken = async (req: TokenRequest, res: Response, next: NextFu
             const token = await getSpotifyToken();
             accessToken = token.access_token;
             tokenExpiryDate = now + token.expires_in * 1000;
-            console.log("spotify token", token)
+            // console.log("spotify token", token)
         }
 
         req.access_token = accessToken;

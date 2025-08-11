@@ -5,6 +5,7 @@ import prisma from './lib/prisma.ts';
 import playlistRoutes from "./routes/playlist.route.ts";
 import authRoutes from "./routes/auth.route.ts";
 import userRoutes from "./routes/user.route.ts";
+import searchRoutes from "./routes/search.route.ts";
 import cookieParser from "cookie-parser";
 
 const app = express();
@@ -21,6 +22,7 @@ app.use(cors({
 app.use(cookieParser())
 
 app.use("/api/playlists", playlistRoutes);
+app.use("/api/spotify", searchRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 
