@@ -131,16 +131,16 @@ const UserComponent = ({ user, playlistData }: UserTypeProps) => {
                         <Button
                             variant={viewMode === "grid" ? "default" : "outline"}
                             size="sm"
-                            onClick={() => setViewMode("grid")}
+                            onClick={() => setViewMode("list")}
                         >
-                            <Grid3X3 className="h-4 w-4" />
+                            <List className="h-4 w-4" />
                         </Button>
                         <Button
                             variant={viewMode === "list" ? "default" : "outline"}
                             size="sm"
-                            onClick={() => setViewMode("list")}
+                            onClick={() => setViewMode("grid")}
                         >
-                            <List className="h-4 w-4" />
+                            <Grid3X3 className="h-4 w-4" />
                         </Button>
                     </div>
                 </motion.div>

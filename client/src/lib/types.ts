@@ -19,7 +19,6 @@ export type Playlist = {
     updatedAt: string
     description: string
     userId: string
-    chartCountryId: string
     image: string
     url: string
     playlistId: string
