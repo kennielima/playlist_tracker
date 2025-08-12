@@ -32,13 +32,13 @@ const UserComponent = ({ user, playlistData }: UserTypeProps) => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        <div className="">
             {/* Header */}
-            <div className="bg-black/20 backdrop-blur-md border-b border-white/10 sticky top-0 z-10">
+            <div className="bg-black/20 backdrop-blur-md border-b border-white/10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
-                            <Avatar className="h-12 w-12">
+                            <Avatar className="h-12 w-12 bg-purple-500">
                                 <AvatarImage src={user.userImage || "/placeholder.svg"} alt={user.name} />
                                 <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
                             </Avatar>
@@ -51,7 +51,34 @@ const UserComponent = ({ user, playlistData }: UserTypeProps) => {
                                 </p>
                             </div>
                         </div>
+
+                        {/* Search and Controls */}
+                        <motion.div
+                            className="flex flex-col sm:flex-row gap-4"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                        >
+                            <div className="flex gap-2">
+                                <Button
+                                    variant={viewMode === "grid" ? "default" : "outline"}
+                                    size="sm"
+                                    onClick={() => setViewMode("list")}
+                                >
+                                    <List className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                    variant={viewMode === "list" ? "default" : "outline"}
+                                    size="sm"
+                                    onClick={() => setViewMode("grid")}
+                                >
+                                    <Grid3X3 className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        </motion.div>
                     </div>
+
+
                 </div>
             </div>
 
@@ -89,9 +116,9 @@ const UserComponent = ({ user, playlistData }: UserTypeProps) => {
                                 </div>
                             </CardContent>
                         </Card>
-                    </motion.div> */}
+                    </motion.div>
 
-                    {/* <motion.div variants={itemVariants}>
+                    <motion.div variants={itemVariants}>
                         <Card className="bg-white/5 backdrop-blur-md border border-white/10 shadow-xl">
                             <CardContent className="p-4 text-center">
                                 <Users className="h-6 w-6 mx-auto mb-2 text-blue-400" />
@@ -103,9 +130,9 @@ const UserComponent = ({ user, playlistData }: UserTypeProps) => {
                                 </div>
                             </CardContent>
                         </Card>
-                    </motion.div> */}
+                    </motion.div>
 
-                    {/* <motion.div variants={itemVariants}>
+                    <motion.div variants={itemVariants}>
                         <Card className="bg-white/5 backdrop-blur-md border border-white/10 shadow-xl">
                             <CardContent className="p-4 text-center">
                                 <Heart className="h-6 w-6 mx-auto mb-2 text-pink-400" />
@@ -118,31 +145,6 @@ const UserComponent = ({ user, playlistData }: UserTypeProps) => {
                             </CardContent>
                         </Card>
                     </motion.div> */}
-                </motion.div>
-
-                {/* Search and Controls */}
-                <motion.div
-                    className="flex flex-col sm:flex-row gap-4 mb-8"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                >
-                    <div className="flex gap-2">
-                        <Button
-                            variant={viewMode === "grid" ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => setViewMode("list")}
-                        >
-                            <List className="h-4 w-4" />
-                        </Button>
-                        <Button
-                            variant={viewMode === "list" ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => setViewMode("grid")}
-                        >
-                            <Grid3X3 className="h-4 w-4" />
-                        </Button>
-                    </div>
                 </motion.div>
 
                 {/* Playlists Grid */}

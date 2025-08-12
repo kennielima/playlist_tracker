@@ -8,11 +8,11 @@ import React from 'react'
 
 const HeaderComponent = ({ user }: { user: User }) => {
     return (
-        <div className='w-full h-24 shadow-md flex items-center justify-between px-6 bg-purple-950'>
+        <div className='sticky top-0 z-10 w-full h-24 shadow-md flex items-center justify-between px-6 bg-purple-950'>
             {/* logo */}
             <Link href='/'>
                 <div className='flex gap-1 items-center justify-between'>
-                    <div className='bg-green-400 p-3 w-fit rounded-lg'>
+                    <div className='bg-green-400 p-3 w-fit rounded-full'>
                         <Headphones className='w-6 h-6' />
                     </div>
                     <span className='font-semibold font-serif gap-0 text-sm'>Playlist <br /> Capsule</span>

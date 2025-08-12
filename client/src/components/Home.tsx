@@ -1,125 +1,364 @@
 "use client"
-import { Playlist } from '@/lib/types'
-import React from 'react'
-import { motion } from 'framer-motion'
-import { Music, Heart, Grid3X3, List, Play, MoreHorizontal } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from "@/components/ui/card"
 
-const Homepage = ({ playlistData }: { playlistData: Playlist[] }) => {
-    console.log('playlistData', playlistData);
+import { useState } from "react"
+import { motion } from "framer-motion"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Input } from "@/components/ui/input"
+
+import {
+    Music,
+    Play,
+    TrendingUp,
+    Users,
+    ExternalLink,
+    Star,
+    ChevronRight,
+    Headphones,
+    Radio,
+    Heart,
+} from "lucide-react"
+import { Playlist, User } from "@/lib/types"
+import Link from "next/link"
+import Image from "next/image"
+
+interface HomepageProps {
+    playlistData?: Playlist[]
+    user?: User
+}
+
+const Homepage = ({ playlistData, user }: HomepageProps) => {
+    const [hoveredPlaylist, setHoveredPlaylist] = useState<string | null>(null)
+
+    const playlists = playlistData
+
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: {
             opacity: 1,
             transition: {
-                staggerChildren: 0.1
-            }
-        }
+                staggerChildren: 0.1,
+            },
+        },
     }
-    const itemVariants = {
-        hidden: { opacity: 0, y: 20 },
-        visible: { opacity: 1, y: 0 }
-    }
-    return (
-        <div className="font-sans grid items-center justify-items-center p-8 pb-20 gap-16 sm:p-20">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* Stats Cards */}
-                <motion.div
-                    className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
-                    variants={containerVariants}
-                    initial="hidden"
-                    animate="visible"
-                >
-                    <motion.div variants={itemVariants}>
-                        <Card className="bg-white/5 backdrop-blur-md border border-white/10 shadow-xl">
-                            <CardContent className="p-4 text-center">
-                                <Music className="h-6 w-6 mx-auto mb-2 text-purple-400" />
-                                <div className="text-2xl font-bold text-white">
-                                    {playlistData.length}
-                                </div>
-                                <div className="text-sm text-slate-300">
-                                    Playlists
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </motion.div>
-                </motion.div>
 
-                {/* Playlists Grid */}
-                <motion.div
-                    className="grid gap-6 grid-cols-1 sm:grid-cols-2 "
-                    variants={containerVariants}
-                    initial="hidden"
-                    animate="visible"
-                >
-                    {playlistData.map((playlist: Playlist) => (
+    const itemVariants = {
+        hidden: { opacity: 0, y: 30 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: {
+                duration: 0.5,
+                // ease: "easeOut",
+            },
+        },
+    }
+
+    const heroVariants = {
+        hidden: { opacity: 0, y: 50 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: {
+                duration: 0.8,
+                // ease: "easeOut",
+            },
+        },
+    }
+
+    return (
+        <div className="">
+            {/* Hero Section */}
+            <motion.div className="relative overflow-hidden"
+                initial="hidden"
+                animate="visible"
+                variants={heroVariants}
+            >
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-purple-600/20" />
+                <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
+                    <div className="text-center">
                         <motion.div
-                            key={playlist.id}
-                            variants={itemVariants}
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ duration: 0.6, delay: 0.2 }}
+                            className="flex justify-center mb-6"
                         >
-                            <Card className="group cursor-pointer bg-white/5 backdrop-blur-md border border-white/10 shadow-xl hover:shadow-2xl hover:bg-white/10 transition-all duration-300">
-                                <CardContent className="p-0">
-                                    <div className="flex items-center p-4 space-x-4">
-                                        <div className="relative">
-                                            <img
-                                                src={playlist.image || "/placeholder.svg"}
-                                                alt={playlist.name}
-                                                className="w-16 h-16 rounded-lg object-cover"
-                                            />
-                                            {/* {playlist.isLiked && (
-                                                <Heart className="absolute -top-1 -right-1 h-4 w-4 text-red-500 fill-current" />
-                                            )} */}
+                            <div className="p-4 bg-white/10 backdrop-blur-md rounded-full">
+                                <Headphones className="h-12 w-12 text-purple-400" />
+                            </div>
+                        </motion.div>
+
+                        <motion.h1
+                            className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.3 }}
+                        >
+                            Discover the
+                            <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+                                {" "}
+                                Hottest{" "}
+                            </span>
+                            Charts
+                        </motion.h1>
+
+                        <motion.p
+                            className="text-xl md:text-2xl text-slate-300 mb-8 max-w-3xl mx-auto"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.4 }}
+                        >
+                            Track any Spotify playlist and rediscover the songs you loved, exactly as they were
+                        </motion.p>
+                        <div className="flex w-full max-w-md items-center gap-1 size-8 justify-center mx-auto">
+                            <Input type="search" placeholder="Search for playlist" className="h-12" />
+                            <Button type="submit" variant="outline" className="h-12 bg-purple-600 hover:bg-purple-500 text-white">
+                                Subscribe
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </motion.div>
+
+            {/* Stats Section */}
+            <motion.section
+                className="py-16 bg-black/20 backdrop-blur-sm"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+            >
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                        <div className="text-center">
+                            <div className="text-3xl md:text-4xl font-bold text-white mb-2">5+</div>
+                            <div className="text-slate-300">Popular Charts</div>
+                        </div>
+                        <div className="text-center">
+                            <div className="text-3xl md:text-4xl font-bold text-white mb-2">10+</div>
+                            <div className="text-slate-300">Playlists Tracked</div>
+                        </div>
+                        <div className="text-center">
+                            <div className="text-3xl md:text-4xl font-bold text-white mb-2">10+</div>
+                            <div className="text-slate-300">Active Users</div>
+                        </div>
+                        <div className="text-center">
+                            <div className="text-3xl md:text-4xl font-bold text-white mb-2">24/7</div>
+                            <div className="text-slate-300">Live Updates</div>
+                        </div>
+                    </div>
+                </div>
+            </motion.section>
+
+            {/* Popular Charts Section */}
+            <section className="py-20">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <motion.div
+                        className="text-center mb-16"
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6 }}
+                        viewport={{ once: true }}
+                    >
+                        <div className="flex items-center justify-center mb-4">
+                            <TrendingUp className="h-8 w-8 text-purple-400 mr-3" />
+                            <h2 className="text-3xl md:text-4xl font-bold text-white">Popular Charts</h2>
+                        </div>
+                        <p className="text-xl text-slate-300 max-w-2xl mx-auto">
+                            Explore the most trending playlists and their weekly snapshots.
+                        </p>
+                    </motion.div>
+
+                    {/* {isLoading ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {[...Array(6)].map((_, i) => (
+                                <Card key={i} className="bg-white/5 backdrop-blur-md border border-white/10">
+                                    <CardContent className="p-0">
+                                        <Skeleton className="w-full h-64 rounded-t-lg" />
+                                        <div className="p-6">
+                                            <Skeleton className="h-6 w-3/4 mb-2" />
+                                            <Skeleton className="h-4 w-full mb-4" />
+                                            <Skeleton className="h-4 w-1/2" />
                                         </div>
-                                        <div className="flex-1 min-w-0">
-                                            <h3 className="font-semibold text-white truncate">
-                                                {playlist.name}
-                                            </h3>
-                                            <p className="text-sm text-slate-300 truncate">
-                                                {playlist.description}
-                                            </p>
-                                            <div className="flex items-center space-x-4 mt-1 text-xs text-slate-400">
-                                                {/* <span>{playlist.trackCount} tracks</span> */}
-                                                {/* <span>{playlist.duration}</span> */}
-                                                {/* <Badge variant={playlist.isPublic ? "default" : "secondary"} className="text-xs">
-                                                        {playlist.isPublic ? "Public" : "Private"}
-                                                    </Badge> */}
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+                        ) : error ? (
+                            <div className="text-center py-12">
+                                <Radio className="h-12 w-12 mx-auto text-slate-400 mb-4" />
+                                <h3 className="text-lg font-semibold text-white mb-2">Unable to load charts</h3>
+                                <p className="text-slate-300 mb-4">Please try again later</p>
+                                <Button variant="outline">Retry</Button>
+                            </div>
+                    ) : ( */}
+                    <motion.div
+                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+                        variants={containerVariants}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                    >
+                        {playlists?.slice(0, 6).map((playlist) => (
+                            <motion.div
+                                key={playlist.id}
+                                variants={itemVariants}
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onHoverStart={() => setHoveredPlaylist(playlist.id)}
+                                onHoverEnd={() => setHoveredPlaylist(null)}
+                            >
+                                <Card className="group cursor-pointer bg-white/5 backdrop-blur-md border border-white/10 shadow-xl hover:shadow-2xl hover:bg-white/10 transition-all duration-300 overflow-hidden">
+                                    <CardContent className="p-0">
+                                        <div className="relative overflow-hidden">
+                                            <Image
+                                                height={300}
+                                                width={300}
+                                                src={playlist.image}
+                                                alt={playlist.name}
+                                                className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
+                                            />
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+                                                <motion.div
+                                                    initial={{ scale: 0, opacity: 0 }}
+                                                    animate={{
+                                                        scale: hoveredPlaylist === playlist.id ? 1 : 0,
+                                                        opacity: hoveredPlaylist === playlist.id ? 1 : 0,
+                                                    }}
+                                                    transition={{ duration: 0.2 }}
+                                                >
+                                                    <Button
+                                                        size="icon"
+                                                        className="bg-purple-600 hover:bg-purple-500 text-white shadow-lg h-14 w-14"
+                                                    >
+                                                        <Play className="h-6 w-6" />
+                                                    </Button>
+                                                </motion.div>
+                                            </div>
+                                            <div className="absolute top-4 right-4">
+                                                <Badge className="bg-black/50 text-white border-0">
+                                                    <Star className="h-3 w-3 mr-1" />
+                                                    Popular
+                                                </Badge>
                                             </div>
                                         </div>
-                                        <div className="flex items-center space-x-2">
-                                            {/* <span className="text-xs text-slate-400">
-                                                {playlist.lastUpdated}
-                                            </span> */}
-                                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                                                <Play className="h-4 w-4" />
-                                            </Button>
-                                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                                                <MoreHorizontal className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </motion.div>
-                    ))}
-                </motion.div>
 
-                {/* Empty State */}
-                {playlistData.length === 0 && (
-                    <motion.div
-                        className="text-center py-12"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                    >
-                        <Music className="h-12 w-12 mx-auto text-slate-400 mb-4" />
-                        <h3 className="text-lg font-semibold text-white mb-2">
-                            No playlists found
-                        </h3>
+                                        <div className="p-6">
+                                            <div className="flex items-start justify-between mb-3">
+                                                <h3 className="font-bold text-white text-lg group-hover:text-purple-300 transition-colors line-clamp-1">
+                                                    {playlist.name}
+                                                </h3>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation()
+                                                        window.open(playlist.url, "_blank")
+                                                    }}
+                                                >
+                                                    <ExternalLink className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+
+                                            <p
+                                                className="text-sm text-slate-300 mb-4 line-clamp-2"
+                                                dangerouslySetInnerHTML={{
+                                                    __html: playlist.description.replace(
+                                                        /<a/g,
+                                                        '<a class="text-purple-400 hover:text-purple-300"',
+                                                    ),
+                                                }}
+                                            />
+
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center space-x-4 text-xs text-slate-400">
+                                                    <span className="flex items-center">
+                                                        <Music className="h-3 w-3 mr-1" />
+                                                        Chart
+                                                    </span>
+                                                    {/* <span className="flex items-center">
+                                                            <TrendingUp className="h-3 w-3 mr-1" />
+                                                            Trending
+                                                        </span> */}
+                                                </div>
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-400">
+                                                    <Heart className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </motion.div>
+                        ))}
                     </motion.div>
-                )}
-            </div>
+
+                    {playlists && playlists.length > 6 && (
+                        <motion.div
+                            className="text-center mt-12"
+                            initial={{ opacity: 0 }}
+                            whileInView={{ opacity: 1 }}
+                            transition={{ duration: 0.6, delay: 0.3 }}
+                            viewport={{ once: true }}
+                        >
+                            <Button
+                                variant="outline"
+                                size="lg"
+                                className="border-white/20 text-white hover:bg-white/10 bg-transparent"
+                            >
+                                View All Charts
+                                <ChevronRight className="ml-2 h-5 w-5" />
+                            </Button>
+                        </motion.div>
+                    )}
+                </div>
+            </section>
+
+            {/* CTA Section */}
+            {!user && (
+                <motion.section
+                    className="py-20 bg-gradient-to-r from-purple-600/20 to-purple-600/20"
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    transition={{ duration: 0.8 }}
+                    viewport={{ once: true }}
+                >
+                    <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+                        <motion.h2
+                            className="text-3xl md:text-4xl font-bold text-white mb-6"
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6 }}
+                            viewport={{ once: true }}
+                        >
+                            Ready to Track Your Music?
+                        </motion.h2>
+                        <motion.p
+                            className="text-xl text-slate-300 mb-8"
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.1 }}
+                            viewport={{ once: true }}
+                        >
+                            Join thousands of music lovers tracking their favorite playlists and discovering new trends
+                        </motion.p>
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.2 }}
+                            viewport={{ once: true }}
+                        >
+                            <Button size="lg" className="bg-purple-600 hover:bg-purple-500 text-white px-8 py-3">
+                                <Music className="mr-2 h-5 w-5" />
+                                Start Tracking Now
+                            </Button>
+                        </motion.div>
+                    </div>
+                </motion.section>
+            )}
         </div>
     )
 }

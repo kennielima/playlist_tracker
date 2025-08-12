@@ -3,15 +3,17 @@ import React from 'react'
 
 const page = () => {
     return (
-        <div className='flex flex-col gap-12 my-20 items-center'>
-            <h3 className="text-3xl font-bold text-white">Welcome Back</h3>
-
-            <Card className="w-full max-w-sm bg-white/10 backdrop-blur-xl mt-20 shadow-2xl p-8">
+        <div className='flex flex-col gap-12 my-16 items-center'>
+            <div className="flex flex-col items-center gap-4 text-center w-2/4">
+                <h3 className="text-3xl font-bold text-white">Playlist Capsule</h3>
+                <h3 className="text-4xl font-semibold text-white">Your Spotify Journey Visualized</h3>
+                <h3 className="text-slate-300">Connect your Spotify account and track your favourite playlists, see the evolution of popular music charts.</h3>
+            </div>
+            <Card className="w-full max-w-sm bg-white/10 backdrop-blur-xl mt-2 shadow-2xl p-8">
                 <div className="text-center space-y-6">
                     <div className="space-y-2">
                         <p className="text-slate-300">Connect with Spotify to get started</p>
                     </div>
-
                     {/* Spotify Login Button */}
                     <a
                         href={`${process.env.API_URL}/api/auth/spotify/login`}
@@ -40,6 +42,7 @@ const page = () => {
                             <div className="absolute inset-0 rounded-full bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         </div>
                     </a>
+                    <div className="text-slate-300 text-sm mt-4 text-center">By continuing, you agree to let PlaylistTracker access your Spotify account data to provide personalized insights and recommendations.</div>
                 </div>
             </Card>
         </div>
