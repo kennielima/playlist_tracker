@@ -5,9 +5,6 @@ export const GET = async () => {
     const cookie = await cookies();
     const token = cookie.get('token')?.value;
 
-    if (!token) {
-        return NextResponse.json({ error: 'No token in chart data' }, { status: 401 });
-    }
 
     try {
         const response = await fetch(`${process.env.API_URL}/api/playlists/get-featured`, {
@@ -19,10 +16,11 @@ export const GET = async () => {
             credentials: 'include'
         });
         if (!response.ok) {
-            throw new Error('Failed to fetch chart data');
+            const data = await response.json();
+            console.error('Error fetching chart data:', data);
+            return NextResponse.json({ error: 'Error fetching chart data:' }, { status: 500 });
         }
         const data = await response.json();
-        // console.log(data);
 
         return NextResponse.json({ data })
     } catch (error) {
