@@ -22,7 +22,6 @@ export const GET = async () => {
             throw new Error('Failed to fetch user data');
         }
         const data = await response.json();
-        // console.log('USER', data)
 
         return NextResponse.json({ data });
     } catch (error) {

@@ -1,23 +1,23 @@
 "use server"
 import { cookies } from "next/headers";
 
-const fetchMyPlaylists = async () => {
+const searchSpotifyPlaylist = async (q: string) => {
     const cookie = await cookies();
     const cookieHeader = cookie.toString();
 
-    const fetchUserPlaylist = await fetch(`${process.env.BASE_URL}/api/getmyplaylists`, {
+    const searchSpotifyPlaylist = await fetch(`${process.env.BASE_URL}/api/search?q=${q}`, {
         method: "GET",
         headers: {
             cookie: cookieHeader
         }
     });
 
-    if (!fetchUserPlaylist.ok) {
+    if (!searchSpotifyPlaylist.ok) {
         return null;
     }
 
-    const { data } = await fetchUserPlaylist.json();
+    const { data } = await searchSpotifyPlaylist.json();
     return data;
 }
 
-export default fetchMyPlaylists;
+export default searchSpotifyPlaylist;

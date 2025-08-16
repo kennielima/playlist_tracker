@@ -1,0 +1,91 @@
+"use client"
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Playlist } from '@/lib/types'
+import { containerVariants, itemVariants } from '@/lib/utils'
+import { motion } from 'framer-motion'
+import { MoreHorizontal, Music, Play } from 'lucide-react'
+import Image from 'next/image'
+import React from 'react'
+
+const SearchComponent = ({ searchData }: { searchData: { data: any[] } }) => {
+    const playlists = searchData.data
+    console.log(playlists, playlists[0].images[0]?.url);
+    return (
+        <div className='m-12'>
+            {/* Playlists Grid */}
+            <motion.div
+                className={"grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"}
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+            >
+                {playlists.map((playlist: any) => (
+                    <motion.div
+                        key={playlist.id}
+                        variants={itemVariants}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                    >
+                        <Card className="group cursor-pointer bg-white/5 backdrop-blur-md border border-white/10 shadow-xl hover:shadow-2xl hover:bg-white/10 transition-all duration-300">
+                            <CardContent className="p-0">
+                                <div>
+                                    <div className="relative overflow-hidden rounded-t-lg">
+                                        <Image
+                                            height={300}
+                                            width={300}
+                                            src={playlist.images[0].url || "/placeholder.svg"}
+                                            alt={playlist.name}
+                                            className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                                        />
+                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+                                            <Button
+                                                size="icon"
+                                                className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-purple-600 hover:bg-purple-500 text-white shadow-lg"
+                                            >
+                                                <Play className="h-5 w-5" />
+                                            </Button>
+                                        </div>
+
+                                    </div>
+                                    <div className="p-4">
+                                        <div className="flex items-start justify-between mb-2">
+                                            <h3 className="font-semibold text-white truncate">
+                                                {playlist.name}
+                                            </h3>
+                                            <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <MoreHorizontal className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                        <p className="text-sm text-slate-300 mb-3 line-clamp-2">
+                                            {playlist.description}
+                                        </p>
+                                        <Button className='rounded-md bg-purple-600 cursor-pointer'>Track Playlist</Button>
+                                        <div className="flex items-center justify-between mt-2">
+                                        </div>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </motion.div>
+                ))}
+            </motion.div>
+
+            {/* Empty State */}
+            {playlists.length === 0 && (
+                <motion.div
+                    className="text-center py-12"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                >
+                    <Music className="h-12 w-12 mx-auto text-slate-400 mb-4" />
+                    <h3 className="text-lg font-semibold text-white mb-2">
+                        No playlists found
+                    </h3>
+                </motion.div>
+            )}
+        </div>
+    )
+}
+
+export default SearchComponent

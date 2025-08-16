@@ -13,9 +13,8 @@ async function getFeaturedPlaylists(req: TokenRequest, res: Response) {
         let playlists = [];
         for (let seed of featuredPlaylists) {
             const validated = await fetchPlaylistById(seed.id, accessToken);
-            const data = validated.data;
-            console.log("playlistslength:", data.name);
-            if (validated.valid) {
+            if (validated && validated.valid) {
+                const data = validated.data;
                 const exists = await prisma.playlist.findUnique({
                     where: {
                         playlistId: data.id,
@@ -36,14 +35,16 @@ async function getFeaturedPlaylists(req: TokenRequest, res: Response) {
                     playlists.push(featuredPlaylist);
                 }
                 playlists.push(exists);
+            } else {
+                console.error("Error fetching playlist:", validated);
             }
         }
 
         return res.status(200).json({ data: playlists });
 
     } catch (error) {
-        console.error("Error searching:", error);
-        return res.status(500).json({ error: "Internal server error while searching" });
+        console.error("Error fetching featured playlists:", error);
+        return res.status(500).json({ error: "Internal server error while fetching featured playlists" });
     }
 }
 

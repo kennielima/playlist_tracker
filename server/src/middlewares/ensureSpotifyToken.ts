@@ -13,7 +13,6 @@ const ensureSpotifyToken = async (req: TokenRequest, res: Response, next: NextFu
 
     try {
         const user = req.user;
-        // console.log("user is", user);
         let tokenExpiryDate;
         let accessToken;
         let refreshToken;
@@ -41,19 +40,16 @@ const ensureSpotifyToken = async (req: TokenRequest, res: Response, next: NextFu
                 refreshToken = spotifyrefreshToken;
                 tokenExpiryDate = now + tokenExpiry! * 1000;
             }
-            // console.log("usertokens", accessToken, refreshToken, tokenExpiryDate)
 
         } else {
             const token = await getSpotifyToken();
             accessToken = token.access_token;
             tokenExpiryDate = now + token.expires_in * 1000;
-            // console.log("spotify token", token)
         }
 
         req.access_token = accessToken;
         req.refresh_token = refreshToken || null;
         req.token_expiresIn = tokenExpiryDate;
-        // console.log("req tokens", tokenExpiryDate, accessToken, refreshToken);
 
         next();
 

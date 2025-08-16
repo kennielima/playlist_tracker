@@ -4,7 +4,6 @@ import prisma from "../lib/prisma";
 
 async function getMe(req: Request, res: Response) {
     const user = req.user;
-    // console.log("req.user", user)
     try {
         if (!user) {
             return res.status(404).json({ error: "User not found" });
@@ -20,7 +19,6 @@ async function fetchCurrentUserPlaylists(req: TokenRequest, res: Response) {
     const accessToken = req.access_token;
     const tokenExpiry = req.token_expiresIn;
     const user = req.user;
-    // console.log(accessToken, user, tokenExpiry)
 
     try {
         if (!accessToken) {

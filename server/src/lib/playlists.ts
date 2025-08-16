@@ -8,12 +8,10 @@ async function fetchPlaylistById(id: string, accessToken: string) {
 
     if (!responseData.ok) {
         const errorBody = await responseData.text();
-        console.log("Error fetching Spotify playlists:", errorBody);
         return { valid: false, error: errorBody };
     }
 
     const fetchedPlaylist = await responseData.json();
-    console.log("validated:", fetchedPlaylist);
 
     return { valid: true, data: fetchedPlaylist };
 }

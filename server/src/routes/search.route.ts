@@ -4,6 +4,6 @@ import { searchPlaylists } from "../controllers/search.controller";
 
 const router = express.Router();
 
-router.get("/search", ensureSpotifyToken, searchPlaylists);
+router.get("/", ensureSpotifyToken, searchPlaylists);
 
 export default router;

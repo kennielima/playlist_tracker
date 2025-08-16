@@ -57,7 +57,6 @@ async function callback(req: Request, res: Response) {
             }
         })
         const userData = await userResponse.json();
-        console.log(userData)
         const existingUser = await prisma.user.findUnique({
             where: {
                 spotifyId: userData.id,
@@ -85,7 +84,6 @@ async function callback(req: Request, res: Response) {
             process.env.JWT_SECRET!,
             { expiresIn: '1d' }
         )
-        // console.log('user', user, 'jwttoken', token, userData, tokenResponse);
         res.cookie("token", token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'PRODUCTION',

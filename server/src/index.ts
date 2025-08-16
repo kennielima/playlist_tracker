@@ -25,6 +25,7 @@ app.use("/api/playlists", playlistRoutes);
 app.use("/api/spotify", searchRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/search", searchRoutes);
 
 async function main() { console.log("Prisma Client initialized") }
 main()

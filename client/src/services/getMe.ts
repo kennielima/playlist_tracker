@@ -2,7 +2,8 @@
 import { cookies } from "next/headers";
 
 const fetchCurrentUser = async () => {
-    const cookieHeader = await cookies().toString();
+    const cookie = await cookies();
+    const cookieHeader = cookie.toString();
 
     const res = await fetch(`${process.env.BASE_URL}/api/getcurrentuser`, {
         method: "GET",

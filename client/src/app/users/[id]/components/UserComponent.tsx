@@ -3,9 +3,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from "@/components/ui/card"
 import { Playlist, User } from '@/lib/types'
-import { getInitials } from '@/lib/utils'
+import { containerVariants, getInitials, itemVariants } from '@/lib/utils'
 import { motion } from 'framer-motion'
 import { Music, Heart, Grid3X3, List, Play, MoreHorizontal } from 'lucide-react'
+import Image from 'next/image'
 import React, { useState } from 'react'
 
 type UserTypeProps = {
@@ -15,21 +16,6 @@ type UserTypeProps = {
 const UserComponent = ({ user, playlistData }: UserTypeProps) => {
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const playlists = playlistData.data
-    console.log('playlistD', playlistData);
-
-    const containerVariants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 0.1
-            }
-        }
-    }
-    const itemVariants = {
-        hidden: { opacity: 0, y: 20 },
-        visible: { opacity: 1, y: 0 }
-    }
 
     return (
         <div className="">
@@ -77,8 +63,6 @@ const UserComponent = ({ user, playlistData }: UserTypeProps) => {
                             </div>
                         </motion.div>
                     </div>
-
-
                 </div>
             </div>
 
@@ -157,7 +141,7 @@ const UserComponent = ({ user, playlistData }: UserTypeProps) => {
                     initial="hidden"
                     animate="visible"
                 >
-                    {playlists.map((playlist: any) => (
+                    {playlists.map((playlist: Playlist) => (
                         <motion.div
                             key={playlist.id}
                             variants={itemVariants}
@@ -169,7 +153,9 @@ const UserComponent = ({ user, playlistData }: UserTypeProps) => {
                                     {viewMode === "grid" ? (
                                         <div>
                                             <div className="relative overflow-hidden rounded-t-lg">
-                                                <img
+                                                <Image
+                                                    height={300}
+                                                    width={300}
                                                     src={playlist.image || "/placeholder.svg"}
                                                     alt={playlist.name}
                                                     className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
@@ -182,9 +168,9 @@ const UserComponent = ({ user, playlistData }: UserTypeProps) => {
                                                         <Play className="h-5 w-5" />
                                                     </Button>
                                                 </div>
-                                                {playlist.isLiked && (
+                                                {/* {playlist.isLiked && (
                                                     <Heart className="absolute top-3 right-3 h-5 w-5 text-red-500 fill-current" />
-                                                )}
+                                                )} */}
                                             </div>
                                             <div className="p-4">
                                                 <div className="flex items-start justify-between mb-2">
@@ -216,14 +202,16 @@ const UserComponent = ({ user, playlistData }: UserTypeProps) => {
                                     ) : (
                                         <div className="flex items-center p-4 space-x-4">
                                             <div className="relative">
-                                                <img
+                                                <Image
+                                                    height={300}
+                                                    width={300}
                                                     src={playlist.image || "/placeholder.svg"}
                                                     alt={playlist.name}
                                                     className="w-16 h-16 rounded-lg object-cover"
                                                 />
-                                                {playlist.isLiked && (
+                                                {/* {playlist.isLiked && (
                                                     <Heart className="absolute -top-1 -right-1 h-4 w-4 text-red-500 fill-current" />
-                                                )}
+                                                )} */}
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <h3 className="font-semibold text-white truncate">
@@ -232,18 +220,18 @@ const UserComponent = ({ user, playlistData }: UserTypeProps) => {
                                                 <p className="text-sm text-slate-300 truncate">
                                                     {playlist.description}
                                                 </p>
-                                                <div className="flex items-center space-x-4 mt-1 text-xs text-slate-400">
+                                                {/* <div className="flex items-center space-x-4 mt-1 text-xs text-slate-400">
                                                     <span>{playlist.trackCount} tracks</span>
                                                     <span>{playlist.duration}</span>
-                                                    {/* <Badge variant={playlist.isPublic ? "default" : "secondary"} className="text-xs">
+                                                    <Badge variant={playlist.isPublic ? "default" : "secondary"} className="text-xs">
                                                         {playlist.isPublic ? "Public" : "Private"}
-                                                    </Badge> */}
-                                                </div>
+                                                    </Badge>
+                                                </div> */}
                                             </div>
                                             <div className="flex items-center space-x-2">
-                                                <span className="text-xs text-slate-400">
+                                                {/* <span className="text-xs text-slate-400">
                                                     {playlist.lastUpdated}
-                                                </span>
+                                                </span> */}
                                                 <Button variant="ghost" size="icon" className="h-8 w-8">
                                                     <Play className="h-4 w-4" />
                                                 </Button>

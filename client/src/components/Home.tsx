@@ -23,6 +23,8 @@ import {
 import { Playlist, User } from "@/lib/types"
 import Link from "next/link"
 import Image from "next/image"
+import Search from "./Search"
+import { containerVariants, itemVariants } from "@/lib/utils"
 
 interface HomepageProps {
     playlistData?: Playlist[]
@@ -33,28 +35,6 @@ const Homepage = ({ playlistData, user }: HomepageProps) => {
     const [hoveredPlaylist, setHoveredPlaylist] = useState<string | null>(null)
 
     const playlists = playlistData
-
-    const containerVariants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 0.1,
-            },
-        },
-    }
-
-    const itemVariants = {
-        hidden: { opacity: 0, y: 30 },
-        visible: {
-            opacity: 1,
-            y: 0,
-            transition: {
-                duration: 0.5,
-                // ease: "easeOut",
-            },
-        },
-    }
 
     const heroVariants = {
         hidden: { opacity: 0, y: 50 },
@@ -112,12 +92,7 @@ const Homepage = ({ playlistData, user }: HomepageProps) => {
                         >
                             Track any Spotify playlist and rediscover the songs you loved, exactly as they were
                         </motion.p>
-                        <div className="flex w-full max-w-md items-center gap-1 size-8 justify-center mx-auto">
-                            <Input type="search" placeholder="Search for playlist" className="h-12" />
-                            <Button type="submit" variant="outline" className="h-12 bg-purple-600 hover:bg-purple-500 text-white">
-                                Subscribe
-                            </Button>
-                        </div>
+                        <Search />
                     </div>
                 </div>
             </motion.div>

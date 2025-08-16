@@ -11,7 +11,6 @@ const page = async ({ params }: { params: Params }) => {
     const { id } = await params;
     const user = id === 'me' && await fetchCurrentUser();
     const playlistData = await fetchMyPlaylists();
-    console.log('playlistData', playlistData);
 
     return (
         <UserComponent user={user} playlistData={playlistData} />

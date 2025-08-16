@@ -2,13 +2,12 @@ import express, { Request, Response } from "express";
 import { TokenRequest } from "../middlewares/ensureSpotifyToken";
 
 async function searchFn(q: string, accessToken: string) {
-    const responseData = await fetch(`${process.env.SPOTIFY_URL}/search?q=${encodeURIComponent(q)}&type=playlist&market=US&limit=50`, {
+    const responseData = await fetch(`${process.env.SPOTIFY_URL}/search?q=${encodeURIComponent(q)}&type=playlist&limit=50`, {
         method: 'GET',
         headers: { 'Authorization': 'Bearer ' + accessToken },
     });
     if (!responseData.ok) {
         const errorBody = await responseData.text();
-        console.log("Error searching Spotify playlists:", errorBody);
     }
     const fetchedPlaylists = await responseData.json();
     return fetchedPlaylists;
@@ -28,7 +27,6 @@ async function searchPlaylists(req: TokenRequest, res: Response) {
         for (let playlist of fetchedPlaylists.playlists.items) {
             if (playlist) {
                 playlists.push(playlist);
-                console.log('SEARCHownerid', playlist.owner.id, playlist.name);
             }
         }
         console.log("Playlists length:", playlists.length);

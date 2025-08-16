@@ -2,7 +2,8 @@
 import { cookies } from "next/headers";
 
 const fetchSpotifyPlaylist = async () => {
-    const cookieHeader = await cookies().toString();
+    const cookie = await cookies();
+    const cookieHeader = cookie.toString();
 
     const fetchSpotifyPlaylist = await fetch(`${process.env.BASE_URL}/api/getspotifyplaylists`, {
         method: "GET",
@@ -16,7 +17,6 @@ const fetchSpotifyPlaylist = async () => {
     }
 
     const { data } = await fetchSpotifyPlaylist.json();
-    // console.log('fetch', data, fetchSpotifyPlaylist)
     return data;
 }
 

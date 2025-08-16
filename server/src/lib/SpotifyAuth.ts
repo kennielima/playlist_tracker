@@ -17,7 +17,6 @@ async function getSpotifyToken() {
     });
 
     const token = await response.json();
-    // console.log("tokenauth", token)
     return token;
 }
 
@@ -39,7 +38,6 @@ async function getRefreshToken(refreshToken: string) {
     });
 
     const token = await response.json();
-    // console.log('rtoken', token)
     return token;
 }
 
