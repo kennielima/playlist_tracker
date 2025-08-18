@@ -5,6 +5,7 @@ import { Headphones } from 'lucide-react'
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react'
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 
 const HeaderComponent = ({ user }: { user: User }) => {
     return (
@@ -20,13 +21,10 @@ const HeaderComponent = ({ user }: { user: User }) => {
             </Link>
             {user &&
                 <Link href='/users/me'>
-                    <div className='w-10 h-10 rounded-full bg-purple-600 flex justify-center items-center'>
-                        {user.userImage ? (
-                            <Image src={user?.userImage} alt='userimg' height={40} width={40} />
-                        ) : (
-                            <p>{getInitials(user?.name)}</p>
-                        )}
-                    </div>
+                    <Avatar className="h-12 w-12 bg-purple-500">
+                        <AvatarImage src={user.userImage} alt={user.name} />
+                        <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                    </Avatar>
                 </Link>
             }
             {!user && (

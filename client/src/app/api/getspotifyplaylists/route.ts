@@ -5,7 +5,6 @@ export const GET = async () => {
     const cookie = await cookies();
     const token = cookie.get('token')?.value;
 
-
     try {
         const response = await fetch(`${process.env.API_URL}/api/playlists/get-featured`, {
             method: 'GET',
@@ -17,14 +16,14 @@ export const GET = async () => {
         });
         if (!response.ok) {
             const data = await response.json();
-            console.error('Error fetching chart data:', data);
-            return NextResponse.json({ error: 'Error fetching chart data:' }, { status: 500 });
+            console.error('Error fetching featured playlists:', data);
+            return NextResponse.json({ error: 'Error fetching featured playlists:' }, { status: 500 });
         }
         const data = await response.json();
 
         return NextResponse.json({ data })
     } catch (error) {
-        console.error('Error fetching chart data:', error);
-        return NextResponse.json({ error: 'Error fetching chart data:' }, { status: 401 });
+        console.error('Error fetching featured playlists:', error);
+        return NextResponse.json({ error: 'Error fetching featured playlists:' }, { status: 401 });
     }
 }

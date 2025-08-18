@@ -7,6 +7,7 @@ import { containerVariants, getInitials, itemVariants } from '@/lib/utils'
 import { motion } from 'framer-motion'
 import { Music, Heart, Grid3X3, List, Play, MoreHorizontal } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 import React, { useState } from 'react'
 
 type UserTypeProps = {
@@ -143,105 +144,97 @@ const UserComponent = ({ user, playlistData }: UserTypeProps) => {
                 >
                     {playlists.map((playlist: Playlist) => (
                         <motion.div
-                            key={playlist.id}
+                            key={playlist.playlistId}
                             variants={itemVariants}
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                         >
-                            <Card className="group cursor-pointer bg-white/5 backdrop-blur-md border border-white/10 shadow-xl hover:shadow-2xl hover:bg-white/10 transition-all duration-300">
-                                <CardContent className="p-0">
-                                    {viewMode === "grid" ? (
-                                        <div>
-                                            <div className="relative overflow-hidden rounded-t-lg">
-                                                <Image
-                                                    height={300}
-                                                    width={300}
-                                                    src={playlist.image || "/placeholder.svg"}
-                                                    alt={playlist.name}
-                                                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                                                />
-                                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
-                                                    <Button
-                                                        size="icon"
-                                                        className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-purple-600 hover:bg-purple-500 text-white shadow-lg"
-                                                    >
-                                                        <Play className="h-5 w-5" />
-                                                    </Button>
+                            <Link href={`/playlists/${playlist.playlistId}`}>
+                                <Card className="group cursor-pointer bg-white/5 backdrop-blur-md border border-white/10 shadow-xl hover:shadow-2xl hover:bg-white/10 transition-all duration-300">
+                                    <CardContent className="p-0">
+                                        {viewMode === "grid" ? (
+                                            <div>
+                                                <div className="relative overflow-hidden rounded-t-lg">
+                                                    <Image
+                                                        height={300}
+                                                        width={300}
+                                                        src={playlist.image || "/placeholder.svg"}
+                                                        alt={playlist.name}
+                                                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                                                    />
+                                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+                                                        <Button
+                                                            size="icon"
+                                                            className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-purple-600 hover:bg-purple-500 text-white shadow-lg"
+                                                        >
+                                                            <Play className="h-5 w-5" />
+                                                        </Button>
+                                                    </div>
                                                 </div>
-                                                {/* {playlist.isLiked && (
-                                                    <Heart className="absolute top-3 right-3 h-5 w-5 text-red-500 fill-current" />
-                                                )} */}
-                                            </div>
-                                            <div className="p-4">
-                                                <div className="flex items-start justify-between mb-2">
-                                                    <h3 className="font-semibold text-white truncate">
-                                                        {playlist.name}
-                                                    </h3>
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                    </Button>
-                                                </div>
-                                                <p className="text-sm text-slate-300 mb-3 line-clamp-2">
-                                                    {playlist.description}
-                                                </p>
-                                                {/* <div className="flex items-center justify-between text-xs text-slate-400">
+                                                <div className="p-4">
+                                                    <div className="flex items-start justify-between mb-2">
+                                                        <h3 className="font-semibold text-white truncate">
+                                                            {playlist.name}
+                                                        </h3>
+                                                        <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            <MoreHorizontal className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                    <p className="text-sm text-slate-300 mb-3 line-clamp-2">
+                                                        {playlist.description}
+                                                    </p>
+                                                    {/* <div className="flex items-center justify-between text-xs text-slate-400">
                                                     <span>{playlist.trackCount} tracks</span>
                                                     <span>{playlist.duration}</span>
                                                 </div> */}
-                                                <div className="flex items-center justify-between mt-2">
-                                                    {/* <Badge variant={playlist.isPublic ? "default" : "secondary"} className="text-xs">
-                                                        {playlist.isPublic ? "Public" : "Private"}
-                                                    </Badge> */}
-                                                    {/* <span className="text-xs text-slate-400">
-                                                        {playlist.lastUpdated}
-                                                    </span> */}
                                                 </div>
                                             </div>
-                                        </div>
-                                    ) : (
-                                        <div className="flex items-center p-4 space-x-4">
-                                            <div className="relative">
-                                                <Image
-                                                    height={300}
-                                                    width={300}
-                                                    src={playlist.image || "/placeholder.svg"}
-                                                    alt={playlist.name}
-                                                    className="w-16 h-16 rounded-lg object-cover"
-                                                />
-                                                {/* {playlist.isLiked && (
+                                        ) : (
+                                            <div className="flex items-center p-4 space-x-4">
+                                                <div className="relative">
+                                                    <Image
+                                                        height={300}
+                                                        width={300}
+                                                        src={playlist.image || "/placeholder.svg"}
+                                                        alt={playlist.name}
+                                                        className="w-16 h-16 rounded-lg object-cover"
+                                                    />
+                                                    {/* {playlist.isLiked && (
                                                     <Heart className="absolute -top-1 -right-1 h-4 w-4 text-red-500 fill-current" />
                                                 )} */}
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <h3 className="font-semibold text-white truncate">
-                                                    {playlist.name}
-                                                </h3>
-                                                <p className="text-sm text-slate-300 truncate">
-                                                    {playlist.description}
-                                                </p>
-                                                {/* <div className="flex items-center space-x-4 mt-1 text-xs text-slate-400">
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <h3 className="font-semibold text-white truncate">
+                                                        {playlist.name}
+                                                    </h3>
+                                                    <p className="text-sm text-slate-300 truncate">
+                                                        {playlist.description}
+                                                    </p>
+                                                    {/* <div className="flex items-center space-x-4 mt-1 text-xs text-slate-400">
                                                     <span>{playlist.trackCount} tracks</span>
                                                     <span>{playlist.duration}</span>
                                                     <Badge variant={playlist.isPublic ? "default" : "secondary"} className="text-xs">
                                                         {playlist.isPublic ? "Public" : "Private"}
                                                     </Badge>
                                                 </div> */}
-                                            </div>
-                                            <div className="flex items-center space-x-2">
-                                                {/* <span className="text-xs text-slate-400">
+                                                </div>
+                                                <div className="flex items-center space-x-2">
+                                                    {/* <span className="text-xs text-slate-400">
                                                     {playlist.lastUpdated}
                                                 </span> */}
-                                                <Button variant="ghost" size="icon" className="h-8 w-8">
-                                                    <Play className="h-4 w-4" />
-                                                </Button>
-                                                <Button variant="ghost" size="icon" className="h-8 w-8">
-                                                    <MoreHorizontal className="h-4 w-4" />
-                                                </Button>
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                        <Play className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                        <MoreHorizontal className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
                                             </div>
-                                        </div>
-                                    )}
-                                </CardContent>
-                            </Card>
+                                        )}
+                                    </CardContent>
+                                </Card>
+                            </Link>
+
                         </motion.div>
                     ))}
                 </motion.div>

@@ -9,11 +9,17 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 
-const SearchComponent = ({ searchData }: { searchData: { data: Playlist[] } }) => {
+type SearchTypeProps = {
+    searchData: { data: Playlist[] },
+    query: string
+}
+
+const SearchComponent = ({ searchData, query }: SearchTypeProps) => {
     const playlists = searchData.data;
 
     return (
         <div className='m-12'>
+            <h2 className='my-8 text-lg'>Showing <b>{playlists.length}</b> results for &apos;<u>{query}</u>&apos;</h2>
             {/* Playlists Grid */}
             <motion.div
                 className={"grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"}
@@ -28,9 +34,9 @@ const SearchComponent = ({ searchData }: { searchData: { data: Playlist[] } }) =
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                     >
-                        <Card className="group cursor-pointer bg-white/5 backdrop-blur-md border border-white/10 shadow-xl hover:shadow-2xl hover:bg-white/10 transition-all duration-300">
-                            <CardContent className="p-0">
-                                <div>
+                        <Link href={`/playlists/${playlist.id}`}>
+                            <Card className="group cursor-pointer bg-white/5 backdrop-blur-md border border-white/10 shadow-xl hover:shadow-2xl hover:bg-white/10 transition-all duration-300">
+                                <CardContent className="p-0">
                                     <div className="relative overflow-hidden rounded-t-lg">
                                         <Image
                                             height={300}
@@ -64,9 +70,9 @@ const SearchComponent = ({ searchData }: { searchData: { data: Playlist[] } }) =
                                         <div className="flex items-center justify-between mt-2">
                                         </div>
                                     </div>
-                                </div>
-                            </CardContent>
-                        </Card>
+                                </CardContent>
+                            </Card>
+                        </Link>
                     </motion.div>
                 ))}
             </motion.div>

@@ -42,7 +42,8 @@ const page = () => {
                             <div className="absolute inset-0 rounded-full bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         </div>
                     </a>
-                    <div className="text-slate-300 text-sm mt-4 text-center">By continuing, you agree to let PlaylistTracker access your Spotify account data to provide personalized insights and recommendations.</div>
+                    <hr className="my-4 text-slate-300" />
+                    <div className="text-slate-300 text-xs text-center">By continuing, you agree to let PlaylistTracker access your Spotify account data to provide personalized insights and recommendations.</div>
                 </div>
             </Card>
         </div>

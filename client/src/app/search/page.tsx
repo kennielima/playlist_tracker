@@ -10,7 +10,7 @@ const page = async ({ searchParams }: { searchParams: { q: string } }) => {
     }
 
     return (
-        <SearchComponent searchData={searchData} />
+        <SearchComponent searchData={searchData} query={query.q} />
     )
 }
 

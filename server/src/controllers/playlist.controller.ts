@@ -48,4 +48,38 @@ async function getFeaturedPlaylists(req: TokenRequest, res: Response) {
     }
 }
 
-export { getFeaturedPlaylists }
+async function getPlaylist(req: TokenRequest, res: Response) {
+    const accessToken = req.access_token;
+    const id = req.params.id;
+    console.log('Fetching playlist with ID:', id);
+    try {
+        if (!accessToken) {
+            return res.status(401).json({ error: "Spotify access token is not available" });
+        }
+        let playlist;
+        const fetchFromDb = await prisma.playlist.findUnique({
+            where: {
+                playlistId: id,
+            }
+        })
+        if (!fetchFromDb) {
+            const fetchFromSpotify = await fetchPlaylistById(id, accessToken);
+            console.log('Fetched from Spotify:', fetchFromSpotify);
+
+            if (fetchFromSpotify && fetchFromSpotify.valid) {
+                playlist = fetchFromSpotify.data;
+
+            } else {
+                return res.status(500).json({ error: "Error fetching playlist from Spotify" });
+            }
+        } else {
+            playlist = fetchFromDb;
+        };
+        return res.status(200).json({ data: playlist });
+    } catch (error) {
+        console.error("Error fetching playlist:", error);
+        return res.status(500).json({ error: "Internal server error while fetching playlist:" + error });
+    }
+}
+
+export { getFeaturedPlaylists, getPlaylist }

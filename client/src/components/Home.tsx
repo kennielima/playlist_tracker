@@ -175,97 +175,76 @@ const Homepage = ({ playlistData, user }: HomepageProps) => {
                         whileInView="visible"
                         viewport={{ once: true }}
                     >
-                        {playlists?.slice(0, 6).map((playlist) => (
+                        {playlists?.map((playlist) => (
                             <motion.div
-                                key={playlist.id}
+                                key={playlist.playlistId}
                                 variants={itemVariants}
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
-                                onHoverStart={() => setHoveredPlaylist(playlist.id)}
+                                onHoverStart={() => setHoveredPlaylist(playlist.playlistId)}
                                 onHoverEnd={() => setHoveredPlaylist(null)}
                             >
-                                <Card className="group cursor-pointer bg-white/5 backdrop-blur-md border border-white/10 shadow-xl hover:shadow-2xl hover:bg-white/10 transition-all duration-300 overflow-hidden">
-                                    <CardContent className="p-0">
-                                        <div className="relative overflow-hidden">
-                                            <Image
-                                                height={300}
-                                                width={300}
-                                                src={playlist.image}
-                                                alt={playlist.name}
-                                                className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
-                                            />
-                                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
-                                                <motion.div
-                                                    initial={{ scale: 0, opacity: 0 }}
-                                                    animate={{
-                                                        scale: hoveredPlaylist === playlist.id ? 1 : 0,
-                                                        opacity: hoveredPlaylist === playlist.id ? 1 : 0,
-                                                    }}
-                                                    transition={{ duration: 0.2 }}
-                                                >
-                                                    <Button
-                                                        size="icon"
-                                                        className="bg-purple-600 hover:bg-purple-500 text-white shadow-lg h-14 w-14"
+                                <Link href={`/playlists/${playlist.playlistId}`}>
+                                    <Card className="group cursor-pointer bg-white/5 backdrop-blur-md border border-white/10 shadow-xl hover:shadow-2xl hover:bg-white/10 transition-all duration-300 overflow-hidden">
+                                        <CardContent className="p-0">
+                                            <div className="relative overflow-hidden">
+                                                <Image
+                                                    height={300}
+                                                    width={300}
+                                                    src={playlist.image}
+                                                    alt={playlist.name}
+                                                    className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
+                                                />
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+                                                    <motion.div
+                                                        initial={{ scale: 0, opacity: 0 }}
+                                                        animate={{
+                                                            scale: hoveredPlaylist === playlist.playlistId ? 1 : 0,
+                                                            opacity: hoveredPlaylist === playlist.playlistId ? 1 : 0,
+                                                        }}
+                                                        transition={{ duration: 0.2 }}
                                                     >
-                                                        <Play className="h-6 w-6" />
-                                                    </Button>
-                                                </motion.div>
-                                            </div>
-                                            <div className="absolute top-4 right-4">
-                                                <Badge className="bg-black/50 text-white border-0">
-                                                    <Star className="h-3 w-3 mr-1" />
-                                                    Popular
-                                                </Badge>
-                                            </div>
-                                        </div>
-
-                                        <div className="p-6">
-                                            <div className="flex items-start justify-between mb-3">
-                                                <h3 className="font-bold text-white text-lg group-hover:text-purple-300 transition-colors line-clamp-1">
-                                                    {playlist.name}
-                                                </h3>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation()
-                                                        window.open(playlist.url, "_blank")
-                                                    }}
-                                                >
-                                                    <ExternalLink className="h-4 w-4" />
-                                                </Button>
-                                            </div>
-
-                                            <p
-                                                className="text-sm text-slate-300 mb-4 line-clamp-2"
-                                                dangerouslySetInnerHTML={{
-                                                    __html: playlist.description.replace(
-                                                        /<a/g,
-                                                        '<a class="text-purple-400 hover:text-purple-300"',
-                                                    ),
-                                                }}
-                                            />
-
-                                            <div className="flex items-center justify-between">
-                                                <div className="flex items-center space-x-4 text-xs text-slate-400">
-                                                    <span className="flex items-center">
-                                                        <Music className="h-3 w-3 mr-1" />
-                                                        Chart
-                                                    </span>
-                                                    {/* <span className="flex items-center">
-                                                            <TrendingUp className="h-3 w-3 mr-1" />
-                                                            Trending
-                                                        </span> */}
+                                                        <Button
+                                                            size="icon"
+                                                            className="bg-purple-600 hover:bg-purple-500 text-white shadow-lg h-14 w-14"
+                                                        >
+                                                            <Play className="h-6 w-6" />
+                                                        </Button>
+                                                    </motion.div>
                                                 </div>
-                                                {/* <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-400">
-                                                    <Heart className="h-4 w-4" />
-                                                </Button> */}
+                                                <div className="absolute top-4 right-4">
+                                                    <Badge className="bg-black/50 text-white border-0">
+                                                        <Star className="h-3 w-3 mr-1" />
+                                                        Popular
+                                                    </Badge>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
+
+                                            <div className="p-6">
+                                                <div className="flex items-start justify-between mb-3">
+                                                    <h3 className="font-bold text-white text-lg group-hover:text-purple-300 transition-colors line-clamp-1">
+                                                        {playlist.name}
+                                                    </h3>
+                                                </div>
+                                                <p
+                                                    className="text-sm text-slate-300 mb-4 line-clamp-2"
+                                                    dangerouslySetInnerHTML={{
+                                                        __html: playlist?.description.replace(/<a[^>]*>(.*?)<\/a>/g, '$1')
+                                                    }}
+                                                />
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center space-x-4 text-xs text-slate-400">
+                                                        <span className="flex items-center">
+                                                            <Music className="h-3 w-3 mr-1" />
+                                                            Chart
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </Link>
                             </motion.div>
                         ))}
                     </motion.div>
