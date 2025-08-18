@@ -6,7 +6,6 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Input } from "@/components/ui/input"
 
 import {
     Music,
@@ -260,9 +259,9 @@ const Homepage = ({ playlistData, user }: HomepageProps) => {
                                                             Trending
                                                         </span> */}
                                                 </div>
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-400">
+                                                {/* <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-400">
                                                     <Heart className="h-4 w-4" />
-                                                </Button>
+                                                </Button> */}
                                             </div>
                                         </div>
                                     </CardContent>

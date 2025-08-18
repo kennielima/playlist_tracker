@@ -20,6 +20,7 @@ export type Playlist = {
     description: string
     userId: string
     image: string
+    images?: { url: string }[]
     url: string
     playlistId: string
     snapshotId: string

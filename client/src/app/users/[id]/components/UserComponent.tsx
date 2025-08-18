@@ -188,7 +188,6 @@ const UserComponent = ({ user, playlistData }: UserTypeProps) => {
                                                     <span>{playlist.trackCount} tracks</span>
                                                     <span>{playlist.duration}</span>
                                                 </div> */}
-                                                <Button className='rounded-md bg-purple-600 cursor-pointer'>Track Playlist</Button>
                                                 <div className="flex items-center justify-between mt-2">
                                                     {/* <Badge variant={playlist.isPublic ? "default" : "secondary"} className="text-xs">
                                                         {playlist.isPublic ? "Public" : "Private"}

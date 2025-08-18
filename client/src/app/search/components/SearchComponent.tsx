@@ -6,11 +6,12 @@ import { containerVariants, itemVariants } from '@/lib/utils'
 import { motion } from 'framer-motion'
 import { MoreHorizontal, Music, Play } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 import React from 'react'
 
-const SearchComponent = ({ searchData }: { searchData: { data: any[] } }) => {
-    const playlists = searchData.data
-    console.log(playlists, playlists[0].images[0]?.url);
+const SearchComponent = ({ searchData }: { searchData: { data: Playlist[] } }) => {
+    const playlists = searchData.data;
+
     return (
         <div className='m-12'>
             {/* Playlists Grid */}
@@ -20,7 +21,7 @@ const SearchComponent = ({ searchData }: { searchData: { data: any[] } }) => {
                 initial="hidden"
                 animate="visible"
             >
-                {playlists.map((playlist: any) => (
+                {playlists.map((playlist: Playlist) => (
                     <motion.div
                         key={playlist.id}
                         variants={itemVariants}
@@ -34,7 +35,7 @@ const SearchComponent = ({ searchData }: { searchData: { data: any[] } }) => {
                                         <Image
                                             height={300}
                                             width={300}
-                                            src={playlist.images[0].url || "/placeholder.svg"}
+                                            src={playlist.images?.[0].url || "/placeholder.svg"}
                                             alt={playlist.name}
                                             className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                                         />
@@ -60,7 +61,6 @@ const SearchComponent = ({ searchData }: { searchData: { data: any[] } }) => {
                                         <p className="text-sm text-slate-300 mb-3 line-clamp-2">
                                             {playlist.description}
                                         </p>
-                                        <Button className='rounded-md bg-purple-600 cursor-pointer'>Track Playlist</Button>
                                         <div className="flex items-center justify-between mt-2">
                                         </div>
                                     </div>

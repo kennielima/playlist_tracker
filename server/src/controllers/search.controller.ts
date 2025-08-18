@@ -8,6 +8,7 @@ async function searchFn(q: string, accessToken: string) {
     });
     if (!responseData.ok) {
         const errorBody = await responseData.text();
+        return { error: errorBody };
     }
     const fetchedPlaylists = await responseData.json();
     return fetchedPlaylists;
@@ -22,6 +23,10 @@ async function searchPlaylists(req: TokenRequest, res: Response) {
             return res.status(401).json({ error: "Spotify access token is not available" });
         }
         const fetchedPlaylists = await searchFn(query, accessToken);
+
+        if (fetchedPlaylists.error) {
+            return res.status(500).json({ error: "Error searching playlists from Spotify", details: fetchedPlaylists.error });
+        }
         let playlists: any[] = [];
 
         for (let playlist of fetchedPlaylists.playlists.items) {
