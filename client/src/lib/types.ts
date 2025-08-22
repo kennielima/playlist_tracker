@@ -25,3 +25,13 @@ export type Playlist = {
     playlistId: string
     snapshotId: string
 }
+
+export type Track = {
+    artist: string[];
+    imageUrl: string;
+    playlist: string;
+    playlistId: string;
+    rank: number
+    title: string
+    trackId: string;
+}
