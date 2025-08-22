@@ -1,6 +1,7 @@
 "use client"
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Card } from '@/components/ui/card'
+import { Progress } from '@/components/ui/progress'
 import { User } from '@/lib/types'
 import { getInitials } from '@/lib/utils'
 import { ArrowRight, CheckCircle, CircleX, Music } from 'lucide-react'
@@ -10,14 +11,15 @@ import React, { useEffect, useState } from 'react'
 
 const CallbackPage = ({ user }: { user: User }) => {
     const router = useRouter();
-    const [progress, setProgress] = useState(13)
+    const [progress, setProgress] = useState(10)
+
 
     useEffect(() => {
-        const progressInterval = setInterval(() => {
+        const timer = setInterval(() => {
             setProgress(prev => {
-                if (prev >= 90) {
-                    clearInterval(progressInterval);
-                    return 90;
+                if (prev >= 100) {
+                    clearInterval(timer);
+                    return 100;
                 }
                 return prev + 10;
             });
@@ -27,15 +29,16 @@ const CallbackPage = ({ user }: { user: User }) => {
     if (!user) {
         setTimeout(() => {
             router.push('/login')
-        }, 1000);
+        }, 500);
     } else {
         setTimeout(() => {
             router.push('/')
-        }, 1000);
+        }, 500);
     }
 
     return (
         <div className='m-12 backdrop-blur-xl'>
+
             <Card className='m-auto w-1/3 p-8 backdrop-blur-xl bg-white/10 min-w-xs'>
                 <div className='flex flex-col justify-center w-full gap-4'>
                     <div className='flex flex-col gap-5 justify-center items-center'>
@@ -43,12 +46,7 @@ const CallbackPage = ({ user }: { user: User }) => {
                             <Music className='size-10' />
                         </div>
                         <h2 className='text-2xl font-semibold'>PlaylistTracker</h2>
-                        <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
-                            <div
-                                className={`h-full transition-all duration-500 ease-out bg-blue-500`}
-                                style={{ width: `${progress}%` }}
-                            ></div>
-                        </div>
+                        <Progress value={progress} className={`${progress}`} />
                     </div>
                     {user ? (
                         <div className='flex flex-col gap-6 justify-center items-center'>

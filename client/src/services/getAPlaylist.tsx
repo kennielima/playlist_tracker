@@ -17,7 +17,7 @@ const fetchAPlaylist = async (id: string) => {
     }
 
     const { data } = await fetchAPlaylist.json();
-    return data;
+    return { data };
 }
 
 export default fetchAPlaylist;

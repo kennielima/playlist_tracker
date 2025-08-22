@@ -51,7 +51,7 @@ async function getFeaturedPlaylists(req: TokenRequest, res: Response) {
 async function getPlaylist(req: TokenRequest, res: Response) {
     const accessToken = req.access_token;
     const id = req.params.id;
-    console.log('Fetching playlist with ID:', id);
+
     try {
         if (!accessToken) {
             return res.status(401).json({ error: "Spotify access token is not available" });
@@ -64,7 +64,7 @@ async function getPlaylist(req: TokenRequest, res: Response) {
         })
         if (!fetchFromDb) {
             const fetchFromSpotify = await fetchPlaylistById(id, accessToken);
-            console.log('Fetched from Spotify:', fetchFromSpotify);
+            // console.log('Fetched from Spotify:', fetchFromSpotify);
 
             if (fetchFromSpotify && fetchFromSpotify.valid) {
                 playlist = fetchFromSpotify.data;
@@ -75,7 +75,45 @@ async function getPlaylist(req: TokenRequest, res: Response) {
         } else {
             playlist = fetchFromDb;
         };
-        return res.status(200).json({ data: playlist });
+
+
+
+        const fetchTracks = await fetch(`${process.env.SPOTIFY_URL}/playlists/${id}/tracks?offset=0&limit=100&locale=*`, {
+            method: 'GET',
+            headers: { 'Authorization': 'Bearer ' + accessToken },
+        });
+        if (!fetchTracks.ok) {
+            const errorBody = await fetchTracks.text();
+            return { error: errorBody };
+        }
+
+        const tracks = await fetchTracks.json();
+
+        let trackdata: any = [];
+        for (let i = 0; i <= tracks.items.length; i++) {
+            const item = tracks.items[i];
+            const track = item?.track;
+            if (!track) continue;
+            const artists = track?.artists;
+
+            let artistArr: any = [];
+
+            for (let artist of artists) {
+                if (!track.artists) continue;
+                artistArr.push(artist.name)
+            }
+
+            trackdata.push({
+                imageUrl: track.album.images[0].url,
+                trackId: track.id,
+                title: track.name,
+                artist: artists,
+                playlistId: id,
+                playlist: playlist.name,
+                rank: i + 1
+            })
+        }
+        return res.status(200).json({ data: playlist, tracks: trackdata });
     } catch (error) {
         console.error("Error fetching playlist:", error);
         return res.status(500).json({ error: "Internal server error while fetching playlist:" + error });

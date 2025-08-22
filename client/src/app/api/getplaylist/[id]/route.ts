@@ -4,11 +4,11 @@ import { NextResponse } from "next/server";
 export const GET = async (req: Request, { params }: { params: { id: string } }) => {
     const cookie = await cookies();
     const token = cookie.get('token')?.value;
+    const t = cookie.get("token")
     const { id } = await params;
-
-    if (!token) {
-        return NextResponse.json({ error: 'No token found in cookies' }, { status: 401 });
-    }
+    // if (!token) {
+    //     return NextResponse.json({ error: 'No token found in cookies' }, { status: 401 });
+    // }
 
     try {
         const response = await fetch(`${process.env.API_URL}/api/playlists/${id}`, {
@@ -21,7 +21,7 @@ export const GET = async (req: Request, { params }: { params: { id: string } }) 
         });
 
         if (!response.ok) {
-            throw new Error('Failed to fetch playlist');
+            throw new Error('Failed to fetch playlist on route');
         }
         const data = await response.json();
 
