@@ -5,7 +5,7 @@ export const featuredPlaylists = [
     },
     {
         name: "Apple Top 100 Nigeria",
-        id: "46iQn1DHoYNlHwBIOnfAxi"
+        id: "2tAv9JR7er6YCkBkDWgrAd"
     },
     {
         name: "Apple Top 100 UK",

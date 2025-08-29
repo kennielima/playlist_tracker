@@ -22,7 +22,7 @@ const page = () => {
                         <div
                             className="group relative w-full bg-green-500 hover:bg-green-400 disabled:bg-green-600 text-white font-semibold py-4 px-6 rounded-full transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-green-500/25 disabled:cursor-not-allowed"
                         >
-                            <div className="flex items-center justify-center gap-3">
+                            <div className="flex items-center justify-center z-100 gap-3">
                                 {/* {isLoading ? (
                                     <>
                                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>

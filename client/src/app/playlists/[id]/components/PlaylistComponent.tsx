@@ -44,13 +44,6 @@ interface PlaylistDetailPageProps {
     playlistsData: Playlist[]
 }
 
-const mockUser = {
-    id: "user123",
-    name: "Afrobeats Lover",
-    avatar: "/diverse-user-avatars.png",
-    followers: 1247,
-    isFollowing: false,
-}
 
 // Mock tracking data
 const mockTrackingData = {
@@ -68,7 +61,7 @@ export default function PlaylistPage({ playlistData, playlistsData }: PlaylistDe
     const playlist = playlistData.data;
     const tracks = playlistData.tracks;
     const isUserPlaylist = playlist.userId !== null
-    console.log(playlistsData)
+    console.log(playlistsData, tracks)
 
     const handleStartTracking = async () => {
         setIsLoading(true)
@@ -326,7 +319,7 @@ export default function PlaylistPage({ playlistData, playlistsData }: PlaylistDe
                             <CardContent className="space-y-4">
                                 <div className="flex justify-between">
                                     <span className="text-slate-400">Total Tracks</span>
-                                    <span className="text-white font-medium">100+</span>
+                                    <span className="text-white font-medium">{tracks.length}</span>
                                 </div>
                                 {/* <div className="flex justify-between">
                                     <span className="text-slate-400">Genre</span>

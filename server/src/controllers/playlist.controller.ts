@@ -99,7 +99,7 @@ async function getPlaylist(req: TokenRequest, res: Response) {
             let artistArr: any = [];
 
             for (let artist of artists) {
-                if (!track.artists) continue;
+                if (!artists) continue;
                 artistArr.push(artist.name)
             }
 
@@ -107,7 +107,7 @@ async function getPlaylist(req: TokenRequest, res: Response) {
                 imageUrl: track.album.images[0].url,
                 trackId: track.id,
                 title: track.name,
-                artist: artists,
+                artist: artistArr,
                 playlistId: id,
                 playlist: playlist.name,
                 rank: i + 1
