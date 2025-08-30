@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { getRefreshToken, getSpotifyToken } from "../lib/SpotifyAuth";
+import { getRefreshToken, getSpotifyToken } from "../services/SpotifyAuth";
 import prisma from "../lib/prisma";
 
 export interface TokenRequest extends Request {

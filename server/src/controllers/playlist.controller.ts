@@ -1,8 +1,9 @@
 import express, { Request, Response } from "express";
 import prisma from "../lib/prisma"
 import { TokenRequest } from "../middlewares/ensureSpotifyToken";
-import { fetchPlaylistById } from "../lib/playlists";
+import { fetchPlaylistById, fetchTracks, saveSnapshot } from "../services/playlists";
 import { featuredPlaylists } from "../lib/seededPlaylists";
+import cronJob from "../services/cronjob";
 
 async function getFeaturedPlaylists(req: TokenRequest, res: Response) {
     const accessToken = req.access_token;
@@ -64,11 +65,9 @@ async function getPlaylist(req: TokenRequest, res: Response) {
         })
         if (!fetchFromDb) {
             const fetchFromSpotify = await fetchPlaylistById(id, accessToken);
-            // console.log('Fetched from Spotify:', fetchFromSpotify);
 
             if (fetchFromSpotify && fetchFromSpotify.valid) {
                 playlist = fetchFromSpotify.data;
-
             } else {
                 return res.status(500).json({ error: "Error fetching playlist from Spotify" });
             }
@@ -76,20 +75,9 @@ async function getPlaylist(req: TokenRequest, res: Response) {
             playlist = fetchFromDb;
         };
 
+        const tracks = await fetchTracks(id, accessToken);
 
-
-        const fetchTracks = await fetch(`${process.env.SPOTIFY_URL}/playlists/${id}/tracks?offset=0&limit=100&locale=*`, {
-            method: 'GET',
-            headers: { 'Authorization': 'Bearer ' + accessToken },
-        });
-        if (!fetchTracks.ok) {
-            const errorBody = await fetchTracks.text();
-            return { error: errorBody };
-        }
-
-        const tracks = await fetchTracks.json();
-
-        let trackdata: any = [];
+        let trackdata: any[] = [];
         for (let i = 0; i <= tracks.items.length; i++) {
             const item = tracks.items[i];
             const track = item?.track;
@@ -120,4 +108,31 @@ async function getPlaylist(req: TokenRequest, res: Response) {
     }
 }
 
-export { getFeaturedPlaylists, getPlaylist }
+async function trackPlaylist(req: TokenRequest, res: Response) {
+    const accessToken = req.access_token;
+    const playlistId = req.params.id;
+    try {
+        if (!accessToken) {
+            return res.status(401).json({ error: "Spotify access token is not available" });
+        }
+        const startTracking = await prisma.playlist.update({
+            data: {
+                isTracked: true,
+            },
+            where: { playlistId }
+        })
+        // if (!startTracking) {
+        //     return res.status(401).json({ error: "Error while attempting to start tracking playlist", isTracking: false });
+        // }
+        const initialSnapshot = await saveSnapshot(playlistId, accessToken);
+
+
+        // console.log(initialSnapshot);
+        return { isTracking: true }
+    } catch (error) {
+        console.error("Error tracking playlist:", error);
+        return res.status(500).json({ error: "Internal server error while tracking playlist:" + error });
+    }
+}
+
+export { getFeaturedPlaylists, getPlaylist, trackPlaylist }

@@ -7,6 +7,7 @@ import authRoutes from "./routes/auth.route.ts";
 import userRoutes from "./routes/user.route.ts";
 import searchRoutes from "./routes/search.route.ts";
 import cookieParser from "cookie-parser";
+import cronJob from "./services/cronjob.ts";
 
 const app = express();
 const PORT = process.env.PORT || 4001;
@@ -26,6 +27,8 @@ app.use("/api/spotify", searchRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/search", searchRoutes);
+
+cronJob.start();
 
 async function main() { console.log("Prisma Client initialized") }
 main()
