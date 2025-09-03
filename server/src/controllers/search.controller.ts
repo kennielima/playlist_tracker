@@ -34,7 +34,6 @@ async function searchPlaylists(req: TokenRequest, res: Response) {
                 playlists.push(playlist);
             }
         }
-        console.log("Playlists length:", playlists.length);
         return res.status(200).json({ data: playlists });
 
     } catch (error) {

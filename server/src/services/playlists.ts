@@ -31,11 +31,13 @@ async function fetchTracks(id: string, accessToken: string) {
     return data;
 }
 
-async function saveSnapshot(id: string, accessToken: string) {
+async function saveSnapshot(id: string, userId: string, accessToken: string) {
     const tracks = await fetchTracks(id, accessToken);
     const playlist = await fetchPlaylistById(id, accessToken);
 
-    if (tracks.data && playlist && playlist.valid) {
+    if (tracks && playlist && playlist.valid) {
+        console.log('snapshotTed');
+
         let trackdata: any = [];
         for (let i = 0; i <= tracks.items.length; i++) {
             const item = tracks.items[i];
@@ -56,7 +58,7 @@ async function saveSnapshot(id: string, accessToken: string) {
                     name: track.name,
                     album: track.album.name,
                     imageUrl: track.album.images[0]?.url,
-                    artist: artistArr,
+                    artists: artistArr,
                     playlistId: id,
                     Playlist: playlist.data.name,
                     rank: i + 1
@@ -64,12 +66,15 @@ async function saveSnapshot(id: string, accessToken: string) {
             });
             trackdata.push(addedTrack);
         }
+        console.log('trackdata', trackdata);
+
         const snapshot = await prisma.snapshot.create({
             data: {
                 id: playlist.data.snapshot_id,
                 playlist: playlist?.data.name,
                 playlistId: id,
-                tracks: trackdata
+                tracks: trackdata,
+                userId: userId,
             }
         });
         console.log(snapshot);

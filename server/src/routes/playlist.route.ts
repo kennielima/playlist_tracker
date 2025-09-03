@@ -6,6 +6,6 @@ const router = express.Router();
 
 router.get("/get-featured", ensureSpotifyToken, getFeaturedPlaylists);
 router.get("/:id", ensureSpotifyToken, getPlaylist);
-router.get("/:id/startTracking", ensureSpotifyToken, trackPlaylist);
+router.get("/:id/users/:userId/trackplaylist", ensureSpotifyToken, trackPlaylist);
 
 export default router;
