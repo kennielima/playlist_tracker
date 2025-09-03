@@ -9,6 +9,7 @@ const page = async ({ params }: { params: { id: string } }) => {
 
     const playlistData = await fetchAPlaylist(id);
     const playlistsData = await fetchSpotifyPlaylist();
+    const currUser = await fetchCurrentUser();
 
     if (!playlistData || !playlistData.data) {
         return <div>No playlist found</div>;
@@ -16,7 +17,7 @@ const page = async ({ params }: { params: { id: string } }) => {
     const playlist = playlistData?.data
     const playlists = playlistsData?.data
     return (
-        <PlaylistComponent playlistData={playlist} playlistsData={playlists} />
+        <PlaylistComponent playlistData={playlist} playlistsData={playlists} currUser={currUser} />
     )
 }
 

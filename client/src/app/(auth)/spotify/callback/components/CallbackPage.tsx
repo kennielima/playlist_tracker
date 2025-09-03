@@ -29,11 +29,11 @@ const CallbackPage = ({ user }: { user: User }) => {
     if (!user) {
         setTimeout(() => {
             router.push('/login')
-        }, 500);
+        }, 100);
     } else {
         setTimeout(() => {
             router.push('/')
-        }, 500);
+        }, 100);
     }
 
     return (

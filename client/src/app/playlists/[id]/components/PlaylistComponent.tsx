@@ -1,19 +1,10 @@
 "use client"
-
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import {
     Dialog,
     DialogContent,
@@ -27,13 +18,13 @@ import {
     Play,
     Camera,
     Music,
-    BarChart3,
-    Eye,
     Share2,
 } from "lucide-react"
-import { Playlist, Track } from "@/lib/types"
+import { Playlist, Track, User } from "@/lib/types"
 import { formatDate } from "@/lib/utils"
 import Image from "next/image"
+import trackPlaylist from "@/services/trackPlaylist"
+import { useRouter } from "next/navigation"
 
 
 interface PlaylistDetailPageProps {
@@ -42,6 +33,7 @@ interface PlaylistDetailPageProps {
         tracks: Track[]
     }
     playlistsData: Playlist[]
+    currUser: User
 }
 
 
@@ -54,63 +46,34 @@ const mockTrackingData = {
     nextSnapshot: "2025-01-19T10:00:00Z",
 }
 
-export default function PlaylistPage({ playlistData, playlistsData }: PlaylistDetailPageProps) {
+export default function PlaylistPage({ playlistData, playlistsData, currUser }: PlaylistDetailPageProps) {
     const [isTracking, setIsTracking] = useState(mockTrackingData.isTracking);
     const [showTrackingDialog, setShowTrackingDialog] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const router = useRouter();
+
     const playlist = playlistData.data;
     const tracks = playlistData.tracks;
     const isUserPlaylist = playlist.userId !== null
-    console.log(playlistsData, tracks)
 
     const handleStartTracking = async () => {
-        setIsLoading(true)
+        if (!currUser) {
+            router.push('/login')
+        }
+        setIsLoading(true);
         try {
-            await new Promise((resolve) => setTimeout(resolve, 1500))
+            await trackPlaylist(playlist.playlistId, currUser.id)
             setIsTracking(true)
             setShowTrackingDialog(false)
         } catch (error) {
-            console.error("Failed to start tracking")
+            // console.error("Failed to start tracking")
         } finally {
-            setIsLoading(false)
+            setIsLoading(false);
         }
     }
 
     return (
-        <div className="">
-            <div className="bg-black/20 backdrop-blur-md border-b border-white/10">
-                {/* <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                    <div className="flex items-center justify-between">
-                        <Button variant="ghost" onClick={onBack} className="text-slate-300 hover:text-white">
-                            <ArrowLeft className="h-4 w-4 mr-2" />
-                            Back
-                        </Button>
-                        <div className="flex items-center space-x-2">
-
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="text-slate-300 hover:text-white">
-                                        <MoreHorizontal className="h-4 w-4" />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent className="bg-slate-800 border-white/10">
-                                    <DropdownMenuItem className="text-slate-300 focus:text-white">
-                                        <ExternalLink className="mr-2 h-4 w-4" />
-                                        Open in Spotify
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem className="text-slate-300 focus:text-white">
-                                        <Download className="mr-2 h-4 w-4" />
-                                        Export Data
-                                    </DropdownMenuItem>
-                                    <DropdownMenuSeparator className="bg-white/10" />
-                                    <DropdownMenuItem className="text-red-400 focus:text-red-300">Report Playlist</DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </div>
-                    </div>
-                </div> */}
-            </div>
-
+        <div>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <motion.div
                     className="flex flex-col lg:flex-row gap-8 mb-8"
