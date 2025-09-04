@@ -3,7 +3,6 @@ import prisma from "../lib/prisma"
 import { TokenRequest } from "../middlewares/ensureSpotifyToken";
 import { fetchPlaylistById, fetchTracks, saveSnapshot } from "../services/playlists";
 import { featuredPlaylists } from "../lib/seededPlaylists";
-import cronJob from "../services/cronjob";
 
 async function getFeaturedPlaylists(req: TokenRequest, res: Response) {
     const accessToken = req.access_token;
@@ -129,8 +128,11 @@ async function trackPlaylist(req: TokenRequest, res: Response) {
         }
         const initialSnapshot = await saveSnapshot(playlistId, userId, accessToken);
 
-        console.log(initialSnapshot);
-        return { isTracking: true }
+        return {
+            isTracking: true,
+            isTrackedBy: userId,
+            initialSnapshot: initialSnapshot
+        };
     } catch (error) {
         console.error("Error tracking playlist:", error);
         return res.status(500).json({ error: "Internal server error while tracking playlist:" + error });

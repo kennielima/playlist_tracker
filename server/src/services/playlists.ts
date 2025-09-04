@@ -36,9 +36,7 @@ async function saveSnapshot(id: string, userId: string, accessToken: string) {
     const playlist = await fetchPlaylistById(id, accessToken);
 
     if (tracks && playlist && playlist.valid) {
-        console.log('snapshotTed');
-
-        let trackdata: any = [];
+        let trackdata = [];
         for (let i = 0; i <= tracks.items.length; i++) {
             const item = tracks.items[i];
             const track = item?.track;
@@ -52,32 +50,47 @@ async function saveSnapshot(id: string, userId: string, accessToken: string) {
                 artistArr.push(artist.name)
             }
 
-            const addedTrack = await prisma.track.create({
-                data: {
+            const existingTrack = await prisma.track.findFirst({
+                where: {
                     id: track.id,
-                    name: track.name,
-                    album: track.album.name,
-                    imageUrl: track.album.images[0]?.url,
-                    artists: artistArr,
-                    playlistId: id,
-                    Playlist: playlist.data.name,
-                    rank: i + 1
                 }
             });
-            trackdata.push(addedTrack);
+            if (!existingTrack) {
+                const addedTrack = await prisma.track.create({
+                    data: {
+                        id: track.id,
+                        name: track.name,
+                        album: track.album.name,
+                        imageUrl: track.album.images[0]?.url,
+                        artists: artistArr,
+                        // playlistId: id,
+                        Playlist: {
+                            connect: { playlistId: id }
+                        },
+                        rank: i + 1
+                    }
+                });
+                trackdata.push(addedTrack);
+            }
+            else {
+                trackdata.push(existingTrack)
+            }
         }
-        console.log('trackdata', trackdata);
 
         const snapshot = await prisma.snapshot.create({
             data: {
-                id: playlist.data.snapshot_id,
-                playlist: playlist?.data.name,
-                playlistId: id,
-                tracks: trackdata,
-                userId: userId,
+                // id: playlist.data.snapshot_id,
+                playlist: {
+                    connect: { playlistId: id }
+                },
+                tracks: {
+                    connect: trackdata.map(track => ({ id: track.id }))
+                },
+                user: {
+                    connect: { id: userId }
+                },
             }
         });
-        console.log(snapshot);
         return snapshot;
     }
 }
