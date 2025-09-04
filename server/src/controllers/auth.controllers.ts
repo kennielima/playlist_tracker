@@ -97,4 +97,18 @@ async function callback(req: Request, res: Response) {
     }
 };
 
-export { login, callback }
+async function logout(req: Request, res: Response) {
+    try {
+        res.cookie("token", '', {
+            maxAge: 0,
+            httpOnly: true,
+            sameSite: 'strict'
+        })
+        res.status(200).json({ message: "Logged out successfully" });
+    }
+    catch (error) {
+        return res.status(500).json({ message: 'Logout error: ' + error })
+    }
+}
+
+export { login, callback, logout }

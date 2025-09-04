@@ -124,7 +124,7 @@ async function trackPlaylist(req: TokenRequest, res: Response) {
             where: { playlistId }
         })
         if (!trackPlaylist) {
-            return res.status(401).json({ error: "Error while attempting to start tracking playlist", isTracking: false });
+            return res.status(400).json({ error: "Error while attempting to start tracking playlist", isTracking: false });
         }
         const initialSnapshot = await saveSnapshot(playlistId, userId, accessToken);
 
@@ -158,4 +158,31 @@ async function getPlaylistSnapshot(req: TokenRequest, res: Response) {
     }
 }
 
-export { getFeaturedPlaylists, getPlaylist, trackPlaylist, getPlaylistSnapshot }
+async function stopTracker(req: TokenRequest, res: Response) {
+    const accessToken = req.access_token;
+    const playlistId = req.params.id;
+    const userId = req.params.userId;
+
+    try {
+        if (!accessToken || !userId) {
+            return res.status(401).json({ error: "Spotify access token or user id is not available" });
+        }
+        await prisma.playlist.update({
+            data: {
+                isTracked: false,
+                isTrackedBy: null
+            },
+            where: { playlistId }
+        })
+
+        return res.status(200).json({
+            isTracking: false,
+            isTrackedBy: null,
+        });
+    } catch (error) {
+        console.error("Error stopping playlist tracker:", error);
+        return res.status(500).json({ error: "Internal server error while stopping playlist tracker:" + error });
+    }
+}
+
+export { getFeaturedPlaylists, getPlaylist, trackPlaylist, getPlaylistSnapshot, stopTracker }
