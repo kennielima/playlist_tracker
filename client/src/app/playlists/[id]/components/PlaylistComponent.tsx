@@ -23,7 +23,7 @@ import {
 import { Playlist, Track, User } from "@/lib/types"
 import { formatDate } from "@/lib/utils"
 import Image from "next/image"
-import trackPlaylist from "@/services/trackPlaylist"
+import { trackPlaylist, stopTracker } from "@/services/trackPlaylist"
 import { useRouter } from "next/navigation"
 
 
@@ -37,7 +37,6 @@ interface PlaylistDetailPageProps {
 }
 
 
-// Mock tracking data
 const mockTrackingData = {
     isTracking: false,
     lastSnapshot: "2025-01-10T10:00:00Z",
@@ -47,7 +46,7 @@ const mockTrackingData = {
 }
 
 export default function PlaylistPage({ playlistData, playlistsData, currUser }: PlaylistDetailPageProps) {
-    const [isTracking, setIsTracking] = useState(mockTrackingData.isTracking);
+    const [isTracking, setIsTracking] = useState(false);
     const [showTrackingDialog, setShowTrackingDialog] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
@@ -56,17 +55,22 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
     const tracks = playlistData.tracks;
     const isUserPlaylist = playlist.userId !== null
 
-    const handleStartTracking = async () => {
+    const handleTracker = async () => {
         if (!currUser) {
             router.push('/login')
         }
         setIsLoading(true);
         try {
-            await trackPlaylist(playlist.playlistId, currUser.id)
-            setIsTracking(true)
-            setShowTrackingDialog(false)
+            if (!isTracking) {
+                await trackPlaylist(playlist.playlistId, currUser.id)
+                setIsTracking(true)
+                setShowTrackingDialog(false)
+            } else {
+                await stopTracker(playlist.playlistId, currUser.id)
+                setIsTracking(false)
+            }
+
         } catch (error) {
-            // console.error("Failed to start tracking")
         } finally {
             setIsLoading(false);
         }
@@ -111,14 +115,6 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
 
                             {/* Metadata */}
                             <div className="flex flex-wrap items-center gap-6 text-sm text-slate-400 mb-6">
-                                {/* <div className="flex items-center">
-                                    <Calendar className="h-4 w-4 mr-2" />
-                                    Created {formatDate(playlist.createdAt)}
-                                </div>
-                                <div className="flex items-center">
-                                    <Clock className="h-4 w-4 mr-2" />
-                                    Updated {getRelativeTime(playlist.updatedAt)}
-                                </div> */}
                                 <div className="flex items-center">
                                     <Music className="h-4 w-4 mr-2" />
                                     {tracks.length} tracks
@@ -136,56 +132,68 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                                     Play on Spotify
                                 </Button>
 
-                                <Dialog open={showTrackingDialog} onOpenChange={setShowTrackingDialog}>
-                                    <DialogTrigger asChild>
-                                        <Button
-                                            variant="outline"
-                                            size="lg"
-                                            className={`border-white/20 ${isTracking
-                                                ? "bg-green-600/20 text-green-400 border-green-400/20"
-                                                : "text-white hover:bg-white/10"
-                                                }`}
-                                        >
-                                            <Camera className="mr-2 h-5 w-5" />
-                                            {isTracking ? "Tracking" : "Start Tracking"}
-                                        </Button>
-                                    </DialogTrigger>
-                                    <DialogContent className="bg-slate-800 border-white/10">
-                                        <DialogHeader>
-                                            <DialogTitle className="text-white">Start Tracking Playlist</DialogTitle>
-                                            <DialogDescription className="text-slate-300">
-                                                Track changes to this playlist over time. We'll take weekly snapshots and show you how it
-                                                evolves.
-                                            </DialogDescription>
-                                        </DialogHeader>
-                                        <div className="space-y-4">
-                                            <Alert className="border-purple-500/20 bg-purple-500/10">
-                                                <Camera className="h-4 w-4 text-purple-400" />
-                                                <AlertDescription className="text-purple-300">
-                                                    We'll automatically take snapshots every week and notify you of changes.
-                                                </AlertDescription>
-                                            </Alert>
-                                            <div className="text-sm text-slate-400">
-                                                <p>• Weekly snapshots of track changes</p>
-                                                {/* <p>• Notifications for major updates</p> */}
-                                                <p>• Historical trends and data</p>
-                                                <p>• Export tracking data anytime</p>
-                                            </div>
-                                        </div>
-                                        <DialogFooter>
-                                            <Button variant="outline" onClick={() => setShowTrackingDialog(false)}>
-                                                Cancel
-                                            </Button>
+                                {!isTracking && (
+                                    <Dialog open={showTrackingDialog} onOpenChange={setShowTrackingDialog}>
+                                        <DialogTrigger asChild>
                                             <Button
-                                                onClick={handleStartTracking}
-                                                disabled={isLoading}
-                                                className="bg-purple-600 hover:bg-purple-500"
+                                                variant="outline"
+                                                size="lg"
+                                                className={`border-white/20 ${isTracking
+                                                    ? "bg-green-600/20 text-green-400 border-green-400/20"
+                                                    : "text-white hover:bg-white/10"
+                                                    }`}
                                             >
-                                                {isLoading ? "Starting..." : "Start Tracking"}
+                                                <Camera className="mr-2 h-5 w-5" />
+                                                {isTracking ? "Tracking" : "Start Tracking"}
                                             </Button>
-                                        </DialogFooter>
-                                    </DialogContent>
-                                </Dialog>
+                                        </DialogTrigger>
+                                        <DialogContent className="bg-slate-800 border-white/10">
+                                            <DialogHeader>
+                                                <DialogTitle className="text-white">Start Tracking Playlist</DialogTitle>
+                                                <DialogDescription className="text-slate-300">
+                                                    Track changes to this playlist over time. We'll take weekly snapshots and show you how it
+                                                    evolves.
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                            <div className="space-y-4">
+                                                <Alert className="border-purple-500/20 bg-purple-500/10">
+                                                    <Camera className="h-4 w-4 text-purple-400" />
+                                                    <AlertDescription className="text-purple-300">
+                                                        We'll automatically take snapshots every week and notify you of changes.
+                                                    </AlertDescription>
+                                                </Alert>
+                                                <div className="text-sm text-slate-400">
+                                                    <p>• Weekly snapshots of track changes</p>
+                                                    {/* <p>• Notifications for major updates</p> */}
+                                                    <p>• Historical trends and data</p>
+                                                    <p>• Export tracking data anytime</p>
+                                                </div>
+                                            </div>
+                                            <DialogFooter>
+                                                <Button variant="outline" onClick={() => setShowTrackingDialog(false)}>
+                                                    Cancel
+                                                </Button>
+                                                <Button
+                                                    onClick={handleTracker}
+                                                    disabled={isLoading}
+                                                    className="bg-purple-600 hover:bg-purple-500"
+                                                >
+                                                    {isLoading ? "Starting..." : "Start Tracking"}
+                                                </Button>
+                                            </DialogFooter>
+                                        </DialogContent>
+                                    </Dialog>
+                                )}
+                                {isTracking && (
+                                    <Button
+                                        variant="outline"
+                                        size="lg"
+                                        onClick={handleTracker}
+                                        className="bg-green-600/20 text-green-400 border-green-400/20 cursor-pointer">
+                                        <Camera className="mr-2 h-5 w-5" />
+                                        Stop Tracking
+                                    </Button>
+                                )}
                                 <Button
                                     className="text-white hover:text-white border-white/20 hover:bg-white/10 px-8"
                                     variant="outline"

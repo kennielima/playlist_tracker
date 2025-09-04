@@ -11,7 +11,23 @@ const trackPlaylist = async (id: string, userId: string) => {
             cookie: cookieHeader
         }
     });
-    console.log(res)
+    if (!res.ok) {
+        return null;
+    }
+
+    const { data } = await res.json();
+    return data;
+}
+const stopTracker = async (id: string, userId: string) => {
+    const cookie = await cookies();
+    const cookieHeader = cookie.toString();
+
+    const res = await fetch(`${process.env.BASE_URL}/api/trackplaylist/${id}/${userId}/stoptracker`, {
+        method: "GET",
+        headers: {
+            cookie: cookieHeader
+        }
+    });
     if (!res.ok) {
         return null;
     }
@@ -20,4 +36,4 @@ const trackPlaylist = async (id: string, userId: string) => {
     return data;
 }
 
-export default trackPlaylist;
+export { trackPlaylist, stopTracker };

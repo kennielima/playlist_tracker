@@ -6,7 +6,7 @@ export const GET = async (req: Request, { params }: { params: { id: string, user
     const token = cookie.get('token')?.value;
     const { id, userId } = await params;
     try {
-        const response = await fetch(`${process.env.API_URL}/api/playlists/${id}/users/${userId}/trackplaylist`, {
+        const response = await fetch(`${process.env.API_URL}/api/playlists/${id}/users/${userId}/stopTracker`, {
             method: 'GET',
             headers: {
                 'authorization': `Bearer ${token}`,
@@ -16,13 +16,13 @@ export const GET = async (req: Request, { params }: { params: { id: string, user
         });
 
         if (!response.ok) {
-            throw new Error('Failed to track playlist on route');
+            throw new Error('Failed to stop tracker on route');
         }
         const data = await response.json();
 
         return NextResponse.json({ data })
     } catch (error) {
-        console.error('Error tracking playlist:', error);
-        return NextResponse.json({ error: 'Error tracking playlist:' }, { status: 401 });
+        console.error('Error stopping playlist tracker:', error);
+        return NextResponse.json({ error: 'Error stopping playlist tracker:' }, { status: 401 });
     }
 }
