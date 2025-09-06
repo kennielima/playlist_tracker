@@ -91,7 +91,7 @@ const Homepage = ({ playlistData, user }: HomepageProps) => {
                         >
                             Track any Spotify playlist and rediscover the songs you loved, exactly as they were
                         </motion.p>
-                        <Search />
+                        <Search category={'playlist'} />
                     </div>
                 </div>
             </motion.div>

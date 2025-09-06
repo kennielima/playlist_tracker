@@ -5,18 +5,20 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Playlist, User } from '@/lib/types'
 import { containerVariants, getInitials, itemVariants } from '@/lib/utils'
 import { motion } from 'framer-motion'
-import { Music, Heart, Grid3X3, List, Play, MoreHorizontal } from 'lucide-react'
+import { Music, Heart, Grid3X3, List, Play, MoreHorizontal, LoaderCircle } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import React, { useEffect, useState } from 'react'
 
 type UserTypeProps = {
     user: User
     playlistData: { data: Playlist[] }
+    id: string
 }
-const UserComponent = ({ user, playlistData }: UserTypeProps) => {
+const UserComponent = ({ user, playlistData, id }: UserTypeProps) => {
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-    const playlists = playlistData.data
+    const playlists = playlistData?.data
 
     return (
         <div className="">
@@ -26,15 +28,15 @@ const UserComponent = ({ user, playlistData }: UserTypeProps) => {
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
                             <Avatar className="h-12 w-12 bg-purple-500">
-                                <AvatarImage src={user.userImage || "/placeholder.svg"} alt={user.name} />
-                                <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                                <AvatarImage src={user?.userImage || "/placeholder.svg"} alt={user?.name} />
+                                <AvatarFallback>{getInitials(user?.name)}</AvatarFallback>
                             </Avatar>
                             <div>
                                 <h1 className="text-xl font-bold text-white">
-                                    {user.name}
+                                    {user?.name}
                                 </h1>
                                 <p className="text-sm text-slate-300">
-                                    @{user.name}
+                                    @{user?.name}
                                 </p>
                             </div>
                         </div>
@@ -80,56 +82,29 @@ const UserComponent = ({ user, playlistData }: UserTypeProps) => {
                             <CardContent className="p-4 text-center">
                                 <Music className="h-6 w-6 mx-auto mb-2 text-purple-400" />
                                 <div className="text-2xl font-bold text-white">
-                                    {playlists.length}
+                                    {playlists?.length}
                                 </div>
                                 <div className="text-sm text-slate-300">
                                     Playlists
                                 </div>
                             </CardContent>
                         </Card>
-                    </motion.div>
 
-                    {/* <motion.div variants={itemVariants}>
-                        <Card className="bg-white/5 backdrop-blur-md border border-white/10 shadow-xl">
-                            <CardContent className="p-4 text-center">
-                                <Clock className="h-6 w-6 mx-auto mb-2 text-emerald-400" />
-                                <div className="text-2xl font-bold text-white">
-                                    {user.totalTracks}
-                                </div>
-                                <div className="text-sm text-slate-300">
-                                    Tracks
-                                </div>
-                            </CardContent>
-                        </Card>
                     </motion.div>
-
                     <motion.div variants={itemVariants}>
                         <Card className="bg-white/5 backdrop-blur-md border border-white/10 shadow-xl">
                             <CardContent className="p-4 text-center">
-                                <Users className="h-6 w-6 mx-auto mb-2 text-blue-400" />
+                                <Music className="h-6 w-6 mx-auto mb-2 text-purple-400" />
                                 <div className="text-2xl font-bold text-white">
-                                    {user.followers}
+                                    0
                                 </div>
                                 <div className="text-sm text-slate-300">
-                                    Followers
+                                    Snapshots
                                 </div>
                             </CardContent>
                         </Card>
-                    </motion.div>
 
-                    <motion.div variants={itemVariants}>
-                        <Card className="bg-white/5 backdrop-blur-md border border-white/10 shadow-xl">
-                            <CardContent className="p-4 text-center">
-                                <Heart className="h-6 w-6 mx-auto mb-2 text-pink-400" />
-                                <div className="text-2xl font-bold text-white">
-                                    {user.totalHours}h
-                                </div>
-                                <div className="text-sm text-slate-300">
-                                    Listening
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </motion.div> */}
+                    </motion.div>
                 </motion.div>
 
                 {/* Playlists Grid */}
@@ -142,7 +117,7 @@ const UserComponent = ({ user, playlistData }: UserTypeProps) => {
                     initial="hidden"
                     animate="visible"
                 >
-                    {playlists.map((playlist: Playlist) => (
+                    {playlists?.map((playlist: Playlist) => (
                         <motion.div
                             key={playlist.playlistId}
                             variants={itemVariants}
@@ -240,7 +215,7 @@ const UserComponent = ({ user, playlistData }: UserTypeProps) => {
                 </motion.div>
 
                 {/* Empty State */}
-                {playlists.length === 0 && (
+                {playlists && playlists.length === 0 && (
                     <motion.div
                         className="text-center py-12"
                         initial={{ opacity: 0 }}

@@ -18,7 +18,7 @@ async function fetchPlaylistById(id: string, accessToken: string) {
 
 
 async function fetchTracks(id: string, accessToken: string) {
-    const responseData = await fetch(`${process.env.SPOTIFY_URL}/playlists/${id}/tracks?offset=0&limit=100&locale=*`, {
+    const responseData = await fetch(`${process.env.SPOTIFY_URL}/playlists/${id}/tracks?offset=0&locale=*`, {
         method: 'GET',
         headers: { 'Authorization': 'Bearer ' + accessToken },
     });

@@ -19,12 +19,16 @@ import {
     Camera,
     Music,
     Share2,
+    Download,
+    EyeOff,
 } from "lucide-react"
 import { Playlist, Track, User } from "@/lib/types"
 import { formatDate } from "@/lib/utils"
 import Image from "next/image"
 import { trackPlaylist, stopTracker } from "@/services/trackPlaylist"
 import { useRouter } from "next/navigation"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import Search from "@/components/Search"
 
 
 interface PlaylistDetailPageProps {
@@ -46,10 +50,11 @@ const mockTrackingData = {
 }
 
 export default function PlaylistPage({ playlistData, playlistsData, currUser }: PlaylistDetailPageProps) {
+    const router = useRouter();
     const [isTracking, setIsTracking] = useState(false);
     const [showTrackingDialog, setShowTrackingDialog] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const router = useRouter();
+    const [selectedTimeframe, setSelectedTimeframe] = useState("4weeks")
 
     const playlist = playlistData.data;
     const tracks = playlistData.tracks;
@@ -71,6 +76,7 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
             }
 
         } catch (error) {
+            console.error(error)
         } finally {
             setIsLoading(false);
         }
@@ -125,10 +131,10 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                             <div className="flex flex-wrap gap-4">
                                 <Button
                                     size="lg"
-                                    className="bg-purple-600 hover:bg-purple-500 text-white px-8"
+                                    className="bg-purple-600 hover:bg-purple-500 text-white px-8 cursor-pointer"
                                     onClick={() => window.open(playlist.url, "_blank")}
                                 >
-                                    <Play className="mr-2 h-5 w-5" />
+                                    <Play className="h-5 w-5" />
                                     Play on Spotify
                                 </Button>
 
@@ -138,13 +144,10 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                                             <Button
                                                 variant="outline"
                                                 size="lg"
-                                                className={`border-white/20 ${isTracking
-                                                    ? "bg-green-600/20 text-green-400 border-green-400/20"
-                                                    : "text-white hover:bg-white/10"
-                                                    }`}
+                                                className="bg-green-600/20 text-green-400 border-green-400/20 cursor-pointer"
                                             >
-                                                <Camera className="mr-2 h-5 w-5" />
-                                                {isTracking ? "Tracking" : "Start Tracking"}
+                                                <Camera className="h-5 w-5" />
+                                                Start Tracking
                                             </Button>
                                         </DialogTrigger>
                                         <DialogContent className="bg-slate-800 border-white/10">
@@ -189,17 +192,18 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                                         variant="outline"
                                         size="lg"
                                         onClick={handleTracker}
-                                        className="bg-green-600/20 text-green-400 border-green-400/20 cursor-pointer">
-                                        <Camera className="mr-2 h-5 w-5" />
+                                        className='flex items-center gap-2 px-4 py-2 rounded-lg font-medium cursor-pointer transition-all duration-200 bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30'
+                                    >
+                                        <EyeOff className="w-5 h-5" />
                                         Stop Tracking
                                     </Button>
                                 )}
                                 <Button
-                                    className="text-white hover:text-white border-white/20 hover:bg-white/10 px-8"
+                                    className="text-white hover:text-white border-white/20 hover:bg-white/10 px-8 cursor-pointer"
                                     variant="outline"
                                     size="lg"
                                 >
-                                    Share {" "} <Share2 className="h-4 w-4" />
+                                    Share {" "} <Share2 className="h-5 w-5" />
                                 </Button>
                             </div>
                         </div>
@@ -207,14 +211,36 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                 </motion.div>
 
                 {/* Content Sections */}
+                {/* <div className="flex flex-col gap-8"> */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-8">
+                        <div className="flex items-center space-x-5 justify-between w-full">
+                            <Select value={selectedTimeframe} onValueChange={setSelectedTimeframe}>
+                                <SelectTrigger className="w-36 h-12 bg-white/5 border-white/10 text-white">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="bg-slate-800 border-white/10">
+                                    <SelectItem value="1week">1 Week</SelectItem>
+                                    <SelectItem value="4weeks">4 Weeks</SelectItem>
+                                    <SelectItem value="3months">3 Months</SelectItem>
+                                    <SelectItem value="all">All Time</SelectItem>
+                                </SelectContent>
+                            </Select>
+
+                            <Button variant="outline" size="lg" className="border-white/20 text-white hover:bg-white/10 bg-transparent">
+                                <Download className="h-4 w-4 mr-2" />
+                                Export
+                            </Button>
+
+                            <Search category={'track'} />
+                        </div>
                         <Card className="bg-white/5 backdrop-blur-md border border-white/10 py-8">
                             <CardHeader>
                                 <CardTitle className="text-white flex items-center">
                                     <Music className="h-5 w-5 mr-2" />
-                                    Recent Tracks
+                                    Tracks
                                 </CardTitle>
+
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 {tracks.map((track: Track, index: number) => (
@@ -245,40 +271,6 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                                 ))}
                             </CardContent>
                         </Card>
-
-                        {/* Tracking History (if tracking) */}
-                        {/* {isTracking && (
-                            <Card className="bg-white/5 backdrop-blur-md border border-white/10">
-                                <CardHeader>
-                                    <CardTitle className="text-white flex items-center">
-                                        <BarChart3 className="h-5 w-5 mr-2" />
-                                        Tracking History
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="space-y-4">
-                                        {[
-                                            { date: "2025-01-10", changes: "+3 tracks", type: "addition" },
-                                            { date: "2025-01-03", changes: "-1 track, +2 tracks", type: "mixed" },
-                                            { date: "2024-12-27", changes: "+5 tracks", type: "addition" },
-                                        ].map((snapshot, index) => (
-                                            <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-white/5">
-                                                <div className="flex items-center space-x-3">
-                                                    <div className="w-2 h-2 bg-purple-400 rounded-full" />
-                                                    <div>
-                                                        <p className="text-white font-medium">{formatDate(snapshot.date)}</p>
-                                                        <p className="text-sm text-slate-400">{snapshot.changes}</p>
-                                                    </div>
-                                                </div>
-                                                <Button variant="ghost" size="sm" className="text-purple-400 hover:text-purple-300">
-                                                    View Details
-                                                </Button>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        )} */}
                     </div>
 
                     {/* Sidebar */}
@@ -337,6 +329,6 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     )
 }

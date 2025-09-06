@@ -77,7 +77,7 @@ async function getPlaylist(req: TokenRequest, res: Response) {
         const tracks = await fetchTracks(id, accessToken);
 
         let trackdata: any[] = [];
-        for (let i = 0; i <= tracks.items.length; i++) {
+        for (let i = 0; i < tracks.items.length; i++) {
             const item = tracks.items[i];
             const track = item?.track;
             if (!track) continue;
@@ -139,25 +139,6 @@ async function trackPlaylist(req: TokenRequest, res: Response) {
     }
 }
 
-async function getPlaylistSnapshot(req: TokenRequest, res: Response) {
-    const playlistId = req.params.id;
-    try {
-        const snapshots = await prisma.snapshot.findMany({
-            where: {
-                playlistId
-            },
-            include: { tracks: true },
-            orderBy: [{
-                createdAt: 'desc'
-            }]
-        })
-        return res.status(200).json({ data: snapshots });
-    } catch (error) {
-        console.error("Error fetching snapshots:", error);
-        return res.status(500).json({ error: "Internal server error while fetching snapshots:" + error });
-    }
-}
-
 async function stopTracker(req: TokenRequest, res: Response) {
     const accessToken = req.access_token;
     const playlistId = req.params.id;
@@ -185,4 +166,39 @@ async function stopTracker(req: TokenRequest, res: Response) {
     }
 }
 
-export { getFeaturedPlaylists, getPlaylist, trackPlaylist, getPlaylistSnapshot, stopTracker }
+async function getPlaylistSnapshots(req: TokenRequest, res: Response) {
+    const playlistId = req.params.id;
+    try {
+        const snapshots = await prisma.snapshot.findMany({
+            where: {
+                playlistId
+            },
+            orderBy: [{
+                createdAt: 'desc'
+            }]
+        })
+        return res.status(200).json({ data: snapshots });
+    } catch (error) {
+        console.error("Error fetching snapshots:", error);
+        return res.status(500).json({ error: "Internal server error while fetching snapshots:" + error });
+    }
+}
+async function getSnapshotById(req: TokenRequest, res: Response) {
+    const snapshotId = req.params.snapshotId;
+    const playlistId = req.params.playlistId;
+    try {
+        const snapshot = await prisma.snapshot.findMany({
+            where: {
+                id: snapshotId,
+                playlistId
+            },
+            include: { tracks: true },
+        })
+        return res.status(200).json({ data: snapshot });
+    } catch (error) {
+        console.error("Error fetching snapshot:", error);
+        return res.status(500).json({ error: "Internal server error while fetching snapshot:" + error });
+    }
+}
+
+export { getFeaturedPlaylists, getPlaylist, trackPlaylist, stopTracker, getPlaylistSnapshots, getSnapshotById }

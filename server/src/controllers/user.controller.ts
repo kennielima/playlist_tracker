@@ -62,5 +62,6 @@ async function fetchCurrentUserPlaylists(req: TokenRequest, res: Response) {
         return res.status(500).json({ error: "Internal server error while fetching user playlist" });
     }
 }
+async function fetchUserSnapshots(req: TokenRequest, res: Response) { }
 
 export { getMe, fetchCurrentUserPlaylists }

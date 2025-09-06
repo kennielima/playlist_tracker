@@ -73,7 +73,7 @@ model Track {
   rank       Int
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
-  Playlist   Playlist  @relation(fields: [playlistId], references: [id])
+  Playlist   Playlist  @relation(fields: [playlistId], references: [playlistId])
   playlistId String
   Snapshot   Snapshot? @relation(fields: [snapshotId], references: [id])
   snapshotId String?

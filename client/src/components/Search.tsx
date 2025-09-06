@@ -3,7 +3,7 @@ import { Input } from './ui/input'
 import { Button } from './ui/button'
 import { useRouter } from 'next/navigation';
 
-const Search = () => {
+const Search = ({ category }: { category: string }) => {
     const router = useRouter();
     const [query, setQuery] = useState("");
 
@@ -15,23 +15,34 @@ const Search = () => {
     const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         setQuery(e.target.value);
     }
+    let placeholder;
+    if (category === 'playlist') {
+        placeholder = "Search for playlist"
+    } else if (category === 'track') {
+        placeholder = "Search for track"
+    }
+
     return (
         <form
             onSubmit={searchHandler}
-            className="flex w-full max-w-md items-center gap-1 size-8 justify-center mx-auto"
+            className={`${category === 'playlist' && 'max-w-md '} flex w-full items-center gap-1 size-8 justify-center mx-auto`}
         >
             <Input
                 type="search"
-                placeholder="Search for playlist"
-                className="h-12"
+                placeholder={placeholder}
+                className={`
+                    ${category === 'playlist' && "h-12"} 
+                    ${category === 'track' && "h-10"}
+                    `}
                 onChange={changeHandler}
             />
             <Button
                 type="submit"
                 variant="outline"
-                className="h-12 bg-purple-600 hover:bg-purple-500 text-white"
+                className={`${category === 'playlist' && "h-12"} 
+                    ${category === 'track' && "h-10"} bg-purple-600 hover:bg-purple-500 text-white`}
             >
-                Subscribe
+                Search
             </Button>
         </form>)
 }
