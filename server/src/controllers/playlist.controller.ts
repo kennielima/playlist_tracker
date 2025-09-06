@@ -110,7 +110,7 @@ async function getPlaylist(req: TokenRequest, res: Response) {
 async function trackPlaylist(req: TokenRequest, res: Response) {
     const accessToken = req.access_token;
     const playlistId = req.params.id;
-    const userId = req.params.userId;
+    const userId = req?.user?.id;
 
     try {
         if (!accessToken || !userId) {
@@ -142,7 +142,7 @@ async function trackPlaylist(req: TokenRequest, res: Response) {
 async function stopTracker(req: TokenRequest, res: Response) {
     const accessToken = req.access_token;
     const playlistId = req.params.id;
-    const userId = req.params.userId;
+    const userId = req?.user?.id;
 
     try {
         if (!accessToken || !userId) {

@@ -1,12 +1,17 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-export const GET = async (req: Request, { params }: { params: { id: string, userId: string } }) => {
+export const GET = async (req: Request, { params }: { params: { id: string } }) => {
     const cookie = await cookies();
     const token = cookie.get('token')?.value;
-    const { id, userId } = await params;
+    const { id } = await params;
+
+    if (!token) {
+        return NextResponse.json({ error: 'No token found in cookies' }, { status: 401 });
+    }
+
     try {
-        const response = await fetch(`${process.env.API_URL}/api/playlists/${id}/users/${userId}/stopTracker`, {
+        const response = await fetch(`${process.env.API_URL}/api/playlists/${id}/stopTracker`, {
             method: 'GET',
             headers: {
                 'authorization': `Bearer ${token}`,

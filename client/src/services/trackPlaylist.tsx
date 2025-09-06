@@ -1,11 +1,11 @@
 "use server"
 import { cookies } from "next/headers";
 
-const trackPlaylist = async (id: string, userId: string) => {
+const startTracker = async (id: string) => {
     const cookie = await cookies();
     const cookieHeader = cookie.toString();
 
-    const res = await fetch(`${process.env.BASE_URL}/api/trackplaylist/${id}/${userId}`, {
+    const res = await fetch(`${process.env.BASE_URL}/api/getplaylist/${id}/starttracker`, {
         method: "GET",
         headers: {
             cookie: cookieHeader
@@ -18,11 +18,11 @@ const trackPlaylist = async (id: string, userId: string) => {
     const { data } = await res.json();
     return data;
 }
-const stopTracker = async (id: string, userId: string) => {
+const stopTracker = async (id: string) => {
     const cookie = await cookies();
     const cookieHeader = cookie.toString();
 
-    const res = await fetch(`${process.env.BASE_URL}/api/trackplaylist/${id}/${userId}/stoptracker`, {
+    const res = await fetch(`${process.env.BASE_URL}/api/getplaylist/${id}/stoptracker`, {
         method: "GET",
         headers: {
             cookie: cookieHeader
@@ -36,4 +36,4 @@ const stopTracker = async (id: string, userId: string) => {
     return data;
 }
 
-export { trackPlaylist, stopTracker };
+export { startTracker, stopTracker };

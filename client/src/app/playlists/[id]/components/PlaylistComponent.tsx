@@ -25,7 +25,7 @@ import {
 import { Playlist, Track, User } from "@/lib/types"
 import { formatDate } from "@/lib/utils"
 import Image from "next/image"
-import { trackPlaylist, stopTracker } from "@/services/trackPlaylist"
+import { startTracker, stopTracker } from "@/services/trackPlaylist"
 import { useRouter } from "next/navigation"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import Search from "@/components/Search"
@@ -67,11 +67,11 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
         setIsLoading(true);
         try {
             if (!isTracking) {
-                await trackPlaylist(playlist.playlistId, currUser.id)
+                await startTracker(playlist.playlistId)
                 setIsTracking(true)
                 setShowTrackingDialog(false)
             } else {
-                await stopTracker(playlist.playlistId, currUser.id)
+                await stopTracker(playlist.playlistId)
                 setIsTracking(false)
             }
 
