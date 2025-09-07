@@ -5,13 +5,9 @@ export const GET = async (req: Request, { params }: { params: { id: string } }) 
     const cookie = await cookies();
     const token = cookie.get('token')?.value;
     const { id } = await params;
-    console.log('token', token, id)
-    if (!token) {
-        return NextResponse.json({ error: 'No token found in cookies' }, { status: 401 });
-    }
 
     try {
-        const response = await fetch(`${process.env.API_URL}/api/playlists/${id}/startTracker`, {
+        const response = await fetch(`${process.env.API_URL}/api/playlists/${id}/getSnapshots`, {
             method: 'GET',
             headers: {
                 'authorization': `Bearer ${token}`,
@@ -19,16 +15,15 @@ export const GET = async (req: Request, { params }: { params: { id: string } }) 
             },
             credentials: 'include'
         });
-        console.log('respp', response)
 
         if (!response.ok) {
-            throw new Error('Failed to track playlist on route');
+            throw new Error('Failed to fetch playlist on route');
         }
         const data = await response.json();
 
         return NextResponse.json({ data })
     } catch (error) {
-        console.error('Error tracking playlist:', error);
-        return NextResponse.json({ error: 'Error tracking playlist:' }, { status: 401 });
+        console.error('Error fetching playlist:', error);
+        return NextResponse.json({ error: 'Error fetching playlist:' }, { status: 401 });
     }
 }

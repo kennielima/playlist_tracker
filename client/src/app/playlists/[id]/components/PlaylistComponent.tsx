@@ -22,7 +22,7 @@ import {
     Download,
     EyeOff,
 } from "lucide-react"
-import { Playlist, Track, User } from "@/lib/types"
+import { Playlist, Snapshot, Track, User } from "@/lib/types"
 import { formatDate } from "@/lib/utils"
 import Image from "next/image"
 import { startTracker, stopTracker } from "@/services/trackPlaylist"
@@ -37,7 +37,8 @@ interface PlaylistDetailPageProps {
         tracks: Track[]
     }
     playlistsData: Playlist[]
-    currUser: User
+    currUser: User,
+    snapshots: Snapshot[]
 }
 
 
@@ -49,34 +50,36 @@ const mockTrackingData = {
     nextSnapshot: "2025-01-19T10:00:00Z",
 }
 
-export default function PlaylistPage({ playlistData, playlistsData, currUser }: PlaylistDetailPageProps) {
+export default function PlaylistPage({ playlistData, playlistsData, currUser, snapshots }: PlaylistDetailPageProps) {
     const router = useRouter();
     const [isTracking, setIsTracking] = useState(false);
     const [showTrackingDialog, setShowTrackingDialog] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [selectedTimeframe, setSelectedTimeframe] = useState("4weeks")
+    const [selectedTimeframe, setSelectedTimeframe] = useState("4weeks");
 
     const playlist = playlistData.data;
     const tracks = playlistData.tracks;
-    const isUserPlaylist = playlist.userId !== null
+    const isUserPlaylist = playlist.userId !== null;
+    console.log("snaps", snapshots)
 
     const handleTracker = async () => {
         if (!currUser) {
+            //rxtquery?
             router.push('/login')
-        }
+        }//shd u handle rqsts clientside with rxtquery to handle delay in fetches
         setIsLoading(true);
         try {
             if (!isTracking) {
-                await startTracker(playlist.playlistId)
-                setIsTracking(true)
-                setShowTrackingDialog(false)
+                await startTracker(playlist.playlistId);
+                setIsTracking(true);
+                setShowTrackingDialog(false);
             } else {
-                await stopTracker(playlist.playlistId)
-                setIsTracking(false)
+                await stopTracker(playlist.playlistId);
+                setIsTracking(false);
             }
 
         } catch (error) {
-            console.error(error)
+            console.error(error);
         } finally {
             setIsLoading(false);
         }
@@ -119,7 +122,6 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
 
                             <p className="text-lg text-slate-300 leading-relaxed mb-6">{playlist.description}</p>
 
-                            {/* Metadata */}
                             <div className="flex flex-wrap items-center gap-6 text-sm text-slate-400 mb-6">
                                 <div className="flex items-center">
                                     <Music className="h-4 w-4 mr-2" />

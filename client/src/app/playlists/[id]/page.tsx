@@ -3,6 +3,7 @@ import React from 'react'
 import PlaylistComponent from './components/PlaylistComponent';
 import fetchCurrentUser from '@/services/getMe';
 import fetchSpotifyPlaylist from '@/services/getSpotifyPlaylist';
+import { getSnapshotById, getSnapshots } from '@/services/getSnapshots';
 
 const page = async ({ params }: { params: { id: string } }) => {
     const { id } = await params;
@@ -14,10 +15,18 @@ const page = async ({ params }: { params: { id: string } }) => {
     if (!playlistData || !playlistData.data) {
         return <div>No playlist found</div>;
     }
-    const playlist = playlistData?.data
-    const playlists = playlistsData?.data
+
+    const { data: playlists } = playlistsData;
+    const { data: playlist } = playlistData;
+    const snapshots = playlist.data.isTracked ? await getSnapshots(id) : null;
+    // const snapshotData = playlist.data.isTracked ? await getSnapshotById(id, ) : null;
     return (
-        <PlaylistComponent playlistData={playlist} playlistsData={playlists} currUser={currUser} />
+        <PlaylistComponent
+            playlistData={playlist}
+            playlistsData={playlists}
+            currUser={currUser}
+            snapshots={snapshots}
+        />
     )
 }
 

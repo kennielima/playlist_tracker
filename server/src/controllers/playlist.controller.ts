@@ -107,7 +107,7 @@ async function getPlaylist(req: TokenRequest, res: Response) {
     }
 }
 
-async function trackPlaylist(req: TokenRequest, res: Response) {
+async function startTracker(req: TokenRequest, res: Response) {
     const accessToken = req.access_token;
     const playlistId = req.params.id;
     const userId = req?.user?.id;
@@ -201,4 +201,4 @@ async function getSnapshotById(req: TokenRequest, res: Response) {
     }
 }
 
-export { getFeaturedPlaylists, getPlaylist, trackPlaylist, stopTracker, getPlaylistSnapshots, getSnapshotById }
+export { getFeaturedPlaylists, getPlaylist, startTracker, stopTracker, getPlaylistSnapshots, getSnapshotById }

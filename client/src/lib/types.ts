@@ -36,3 +36,12 @@ export type Track = {
     title: string
     trackId: string;
 }
+
+export type Snapshot = {
+    playlist: string;
+    playlistId: string;
+    createdAt: string
+    updatedAt: string
+    userId: string
+    track: Track[]
+}
