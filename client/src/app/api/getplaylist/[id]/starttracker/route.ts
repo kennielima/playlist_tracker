@@ -5,7 +5,7 @@ export const GET = async (req: Request, { params }: { params: { id: string } }) 
     const cookie = await cookies();
     const token = cookie.get('token')?.value;
     const { id } = await params;
-    console.log('token', token, id)
+
     if (!token) {
         return NextResponse.json({ error: 'No token found in cookies' }, { status: 401 });
     }
@@ -19,7 +19,6 @@ export const GET = async (req: Request, { params }: { params: { id: string } }) 
             },
             credentials: 'include'
         });
-        console.log('respp', response)
 
         if (!response.ok) {
             throw new Error('Failed to track playlist on route');

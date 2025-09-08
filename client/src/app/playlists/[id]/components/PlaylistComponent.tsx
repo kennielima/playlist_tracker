@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -29,6 +29,8 @@ import { startTracker, stopTracker } from "@/services/trackPlaylist"
 import { useRouter } from "next/navigation"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import Search from "@/components/Search"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { getSnapshots } from "@/services/getSnapshots"
 
 
 interface PlaylistDetailPageProps {
@@ -38,7 +40,7 @@ interface PlaylistDetailPageProps {
     }
     playlistsData: Playlist[]
     currUser: User,
-    snapshots: Snapshot[]
+    // snapshots: Snapshot[]
 }
 
 
@@ -50,38 +52,60 @@ const mockTrackingData = {
     nextSnapshot: "2025-01-19T10:00:00Z",
 }
 
-export default function PlaylistPage({ playlistData, playlistsData, currUser, snapshots }: PlaylistDetailPageProps) {
+export default function PlaylistPage({ playlistData, playlistsData, currUser }: PlaylistDetailPageProps) {
     const router = useRouter();
-    const [isTracking, setIsTracking] = useState(false);
+    const queryClient = useQueryClient();
+    const { data: playlist, tracks } = playlistData;
+    const isUserPlaylist = playlist.userId !== null;
+
+    const [isTracking, setIsTracking] = useState(playlist.isTracked);
     const [showTrackingDialog, setShowTrackingDialog] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [selectedTimeframe, setSelectedTimeframe] = useState("4weeks");
 
-    const playlist = playlistData.data;
-    const tracks = playlistData.tracks;
-    const isUserPlaylist = playlist.userId !== null;
-    console.log("snaps", snapshots)
+    const { data: snapshotData, isLoading: snapshotLoading } = useQuery({
+        queryKey: ['snapshots', playlist.playlistId],
+        queryFn: () => getSnapshots(playlist.playlistId),
+        enabled: !!playlist.playlistId,
+    })
 
-    const handleTracker = async () => {
+    const startTrackerMutation = useMutation({
+        mutationFn: (playlistId: string) => startTracker(playlistId),
+        onSuccess: () => {
+            setIsTracking(true);
+            setShowTrackingDialog(false);
+            queryClient.invalidateQueries({ queryKey: ['snapshots', playlist.playlistId] });
+        },
+        onError: (error) => {
+            console.error('Start tracker error:', error);
+        }
+    });
+
+    const stopTrackerMutation = useMutation({
+        mutationFn: (playlistId: string) => stopTracker(playlistId),
+        onSuccess: () => {
+            setIsTracking(false);
+            queryClient.invalidateQueries({ queryKey: ['snapshots', playlist.playlistId] });
+        },
+        onError: (error) => {
+            console.error('Stop tracker error:', error);
+        }
+    });
+
+    // useEffect(() => {
+    //     console.log('snapshots:', snapshots, 'queryData:', snapshotData);
+    // }, [snapshots, snapshotData])
+
+    const handleTracker = () => {
         if (!currUser) {
-            //rxtquery?
-            router.push('/login')
-        }//shd u handle rqsts clientside with rxtquery to handle delay in fetches
-        setIsLoading(true);
-        try {
-            if (!isTracking) {
-                await startTracker(playlist.playlistId);
-                setIsTracking(true);
-                setShowTrackingDialog(false);
-            } else {
-                await stopTracker(playlist.playlistId);
-                setIsTracking(false);
-            }
+            router.push('/login');
+            return;
+        }
 
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setIsLoading(false);
+        if (!isTracking) {
+            startTrackerMutation.mutate(playlist.playlistId);
+        } else {
+            stopTrackerMutation.mutate(playlist.playlistId);
         }
     }
 

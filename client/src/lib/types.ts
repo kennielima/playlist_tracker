@@ -38,6 +38,7 @@ export type Track = {
 }
 
 export type Snapshot = {
+    id: string
     playlist: string;
     playlistId: string;
     createdAt: string

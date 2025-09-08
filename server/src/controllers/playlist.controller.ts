@@ -116,22 +116,38 @@ async function startTracker(req: TokenRequest, res: Response) {
         if (!accessToken || !userId) {
             return res.status(401).json({ error: "Spotify access token or user id is not available" });
         }
-        const trackPlaylist = await prisma.playlist.update({
+
+        let initialSnapshot;
+
+        const sevendaysago = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+        const initialSnapshotExists = await prisma.snapshot.findFirst({
+            where: {
+                playlistId: playlistId,
+                id: userId,
+                createdAt: {
+                    gte: sevendaysago
+                }
+            }
+        })
+        if (initialSnapshotExists) {
+            initialSnapshot = initialSnapshotExists;
+        } else {
+            initialSnapshot = await saveSnapshot(playlistId, userId, accessToken);
+        }
+        const updatedPlaylist = await prisma.playlist.update({
             data: {
                 isTracked: true,
-                isTrackedBy: userId
+                isTrackedBy: userId,
+                trackingStartDate: new Date()
             },
             where: { playlistId }
         })
-        if (!trackPlaylist) {
-            return res.status(400).json({ error: "Error while attempting to start tracking playlist", isTracking: false });
-        }
-        const initialSnapshot = await saveSnapshot(playlistId, userId, accessToken);
 
         return res.status(200).json({
             isTracking: true,
             isTrackedBy: userId,
-            initialSnapshot: initialSnapshot
+            initialSnapshot: initialSnapshot,
+            updatedPlaylist: updatedPlaylist
         });
     } catch (error) {
         console.error("Error tracking playlist:", error);
