@@ -25,6 +25,7 @@ export type Playlist = {
     playlistId: string
     snapshotId: string
     isTracked: boolean
+    isTrackedBy: string | null
 }
 
 export type Track = {

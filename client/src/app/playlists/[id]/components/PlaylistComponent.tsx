@@ -60,14 +60,25 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
 
     const [isTracking, setIsTracking] = useState(playlist.isTracked);
     const [showTrackingDialog, setShowTrackingDialog] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const [selectedTimeframe, setSelectedTimeframe] = useState("4weeks");
+    // const [isLoading, setIsLoading] = useState(false);
 
     const { data: snapshotData, isLoading: snapshotLoading } = useQuery({
         queryKey: ['snapshots', playlist.playlistId],
         queryFn: () => getSnapshots(playlist.playlistId),
         enabled: !!playlist.playlistId,
     })
+    const formattedFirstSnap = isTracking && snapshotData?.data?.[0]?.createdAt
+        ? formatDate(snapshotData.data[0].createdAt)
+        : '';
+
+    const [firstsnapshotTime, setFirstsnapshotTime] = useState<string>(formattedFirstSnap);
+
+    useEffect(() => {
+        if (formattedFirstSnap && firstsnapshotTime === '') {
+            setFirstsnapshotTime(formattedFirstSnap);
+        }
+    }, [formattedFirstSnap, firstsnapshotTime]);
+
 
     const startTrackerMutation = useMutation({
         mutationFn: (playlistId: string) => startTracker(playlistId),
@@ -91,7 +102,7 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
             console.error('Stop tracker error:', error);
         }
     });
-
+    // console.log('startTrackerMutation', startTrackerMutation);
     // useEffect(() => {
     //     console.log('snapshots:', snapshots, 'queryData:', snapshotData);
     // }, [snapshots, snapshotData])
@@ -164,7 +175,7 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                                     Play on Spotify
                                 </Button>
 
-                                {!isTracking && (
+                                {(!isTracking || !currUser || (currUser && playlist.isTrackedBy !== currUser.id)) && (
                                     <Dialog open={showTrackingDialog} onOpenChange={setShowTrackingDialog}>
                                         <DialogTrigger asChild>
                                             <Button
@@ -204,16 +215,16 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                                                 </Button>
                                                 <Button
                                                     onClick={handleTracker}
-                                                    disabled={isLoading}
+                                                    disabled={snapshotLoading}
                                                     className="bg-purple-600 hover:bg-purple-500"
                                                 >
-                                                    {isLoading ? "Starting..." : "Start Tracking"}
+                                                    {snapshotLoading ? "Starting..." : "Start Tracking"}
                                                 </Button>
                                             </DialogFooter>
                                         </DialogContent>
                                     </Dialog>
                                 )}
-                                {isTracking && (
+                                {(isTracking && playlist.isTrackedBy === currUser.id) && (
                                     <Button
                                         variant="outline"
                                         size="lg"
@@ -240,24 +251,25 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                 {/* <div className="flex flex-col gap-8"> */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-8">
-                        <div className="flex items-center space-x-5 justify-between w-full">
-                            <Select value={selectedTimeframe} onValueChange={setSelectedTimeframe}>
-                                <SelectTrigger className="w-36 h-12 bg-white/5 border-white/10 text-white">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent className="bg-slate-800 border-white/10">
-                                    <SelectItem value="1week">1 Week</SelectItem>
-                                    <SelectItem value="4weeks">4 Weeks</SelectItem>
-                                    <SelectItem value="3months">3 Months</SelectItem>
-                                    <SelectItem value="all">All Time</SelectItem>
-                                </SelectContent>
-                            </Select>
-
+                        <div className={`flex items-center space-x-5 justify-between w-full ${!isTracking && "flex-row-reverse gap-4"}`}>
+                            {isTracking && (
+                                <Select value={firstsnapshotTime || ""} onValueChange={setFirstsnapshotTime}>
+                                    <SelectTrigger className="w-36 h-12 bg-white/5 border-white/10 text-white">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-slate-800 border-white/10">
+                                        {snapshotData?.data?.map((snapshot: Snapshot) => (
+                                            <SelectItem key={snapshot.id} value={formatDate(snapshot.createdAt)}>
+                                                {formatDate(snapshot.createdAt)}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            )}
                             <Button variant="outline" size="lg" className="border-white/20 text-white hover:bg-white/10 bg-transparent">
-                                <Download className="h-4 w-4 mr-2" />
+                                <Download className="h-4 w-4" />
                                 Export
                             </Button>
-
                             <Search category={'track'} />
                         </div>
                         <Card className="bg-white/5 backdrop-blur-md border border-white/10 py-8">
