@@ -29,13 +29,15 @@ export type Playlist = {
 }
 
 export type Track = {
-    artist: string[];
+    artists: string[];
     imageUrl: string;
     playlist: string;
     playlistId: string;
     rank: number
-    title: string
+    name: string
     trackId: string;
+    snapshotId?: string;
+    album: string;
 }
 
 export type Snapshot = {

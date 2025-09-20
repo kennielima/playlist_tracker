@@ -22,8 +22,7 @@ const getSnapshots = async (playlistId: string) => {
 const getSnapshotById = async (playlistId: string, snapshotId: string) => {
     const cookie = await cookies();
     const cookieHeader = cookie.toString();
-
-    const res = await fetch(`${process.env.BASE_URL}/api/getplaylist/${playlistId}/getSnapshots/${snapshotId}`, {
+    const res = await fetch(`${process.env.BASE_URL}/api/getplaylist/${playlistId}/getsnapshots/${snapshotId}`, {
         method: "GET",
         headers: {
             cookie: cookieHeader

@@ -63,7 +63,6 @@ async function saveSnapshot(id: string, userId: string, accessToken: string) {
                         album: track.album.name,
                         imageUrl: track.album.images[0]?.url,
                         artists: artistArr,
-                        // playlistId: id,
                         Playlist: {
                             connect: { playlistId: id }
                         },

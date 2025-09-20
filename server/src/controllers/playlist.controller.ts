@@ -93,11 +93,12 @@ async function getPlaylist(req: TokenRequest, res: Response) {
             trackdata.push({
                 imageUrl: track.album.images[0].url,
                 trackId: track.id,
-                title: track.name,
-                artist: artistArr,
+                name: track.name,
+                artists: artistArr,
                 playlistId: id,
                 playlist: playlist.name,
-                rank: i + 1
+                rank: i + 1,
+                album: track.album.name
             })
         }
         return res.status(200).json({ data: playlist, tracks: trackdata });
@@ -200,10 +201,10 @@ async function getPlaylistSnapshots(req: TokenRequest, res: Response) {
     }
 }
 async function getSnapshotById(req: TokenRequest, res: Response) {
-    const snapshotId = req.params.snapshotId;
-    const playlistId = req.params.playlistId;
+    const playlistId = req.params.id;
+    const snapshotId = req.params.snapId;
     try {
-        const snapshot = await prisma.snapshot.findMany({
+        const snapshot = await prisma.snapshot.findFirst({
             where: {
                 id: snapshotId,
                 playlistId

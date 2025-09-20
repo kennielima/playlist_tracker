@@ -30,7 +30,8 @@ import { useRouter } from "next/navigation"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import Search from "@/components/Search"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { getSnapshots } from "@/services/getSnapshots"
+import { getSnapshots, getSnapshotById } from "@/services/getSnapshots"
+import Link from "next/link"
 
 
 interface PlaylistDetailPageProps {
@@ -60,25 +61,55 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
 
     const [isTracking, setIsTracking] = useState(playlist.isTracked);
     const [showTrackingDialog, setShowTrackingDialog] = useState(false);
-    // const [isLoading, setIsLoading] = useState(false);
 
-    const { data: snapshotData, isLoading: snapshotLoading } = useQuery({
+    const { data: allSnapshotsData, isLoading: snapshotLoading } = useQuery({
         queryKey: ['snapshots', playlist.playlistId],
         queryFn: () => getSnapshots(playlist.playlistId),
         enabled: !!playlist.playlistId,
     })
-    const formattedFirstSnap = isTracking && snapshotData?.data?.[0]?.createdAt
-        ? formatDate(snapshotData.data[0].createdAt)
-        : '';
 
-    const [firstsnapshotTime, setFirstsnapshotTime] = useState<string>(formattedFirstSnap);
+    const formattedFirstSnapDate = isTracking && allSnapshotsData?.data?.[0]?.createdAt ? formatDate(allSnapshotsData.data[0].createdAt) : '';
+    const formattedFirstSnapData = isTracking && allSnapshotsData?.data?.[0] ? allSnapshotsData?.data?.[0] : null;
+
+    const [snapshotDate, setSnapshotDate] = useState<string>(formattedFirstSnapDate);
+    const [snapshotData, setSnapshotData] = useState(formattedFirstSnapData);
+    const [snapTracks, setSnapTracks] = useState(tracks);
 
     useEffect(() => {
-        if (formattedFirstSnap && firstsnapshotTime === '') {
-            setFirstsnapshotTime(formattedFirstSnap);
+        if (formattedFirstSnapDate && snapshotDate === '') {
+            setSnapshotDate(formattedFirstSnapDate);
         }
-    }, [formattedFirstSnap, firstsnapshotTime]);
+    }, [formattedFirstSnapDate, snapshotDate]);
 
+    useEffect(() => {
+        if (formattedFirstSnapData && (snapshotData === undefined || snapshotData === null)) {
+            setSnapshotData(formattedFirstSnapData);
+        }
+    }, [formattedFirstSnapData, snapshotData]);
+
+    const handleChangeSnapshot = (snapDate: string) => {
+        const selectedSnapshot = allSnapshotsData?.data.find((s: Snapshot) => formatDate(s.createdAt) === snapDate) || {}
+        setSnapshotDate(snapDate);
+        setSnapshotData(selectedSnapshot);
+
+        // Invalidate the snapshot query to force a fresh fetch
+        if (selectedSnapshot?.id) {
+            queryClient.invalidateQueries({ queryKey: ['snapshot', playlist?.playlistId, selectedSnapshot.id] });
+        }
+    }
+
+    const { data: snapshotDetails, isLoading: snapshotIsLoading } = useQuery({
+        queryKey: ['snapshot', playlist?.playlistId, snapshotData?.id],
+        queryFn: () => getSnapshotById(playlist?.playlistId, snapshotData?.id),
+        enabled: !!playlist?.playlistId && !!snapshotData?.id
+    })
+
+    useEffect(() => {
+        if (snapshotDetails?.data?.tracks) {
+            // if (snapshotDetails?.data && snapshotDetails?.data !== formattedFirstSnapData && snapshotDetails?.data?.tracks !== snapTracks) {
+            setSnapTracks(snapshotDetails.data.tracks);
+        }
+    }, [snapshotDetails]);
 
     const startTrackerMutation = useMutation({
         mutationFn: (playlistId: string) => startTracker(playlistId),
@@ -102,10 +133,6 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
             console.error('Stop tracker error:', error);
         }
     });
-    // console.log('startTrackerMutation', startTrackerMutation);
-    // useEffect(() => {
-    //     console.log('snapshots:', snapshots, 'queryData:', snapshotData);
-    // }, [snapshots, snapshotData])
 
     const handleTracker = () => {
         if (!currUser) {
@@ -164,7 +191,6 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                                 </div>
                             </div>
 
-                            {/* Action Buttons */}
                             <div className="flex flex-wrap gap-4">
                                 <Button
                                     size="lg"
@@ -224,7 +250,7 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                                         </DialogContent>
                                     </Dialog>
                                 )}
-                                {(isTracking && playlist.isTrackedBy === currUser.id) && (
+                                {(isTracking && playlist.isTrackedBy === currUser?.id) && (
                                     <Button
                                         variant="outline"
                                         size="lg"
@@ -252,14 +278,16 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-8">
                         <div className={`flex items-center space-x-5 justify-between w-full ${!isTracking && "flex-row-reverse gap-4"}`}>
-                            {isTracking && (
-                                <Select value={firstsnapshotTime || ""} onValueChange={setFirstsnapshotTime}>
+                            {isTracking && currUser.id === playlist.isTrackedBy && (
+                                <Select value={snapshotDate || ""} onValueChange={(snapshot) => handleChangeSnapshot(snapshot)}>
                                     <SelectTrigger className="w-36 h-12 bg-white/5 border-white/10 text-white">
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent className="bg-slate-800 border-white/10">
-                                        {snapshotData?.data?.map((snapshot: Snapshot) => (
-                                            <SelectItem key={snapshot.id} value={formatDate(snapshot.createdAt)}>
+                                        {allSnapshotsData?.data?.map((snapshot: Snapshot) => (
+                                            <SelectItem
+                                                key={snapshot.id}
+                                                value={formatDate(snapshot.createdAt)}>
                                                 {formatDate(snapshot.createdAt)}
                                             </SelectItem>
                                         ))}
@@ -281,7 +309,7 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
 
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                {tracks.map((track: Track, index: number) => (
+                                {snapTracks?.map((track: Track, index: number) => (
                                     <div
                                         key={index}
                                         className="flex items-center justify-between p-3 rounded-lg hover:bg-white/5 transition-colors"
@@ -291,12 +319,12 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                                                 {index + 1}
                                             </div>
                                             <div>
-                                                <p className="text-white font-medium">{track.title}</p>
+                                                <p className="text-white font-medium">{track.name}</p>
                                                 <p className="text-sm text-slate-400">
-                                                    {track.artist.map((artist: string, index: number) =>
+                                                    {track?.artists?.map((artist: string, index: number) =>
                                                         <span key={index}>
                                                             {artist}
-                                                            {(track.artist.length > 1 && index < track.artist.length - 1) && ', '}
+                                                            {(track.artists.length > 1 && index < track.artists.length - 1) && ', '}
                                                         </span>
                                                     )}
                                                 </p>
@@ -322,23 +350,15 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                                     <span className="text-slate-400">Total Tracks</span>
                                     <span className="text-white font-medium">{tracks.length}</span>
                                 </div>
-                                {/* <div className="flex justify-between">
-                                    <span className="text-slate-400">Genre</span>
-                                    <span className="text-white font-medium">Afrobeats</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-slate-400">Country</span>
-                                    <span className="text-white font-medium">Nigeria</span>
-                                </div> */}
                                 <div className="flex justify-between">
                                     <span className="text-slate-400">Updated</span>
                                     <span className="text-white font-medium">Weekly</span>
                                 </div>
-                                {/* <Separator className="bg-white/10" />
+
                                 <div className="flex justify-between">
-                                    <span className="text-slate-400">Playlist ID</span>
-                                    <span className="text-white font-mono text-sm">{playlist.playlistId}...</span>
-                                </div> */}
+                                    <span className="text-slate-400">Snapshots</span>
+                                    <span className="text-white font-medium">{allSnapshotsData?.data?.length}</span>
+                                </div>
                             </CardContent>
                         </Card>
 
@@ -348,25 +368,26 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                                 <CardTitle className="text-white text-lg">Similar Playlists</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                {playlistsData.map((playlist: any, index: number) => (
-                                    <div
-                                        key={index}
-                                        className="flex items-center space-x-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors"
-                                    >
-                                        <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
-                                            <Music className="h-6 w-6 text-white" />
-                                        </div>
-                                        <div className="flex-1">
-                                            <p className="text-white font-medium">{playlist.name}</p>
-                                            {/* <p className="text-sm text-slate-400">{playlist.tracks}</p> */}
-                                        </div>
-                                    </div>
+                                {playlistsData.map((playlist: Playlist, index: number) => (
+                                    playlist.playlistId !== playlistData.data.playlistId && (
+                                        <Link key={index} href={`/playlists/${playlist.playlistId}`}>
+                                            <div className="flex items-center space-x-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors">
+                                                <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
+                                                    <Music className="h-6 w-6 text-white" />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <p className="text-white font-medium">{playlist.name}</p>
+                                                    {/* <p className="text-sm text-slate-400">{playlist.tracks}</p> */}
+                                                </div>
+                                            </div>
+                                        </Link>
+                                    )
                                 ))}
                             </CardContent>
                         </Card>
                     </div>
                 </div>
             </div>
-        </div >
+        </div>
     )
 }

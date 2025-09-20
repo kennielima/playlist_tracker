@@ -18,14 +18,12 @@ const page = async ({ params }: { params: { id: string } }) => {
 
     const { data: playlists } = playlistsData;
     const { data: playlist } = playlistData;
-    const snapshots = playlist.data.isTracked ? await getSnapshots(id) : null;
-    // const snapshotData = playlist.data.isTracked ? await getSnapshotById(id, ) : null;
+
     return (
         <PlaylistComponent
             playlistData={playlist}
             playlistsData={playlists}
             currUser={currUser}
-            snapshots={snapshots}
         />
     )
 }
