@@ -184,7 +184,7 @@ const Homepage = ({ playlistData, user }: HomepageProps) => {
                                 onHoverStart={() => setHoveredPlaylist(playlist.playlistId)}
                                 onHoverEnd={() => setHoveredPlaylist(null)}
                             >
-                                <Link href={`/playlists/${playlist.playlistId}`}>
+                                <Link href={`/playlists/${playlist?.playlistId}`}>
                                     <Card className="group cursor-pointer bg-white/5 backdrop-blur-md border border-white/10 shadow-xl hover:shadow-2xl hover:bg-white/10 transition-all duration-300 overflow-hidden">
                                         <CardContent className="p-0">
                                             <div className="relative overflow-hidden">

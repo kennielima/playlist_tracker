@@ -124,7 +124,7 @@ const UserComponent = ({ user, playlistData, id }: UserTypeProps) => {
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                         >
-                            <Link href={`/playlists/${playlist.playlistId}`}>
+                            <Link href={`/playlists/${playlist?.playlistId}`}>
                                 <Card className="group cursor-pointer bg-white/5 backdrop-blur-md border border-white/10 shadow-xl hover:shadow-2xl hover:bg-white/10 transition-all duration-300">
                                     <CardContent className="p-0">
                                         {viewMode === "grid" ? (

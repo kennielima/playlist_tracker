@@ -8,7 +8,7 @@ const router = express.Router();
 router.get("/get-featured", ensureSpotifyToken, getFeaturedPlaylists);
 router.get("/:id", ensureSpotifyToken, getPlaylist);
 router.get("/:id/startTracker", authenticate, ensureSpotifyToken, startTracker);
-router.get("/:id/stopTracker", authenticate, stopTracker);
+router.get("/:id/stopTracker", authenticate, ensureSpotifyToken, stopTracker);
 router.get("/:id/getSnapshots", getPlaylistSnapshots);
 router.get("/:id/getSnapshots/:snapId", getSnapshotById);
 

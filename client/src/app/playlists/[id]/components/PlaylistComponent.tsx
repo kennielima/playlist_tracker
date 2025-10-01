@@ -44,20 +44,12 @@ interface PlaylistDetailPageProps {
     // snapshots: Snapshot[]
 }
 
-
-const mockTrackingData = {
-    isTracking: false,
-    lastSnapshot: "2025-01-10T10:00:00Z",
-    totalSnapshots: 12,
-    weeklyChange: "+5 tracks",
-    nextSnapshot: "2025-01-19T10:00:00Z",
-}
-
 export default function PlaylistPage({ playlistData, playlistsData, currUser }: PlaylistDetailPageProps) {
     const router = useRouter();
     const queryClient = useQueryClient();
     const { data: playlist, tracks } = playlistData;
     const isUserPlaylist = playlist.userId !== null;
+    let featured = ["6UeSakyzhiEt4NB3UAd6NQ", "2tAv9JR7er6YCkBkDWgrAd", "0Ra05IrSpRRAIkuCv84S1i", "2khn1j2muqFCP1bZveUgEt", "758C2hxpVLddA3qW02eHtE"]
 
     const [isTracking, setIsTracking] = useState(playlist.isTracked);
     const [showTrackingDialog, setShowTrackingDialog] = useState(false);
@@ -242,7 +234,7 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                                                 <Button
                                                     onClick={handleTracker}
                                                     disabled={snapshotLoading}
-                                                    className="bg-purple-600 hover:bg-purple-500"
+                                                    className="bg-purple-600 hover:bg-purple-500 cursor-pointer"
                                                 >
                                                     {snapshotLoading ? "Starting..." : "Start Tracking"}
                                                 </Button>
@@ -278,7 +270,7 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-8">
                         <div className={`flex items-center space-x-5 justify-between w-full ${!isTracking && "flex-row-reverse gap-4"}`}>
-                            {isTracking && currUser.id === playlist.isTrackedBy && (
+                            {isTracking && (currUser?.id === playlist?.isTrackedBy) && featured.includes(playlist?.playlistId) && (
                                 <Select value={snapshotDate || ""} onValueChange={(snapshot) => handleChangeSnapshot(snapshot)}>
                                     <SelectTrigger className="w-36 h-12 bg-white/5 border-white/10 text-white">
                                         <SelectValue />

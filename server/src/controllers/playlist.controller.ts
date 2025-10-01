@@ -123,8 +123,8 @@ async function startTracker(req: TokenRequest, res: Response) {
         const sevendaysago = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
         const initialSnapshotExists = await prisma.snapshot.findFirst({
             where: {
-                playlistId: playlistId,
-                id: userId,
+                playlistId,
+                userId,
                 createdAt: {
                     gte: sevendaysago
                 }
