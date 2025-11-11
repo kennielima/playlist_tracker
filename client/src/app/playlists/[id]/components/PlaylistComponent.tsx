@@ -54,7 +54,7 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
     const [isTracking, setIsTracking] = useState(playlist.isTracked);
     const [showTrackingDialog, setShowTrackingDialog] = useState(false);
 
-    const { data: allSnapshotsData, isLoading: snapshotLoading } = useQuery({
+    const { data: allSnapshotsData, isLoading: snapshotsLoading } = useQuery({
         queryKey: ['snapshots', playlist.playlistId],
         queryFn: () => getSnapshots(playlist.playlistId),
         enabled: !!playlist.playlistId,
@@ -79,13 +79,11 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
         }
     }, [formattedFirstSnapData, snapshotData]);
 
-    const handleChangeSnapshot = (snapDate: string) => {
-        const selectedSnapshot = allSnapshotsData?.data.find((s: Snapshot) => formatDate(s.createdAt) === snapDate) || {}
-        setSnapshotDate(snapDate);
-        setSnapshotData(selectedSnapshot);
-
-        // Invalidate the snapshot query to force a fresh fetch
-        if (selectedSnapshot?.id) {
+    const handleChangeSnapshot = (snapshotId: string) => {
+        const selectedSnapshot = allSnapshotsData?.data.find((s: Snapshot) => s.id === snapshotId);
+        if (selectedSnapshot) {
+            setSnapshotDate(formatDate(selectedSnapshot.createdAt));
+            setSnapshotData(selectedSnapshot);
             queryClient.invalidateQueries({ queryKey: ['snapshot', playlist?.playlistId, selectedSnapshot.id] });
         }
     }
@@ -93,8 +91,11 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
     const { data: snapshotDetails, isLoading: snapshotIsLoading } = useQuery({
         queryKey: ['snapshot', playlist?.playlistId, snapshotData?.id],
         queryFn: () => getSnapshotById(playlist?.playlistId, snapshotData?.id),
-        enabled: !!playlist?.playlistId && !!snapshotData?.id
+        enabled: !!snapshotData,
+        refetchOnMount: true,
+        // staleTime: 0
     })
+    console.log("SNAPDETAILS", snapshotDetails);
 
     useEffect(() => {
         if (snapshotDetails?.data?.tracks) {
@@ -233,10 +234,10 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                                                 </Button>
                                                 <Button
                                                     onClick={handleTracker}
-                                                    disabled={snapshotLoading}
+                                                    disabled={snapshotsLoading}
                                                     className="bg-purple-600 hover:bg-purple-500 cursor-pointer"
                                                 >
-                                                    {snapshotLoading ? "Starting..." : "Start Tracking"}
+                                                    {snapshotsLoading ? "Starting..." : "Start Tracking"}
                                                 </Button>
                                             </DialogFooter>
                                         </DialogContent>
@@ -266,20 +267,22 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                 </motion.div>
 
                 {/* Content Sections */}
-                {/* <div className="flex flex-col gap-8"> */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-8">
                         <div className={`flex items-center space-x-5 justify-between w-full ${!isTracking && "flex-row-reverse gap-4"}`}>
                             {isTracking && (currUser?.id === playlist?.isTrackedBy) && featured.includes(playlist?.playlistId) && (
-                                <Select value={snapshotDate || ""} onValueChange={(snapshot) => handleChangeSnapshot(snapshot)}>
+                                <Select
+                                    value={snapshotData?.id || ""}
+                                    onValueChange={(snapshotId) => handleChangeSnapshot(snapshotId)}
+                                >
                                     <SelectTrigger className="w-36 h-12 bg-white/5 border-white/10 text-white">
-                                        <SelectValue />
+                                        <SelectValue placeholder={snapshotData ? formatDate(snapshotData.createdAt) : ""} />
                                     </SelectTrigger>
                                     <SelectContent className="bg-slate-800 border-white/10">
                                         {allSnapshotsData?.data?.map((snapshot: Snapshot) => (
                                             <SelectItem
                                                 key={snapshot.id}
-                                                value={formatDate(snapshot.createdAt)}>
+                                                value={snapshot.id}>
                                                 {formatDate(snapshot.createdAt)}
                                             </SelectItem>
                                         ))}
