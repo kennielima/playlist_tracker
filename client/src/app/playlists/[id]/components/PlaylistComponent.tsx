@@ -79,14 +79,7 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
         }
     }, [formattedFirstSnapData, snapshotData]);
 
-    const handleChangeSnapshot = (snapshotId: string) => {
-        const selectedSnapshot = allSnapshotsData?.data.find((s: Snapshot) => s.id === snapshotId);
-        if (selectedSnapshot) {
-            setSnapshotDate(formatDate(selectedSnapshot.createdAt));
-            setSnapshotData(selectedSnapshot);
-            queryClient.invalidateQueries({ queryKey: ['snapshot', playlist?.playlistId, selectedSnapshot.id] });
-        }
-    }
+
 
     const { data: snapshotDetails, isLoading: snapshotIsLoading } = useQuery({
         queryKey: ['snapshot', playlist?.playlistId, snapshotData?.id],
@@ -95,18 +88,20 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
         refetchOnMount: true,
         // staleTime: 0
     })
-    console.log("SNAPDETAILS", snapshotDetails);
 
     useEffect(() => {
         if (snapshotDetails?.data?.tracks) {
             // if (snapshotDetails?.data && snapshotDetails?.data !== formattedFirstSnapData && snapshotDetails?.data?.tracks !== snapTracks) {
             setSnapTracks(snapshotDetails.data.tracks);
+            // } else {
+            //     setIsTracking(false)
         }
     }, [snapshotDetails]);
 
     const startTrackerMutation = useMutation({
         mutationFn: (playlistId: string) => startTracker(playlistId),
         onSuccess: () => {
+            console.log('Start tracker success');
             setIsTracking(true);
             setShowTrackingDialog(false);
             queryClient.invalidateQueries({ queryKey: ['snapshots', playlist.playlistId] });
@@ -137,6 +132,15 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
             startTrackerMutation.mutate(playlist.playlistId);
         } else {
             stopTrackerMutation.mutate(playlist.playlistId);
+        }
+    }
+
+    const handleChangeSnapshot = (snapshotId: string) => {
+        const selectedSnapshot = allSnapshotsData?.data.find((s: Snapshot) => s.id === snapshotId);
+        if (selectedSnapshot) {
+            setSnapshotDate(formatDate(selectedSnapshot.createdAt));
+            setSnapshotData(selectedSnapshot);
+            queryClient.invalidateQueries({ queryKey: ['snapshot', playlist?.playlistId, selectedSnapshot.id] });
         }
     }
 

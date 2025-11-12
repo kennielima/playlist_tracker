@@ -21,7 +21,7 @@ const cronJob = cron.schedule('0 0 * * *', async () => { // Run daily at midnigh
         if (daysSinceStart > 0 && daysSinceStart % 7 === 0) {
             const tracker = playlist.isTrackedBy || '';
             try {
-                const snapshot = await saveSnapshot(playlist.playlistId, tracker, access_token);
+                const snapshot = await saveSnapshot(playlist.playlistId, tracker, access_token, null);
             } catch (err) {
                 console.error(`Error tracking ${playlist.id}:`, err);
             }

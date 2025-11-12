@@ -118,23 +118,19 @@ async function startTracker(req: TokenRequest, res: Response) {
             return res.status(401).json({ error: "Spotify access token or user id is not available" });
         }
 
-        let initialSnapshot;
-
         const sevendaysago = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
         const initialSnapshotExists = await prisma.snapshot.findFirst({
             where: {
                 playlistId,
                 userId,
                 createdAt: {
-                    gte: sevendaysago
+                    lte: sevendaysago
                 }
             }
         })
-        if (initialSnapshotExists) {
-            initialSnapshot = initialSnapshotExists;
-        } else {
-            initialSnapshot = await saveSnapshot(playlistId, userId, accessToken);
-        }
+
+        const snapshot = await saveSnapshot(playlistId, userId, accessToken, initialSnapshotExists)
+
         const updatedPlaylist = await prisma.playlist.update({
             data: {
                 isTracked: true,
@@ -147,7 +143,7 @@ async function startTracker(req: TokenRequest, res: Response) {
         return res.status(200).json({
             isTracking: true,
             isTrackedBy: userId,
-            initialSnapshot: initialSnapshot,
+            snapshot: snapshot,
             updatedPlaylist: updatedPlaylist
         });
     } catch (error) {
@@ -165,7 +161,7 @@ async function stopTracker(req: TokenRequest, res: Response) {
         if (!accessToken || !userId) {
             return res.status(401).json({ error: "Spotify access token or user id is not available" });
         }
-        await prisma.playlist.update({
+        const playlist = await prisma.playlist.update({
             data: {
                 isTracked: false,
                 isTrackedBy: null
@@ -200,6 +196,7 @@ async function getPlaylistSnapshots(req: TokenRequest, res: Response) {
         return res.status(500).json({ error: "Internal server error while fetching snapshots:" + error });
     }
 }
+
 async function getSnapshotById(req: TokenRequest, res: Response) {
     const playlistId = req.params.id;
     const snapshotId = req.params.snapId;
@@ -211,6 +208,8 @@ async function getSnapshotById(req: TokenRequest, res: Response) {
             },
             include: { tracks: true },
         })
+        // console.log(snapshot, "snapcheck")
+
         return res.status(200).json({ data: snapshot });
     } catch (error) {
         console.error("Error fetching snapshot:", error);

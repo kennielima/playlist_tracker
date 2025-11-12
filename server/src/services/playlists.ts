@@ -1,3 +1,4 @@
+import { Snapshot } from "../../generated/prisma";
 import prisma from "../lib/prisma";
 
 async function fetchPlaylistById(id: string, accessToken: string) {
@@ -31,13 +32,13 @@ async function fetchTracks(id: string, accessToken: string) {
     return data;
 }
 
-async function saveSnapshot(id: string, userId: string, accessToken: string) {
+async function saveSnapshot(id: string, userId: string, accessToken: string, snapshotExists: Snapshot | null) {
     const tracks = await fetchTracks(id, accessToken);
     const playlist = await fetchPlaylistById(id, accessToken);
 
     if (tracks && playlist && playlist.valid) {
         let trackdata = [];
-        for (let i = 0; i <= tracks.items.length; i++) {
+        for (let i = 0; i < tracks.items.length; i++) {
             const item = tracks.items[i];
             const track = item?.track;
             if (!track) continue;
@@ -76,22 +77,52 @@ async function saveSnapshot(id: string, userId: string, accessToken: string) {
             }
         }
 
-        const snapshot = await prisma.snapshot.create({
-            data: {
-                // id: playlist.data.snapshot_id,
-                playlist: {
-                    connect: { playlistId: id }
-                },
-                tracks: {
-                    connect: trackdata.map(track => ({ id: track.id }))
-                },
-                user: {
-                    connect: { id: userId }
-                },
+        let snapshot;
+        try {
+            if (!snapshotExists) {
+                snapshot = await prisma.snapshot.create({
+                    data: {
+                        // id: playlist.data.snapshot_id,
+                        playlist: {
+                            connect: { playlistId: id }
+                        },
+                        tracks: {
+                            connect: trackdata.map(track => ({ id: track.id }))
+                            // create: trackdata.map((track, index) => ({
+                            //     id: track.id + '_' + Date.now() + '_' + index, // Make unique
+                            //     artists: track.artists,
+                            //     name: track.name,
+                            //     album: track.album,
+                            //     imageUrl: track.imageUrl,
+                            //     rank: track.rank,
+                            //     playlistId: id
+                            // }))
+                        },
+                        user: {
+                            connect: { id: userId }
+                        },
+                    }
+                });
+                console.log(snapshot, "created");
             }
-        });
-        return snapshot;
+            else {
+                snapshot = await prisma.snapshot.update({
+                    where: {
+                        id: snapshotExists.id
+                    },
+                    data: {
+                        tracks: {
+                            set: [],
+                            connect: trackdata.map(track => ({ id: track.id }))
+                        }
+                    }
+                });
+            }
+            return snapshot;
+        } catch (error) {
+            console.error("Error saving snapshot:", error);
+            throw new Error("Error saving snapshot:" + error);
+        }
     }
 }
-
 export { fetchPlaylistById, fetchTracks, saveSnapshot };
