@@ -33,11 +33,19 @@ export type Track = {
     imageUrl: string;
     playlist: string;
     playlistId: string;
-    rank: number
     name: string
     trackId: string;
     snapshotId?: string;
     album: string;
+    rank?: number
+    tracks?: SnapshotTrack[]
+}
+export type SnapshotTrack = {
+    id: string;
+    snapshotId: string;
+    rank: number
+    createdAt: string;
+    track: Track;
 }
 
 export type Snapshot = {
@@ -47,5 +55,5 @@ export type Snapshot = {
     createdAt: string
     updatedAt: string
     userId: string
-    track: Track[]
+    tracks: SnapshotTrack[]
 }

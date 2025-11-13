@@ -22,7 +22,7 @@ import {
     Download,
     EyeOff,
 } from "lucide-react"
-import { Playlist, Snapshot, Track, User } from "@/lib/types"
+import { Playlist, Snapshot, SnapshotTrack, Track, User } from "@/lib/types"
 import { formatDate } from "@/lib/utils"
 import Image from "next/image"
 import { startTracker, stopTracker } from "@/services/trackPlaylist"
@@ -65,8 +65,10 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
 
     const [snapshotDate, setSnapshotDate] = useState<string>(formattedFirstSnapDate);
     const [snapshotData, setSnapshotData] = useState(formattedFirstSnapData);
-    const [snapTracks, setSnapTracks] = useState(tracks);
+    const [snapTracks, setSnapTracks] = useState<Track[]>(tracks);
+    const [snapshotTracks, setSnapshotTracks] = useState<SnapshotTrack[]>([]);
 
+    // set initial snapdata snd date
     useEffect(() => {
         if (formattedFirstSnapDate && snapshotDate === '') {
             setSnapshotDate(formattedFirstSnapDate);
@@ -79,8 +81,6 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
         }
     }, [formattedFirstSnapData, snapshotData]);
 
-
-
     const { data: snapshotDetails, isLoading: snapshotIsLoading } = useQuery({
         queryKey: ['snapshot', playlist?.playlistId, snapshotData?.id],
         queryFn: () => getSnapshotById(playlist?.playlistId, snapshotData?.id),
@@ -88,13 +88,9 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
         refetchOnMount: true,
         // staleTime: 0
     })
-
     useEffect(() => {
         if (snapshotDetails?.data?.tracks) {
-            // if (snapshotDetails?.data && snapshotDetails?.data !== formattedFirstSnapData && snapshotDetails?.data?.tracks !== snapTracks) {
-            setSnapTracks(snapshotDetails.data.tracks);
-            // } else {
-            //     setIsTracking(false)
+            setSnapshotTracks(snapshotDetails.data.tracks);
         }
     }, [snapshotDetails]);
 
@@ -308,32 +304,61 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
 
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                {snapTracks?.map((track: Track, index: number) => (
-                                    <div
-                                        key={index}
-                                        className="flex items-center justify-between p-3 rounded-lg hover:bg-white/5 transition-colors"
-                                    >
-                                        <div className="flex items-center space-x-3">
-                                            <div className="w-8 h-8 bg-purple-600/20 rounded flex items-center justify-center text-purple-300 text-sm font-medium">
-                                                {index + 1}
+                                {!isTracking &&
+                                    (snapTracks?.map((track: Track, index: number) => (
+                                        <div
+                                            key={index}
+                                            className="flex items-center justify-between p-3 rounded-lg hover:bg-white/5 transition-colors"
+                                        >
+                                            <div className="flex items-center space-x-3">
+                                                <div className="w-8 h-8 bg-purple-600/20 rounded flex items-center justify-center text-purple-300 text-sm font-medium">
+                                                    {index + 1}
+                                                </div>
+                                                <div>
+                                                    <p className="text-white font-medium">{track.name}</p>
+                                                    <p className="text-sm text-slate-400">
+                                                        {track?.artists?.map((artist: string, index: number) =>
+                                                            <span key={index}>
+                                                                {artist}
+                                                                {(track.artists.length > 1 && index < track.artists.length - 1) && ', '}
+                                                            </span>
+                                                        )}
+                                                    </p>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <p className="text-white font-medium">{track.name}</p>
-                                                <p className="text-sm text-slate-400">
-                                                    {track?.artists?.map((artist: string, index: number) =>
-                                                        <span key={index}>
-                                                            {artist}
-                                                            {(track.artists.length > 1 && index < track.artists.length - 1) && ', '}
-                                                        </span>
-                                                    )}
-                                                </p>
-                                            </div>
+                                            <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white">
+                                                <Play className="h-4 w-4" />
+                                            </Button>
                                         </div>
-                                        <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white">
-                                            <Play className="h-4 w-4" />
-                                        </Button>
-                                    </div>
-                                ))}
+                                    )))
+                                }
+                                {isTracking &&
+                                    (snapshotTracks?.map((track: SnapshotTrack) => (
+                                        <div
+                                            key={track.rank}
+                                            className="flex items-center justify-between p-3 rounded-lg hover:bg-white/5 transition-colors"
+                                        >
+                                            <div className="flex items-center space-x-3">
+                                                <div className="w-8 h-8 bg-purple-600/20 rounded flex items-center justify-center text-purple-300 text-sm font-medium">
+                                                    {track.rank}
+                                                </div>
+                                                <div>
+                                                    <p className="text-white font-medium">{track?.track?.name}</p>
+                                                    <p className="text-sm text-slate-400">
+                                                        {track?.track?.artists?.map((artist: string, index: number) =>
+                                                            <span key={index}>
+                                                                {artist}
+                                                                {(track?.track?.artists.length > 1 && index < track?.track?.artists.length - 1) && ', '}
+                                                            </span>
+                                                        )}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white">
+                                                <Play className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    )))}
                             </CardContent>
                         </Card>
                     </div>

@@ -124,12 +124,12 @@ async function startTracker(req: TokenRequest, res: Response) {
                 playlistId,
                 userId,
                 createdAt: {
-                    lte: sevendaysago
+                    gte: sevendaysago
                 }
             }
         })
 
-        const snapshot = await saveSnapshot(playlistId, userId, accessToken, initialSnapshotExists)
+        const snapshot = await saveSnapshot(playlistId, userId, accessToken, initialSnapshotExists || null)
 
         const updatedPlaylist = await prisma.playlist.update({
             data: {
@@ -206,9 +206,18 @@ async function getSnapshotById(req: TokenRequest, res: Response) {
                 id: snapshotId,
                 playlistId
             },
-            include: { tracks: true },
+            include: {
+                tracks: {
+                    include: {
+                        track: true
+                    },
+                    orderBy: {
+                        rank: 'asc'
+                    }
+                }
+            },
         })
-        // console.log(snapshot, "snapcheck")
+        console.log(snapshot, "snapcheck")
 
         return res.status(200).json({ data: snapshot });
     } catch (error) {
@@ -217,4 +226,11 @@ async function getSnapshotById(req: TokenRequest, res: Response) {
     }
 }
 
-export { getFeaturedPlaylists, getPlaylist, startTracker, stopTracker, getPlaylistSnapshots, getSnapshotById }
+export {
+    getFeaturedPlaylists,
+    getPlaylist,
+    startTracker,
+    stopTracker,
+    getPlaylistSnapshots,
+    getSnapshotById
+}
