@@ -33,7 +33,7 @@ const Sidebar = ({ playlistsData, playlistData, tracks, allSnapshotsData }: Side
 
                     <div className="flex justify-between">
                         <span className="text-slate-400">Snapshots</span>
-                        <span className="text-white font-medium">{allSnapshotsData?.data?.length}</span>
+                        <span className="text-white font-medium">{allSnapshotsData?.data?.length || 0}</span>
                     </div>
                 </CardContent>
             </Card>

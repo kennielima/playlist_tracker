@@ -164,14 +164,14 @@ async function stopTracker(req: TokenRequest, res: Response) {
         const playlist = await prisma.playlist.update({
             data: {
                 isTracked: false,
-                isTrackedBy: null
+                // isTrackedBy: null
             },
             where: { playlistId }
         })
 
         return res.status(200).json({
             isTracking: false,
-            isTrackedBy: null,
+            // isTrackedBy: null,
         });
     } catch (error) {
         console.error("Error stopping playlist tracker:", error);

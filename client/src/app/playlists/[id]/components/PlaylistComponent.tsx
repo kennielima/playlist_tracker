@@ -17,6 +17,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { getSnapshots, getSnapshotById } from "@/services/getSnapshots"
 import Sidebar from "./Sidebar"
 import PlaylistHeader from "./Header"
+import SearchPlaylistTrack from "./Search"
 
 
 interface PlaylistDetailPageProps {
@@ -47,15 +48,25 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
     })
 
     // set initial snapdata snd date if tracking
-    const formattedFirstSnapDate = isTracking && allSnapshotsData?.data?.[0]?.createdAt ? formatDate(allSnapshotsData.data[0].createdAt) : '';
-    const formattedFirstSnapData = isTracking && allSnapshotsData?.data?.[0] ? allSnapshotsData?.data?.[0] : null;
+    const formattedFirstSnapDate = allSnapshotsData?.data?.[0]?.createdAt ? formatDate(allSnapshotsData.data[0].createdAt) : '';
+    const formattedFirstSnapData = allSnapshotsData?.data?.[0] ? allSnapshotsData?.data?.[0] : null;
 
     const [snapshotDate, setSnapshotDate] = useState<string>(formattedFirstSnapDate);
     const [snapshotData, setSnapshotData] = useState(formattedFirstSnapData);
-    const [snapTracks, setSnapTracks] = useState<Track[] | SnapshotTrack[] | any>(tracks);
-    // const [snapshotTracks, setSnapshotTracks] = useState<>([]);
-    // const [currPlaylist, setCurrPlaylist] = useState(playlist);
+    const [snapTracks, setSnapTracks] = useState<Track[]>(tracks);
+    const [snapshotTracks, setSnapshotTracks] = useState<SnapshotTrack[]>([]);
+    const [searchKeyword, setSearchKeyword] = useState<string>("");
 
+    // Filter tracks based on search
+    const filteredSnapTracks = snapTracks.filter(track =>
+        track.name.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+        track.artists.some(artist => artist.toLowerCase().includes(searchKeyword.toLowerCase()))
+    );
+
+    const filteredSnapshotTracks = snapshotTracks.filter(st =>
+        st.track.name.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+        st.track.artists.some(artist => artist.toLowerCase().includes(searchKeyword.toLowerCase()))
+    );
 
     // render initial snapdata and date if tracking
     useEffect(() => {
@@ -79,7 +90,7 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
     })
     useEffect(() => {
         if (snapshotDetails?.data?.tracks) {
-            setSnapTracks(snapshotDetails.data.tracks);
+            setSnapshotTracks(snapshotDetails.data.tracks);
         }
     }, [snapshotDetails]);
 
@@ -157,8 +168,8 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                 {/* Content */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-8">
-                        <div className={`flex items-center space-x-5 justify-between w-full ${!isTracking && "flex-row-reverse gap-4"}`}>
-                            {isTracking && (currUser?.id === isTrackedBy) && (
+                        <div className={`flex items-center space-x-5 justify-between w-full ${(!isTracking && !allSnapshotsData) && "flex-row-reverse gap-4"}`}>
+                            {(isTracking || snapshotData) && (currUser?.id === isTrackedBy) && (
                                 <Select
                                     value={snapshotData?.id || ""}
                                     onValueChange={(snapshotId) => handleChangeSnapshot(snapshotId)}
@@ -181,7 +192,10 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                                 <Download className="h-4 w-4" />
                                 Export
                             </Button>
-                            <Search category={'track'} />
+                            <SearchPlaylistTrack
+                                searchKeyword={searchKeyword}
+                                setSearchKeyword={setSearchKeyword}
+                            />
                         </div>
                         <Card className="bg-white/5 backdrop-blur-md border border-white/10 py-8">
                             <CardHeader>
@@ -193,7 +207,7 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 {!isTracking &&
-                                    (snapTracks?.map((track: Track, index: number) => (
+                                    (filteredSnapTracks?.map((track: Track, index: number) => (
                                         <div
                                             key={index}
                                             className="flex items-center justify-between p-3 rounded-lg hover:bg-white/5 transition-colors"
@@ -221,7 +235,7 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                                     )))
                                 }
                                 {isTracking &&
-                                    (snapTracks?.map((track: SnapshotTrack) => (
+                                    (filteredSnapshotTracks?.map((track: SnapshotTrack) => (
                                         <div
                                             key={track.rank}
                                             className="flex items-center justify-between p-3 rounded-lg hover:bg-white/5 transition-colors"
