@@ -1,37 +1,22 @@
 "use client"
 import { useEffect, useState } from "react"
-import { motion } from "framer-motion"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog"
 import {
     Play,
-    Camera,
     Music,
-    Share2,
     Download,
-    EyeOff,
 } from "lucide-react"
 import { Playlist, Snapshot, SnapshotTrack, Track, User } from "@/lib/types"
 import { formatDate } from "@/lib/utils"
-import Image from "next/image"
 import { startTracker, stopTracker } from "@/services/trackPlaylist"
 import { useRouter } from "next/navigation"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import Search from "@/components/Search"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { getSnapshots, getSnapshotById } from "@/services/getSnapshots"
-import Link from "next/link"
+import Sidebar from "./Sidebar"
+import PlaylistHeader from "./Header"
 
 
 interface PlaylistDetailPageProps {
@@ -49,26 +34,30 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
     const queryClient = useQueryClient();
     const { data: playlist, tracks } = playlistData;
     const isUserPlaylist = playlist.userId !== null;
-    let featured = ["6UeSakyzhiEt4NB3UAd6NQ", "2tAv9JR7er6YCkBkDWgrAd", "0Ra05IrSpRRAIkuCv84S1i", "2khn1j2muqFCP1bZveUgEt", "758C2hxpVLddA3qW02eHtE"]
 
     const [isTracking, setIsTracking] = useState(playlist.isTracked);
+    const [isTrackedBy, setIsTrackedBy] = useState(playlist.isTrackedBy);
     const [showTrackingDialog, setShowTrackingDialog] = useState(false);
 
+    //fetch snapshots if tracking
     const { data: allSnapshotsData, isLoading: snapshotsLoading } = useQuery({
         queryKey: ['snapshots', playlist.playlistId],
         queryFn: () => getSnapshots(playlist.playlistId),
         enabled: !!playlist.playlistId,
     })
 
+    // set initial snapdata snd date if tracking
     const formattedFirstSnapDate = isTracking && allSnapshotsData?.data?.[0]?.createdAt ? formatDate(allSnapshotsData.data[0].createdAt) : '';
     const formattedFirstSnapData = isTracking && allSnapshotsData?.data?.[0] ? allSnapshotsData?.data?.[0] : null;
 
     const [snapshotDate, setSnapshotDate] = useState<string>(formattedFirstSnapDate);
     const [snapshotData, setSnapshotData] = useState(formattedFirstSnapData);
-    const [snapTracks, setSnapTracks] = useState<Track[]>(tracks);
-    const [snapshotTracks, setSnapshotTracks] = useState<SnapshotTrack[]>([]);
+    const [snapTracks, setSnapTracks] = useState<Track[] | SnapshotTrack[] | any>(tracks);
+    // const [snapshotTracks, setSnapshotTracks] = useState<>([]);
+    // const [currPlaylist, setCurrPlaylist] = useState(playlist);
 
-    // set initial snapdata snd date
+
+    // render initial snapdata and date if tracking
     useEffect(() => {
         if (formattedFirstSnapDate && snapshotDate === '') {
             setSnapshotDate(formattedFirstSnapDate);
@@ -90,16 +79,26 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
     })
     useEffect(() => {
         if (snapshotDetails?.data?.tracks) {
-            setSnapshotTracks(snapshotDetails.data.tracks);
+            setSnapTracks(snapshotDetails.data.tracks);
         }
     }, [snapshotDetails]);
 
     const startTrackerMutation = useMutation({
         mutationFn: (playlistId: string) => startTracker(playlistId),
-        onSuccess: () => {
-            console.log('Start tracker success');
+        onSuccess: (data) => {
+            console.log('Start tracker success:', data);
             setIsTracking(true);
             setShowTrackingDialog(false);
+
+            if (data?.snapshot) {
+                setSnapshotData(data.snapshot);
+                setSnapshotDate(formatDate(data.snapshot.createdAt));
+                // setCurrPlaylist(data.updatedPlaylist);
+                setIsTrackedBy(data.isTrackedBy);
+            } else {
+                console.log('No snapshot in response');
+            }
+            // Invalidate queries to refetch snapshots list
             queryClient.invalidateQueries({ queryKey: ['snapshots', playlist.playlistId] });
         },
         onError: (error) => {
@@ -123,7 +122,6 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
             router.push('/login');
             return;
         }
-
         if (!isTracking) {
             startTrackerMutation.mutate(playlist.playlistId);
         } else {
@@ -143,134 +141,24 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
     return (
         <div>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <motion.div
-                    className="flex flex-col lg:flex-row gap-8 mb-8"
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
-                >
-                    <div className="flex-shrink-0">
-                        <Image
-                            height={600}
-                            width={600}
-                            src={playlist.image || "/placeholder.svg"}
-                            alt={playlist.name || 'playlistimg'}
-                            className="w-80 h-80 object-cover rounded-lg shadow-2xl"
-                        />
-                    </div>
+                <PlaylistHeader
+                    playlist={playlist}
+                    isUserPlaylist={isUserPlaylist}
+                    isTracking={isTracking}
+                    currUser={currUser}
+                    isTrackedBy={isTrackedBy}
+                    showTrackingDialog={showTrackingDialog}
+                    setShowTrackingDialog={setShowTrackingDialog}
+                    tracks={tracks}
+                    snapshotsLoading={snapshotsLoading}
+                    handleTracker={handleTracker}
+                />
 
-                    <div className="flex-1 space-y-6">
-                        <div>
-                            <div className="flex items-center gap-2 mb-2">
-                                <Badge variant="secondary" className="bg-purple-600/20 text-purple-300">
-                                    {isUserPlaylist ? "User Playlist" : "Chart"}
-                                </Badge>
-                                {isTracking && (
-                                    <Badge variant="secondary" className="bg-green-600/20 text-green-300">
-                                        <Camera className="h-3 w-3 mr-1" />
-                                        Tracking
-                                    </Badge>
-                                )}
-                            </div>
-
-                            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">{playlist.name}</h1>
-
-                            <p className="text-lg text-slate-300 leading-relaxed mb-6">{playlist.description}</p>
-
-                            <div className="flex flex-wrap items-center gap-6 text-sm text-slate-400 mb-6">
-                                <div className="flex items-center">
-                                    <Music className="h-4 w-4 mr-2" />
-                                    {tracks.length} tracks
-                                </div>
-                            </div>
-
-                            <div className="flex flex-wrap gap-4">
-                                <Button
-                                    size="lg"
-                                    className="bg-purple-600 hover:bg-purple-500 text-white px-8 cursor-pointer"
-                                    onClick={() => window.open(playlist.url, "_blank")}
-                                >
-                                    <Play className="h-5 w-5" />
-                                    Play on Spotify
-                                </Button>
-
-                                {(!isTracking || !currUser || (currUser && playlist.isTrackedBy !== currUser.id)) && (
-                                    <Dialog open={showTrackingDialog} onOpenChange={setShowTrackingDialog}>
-                                        <DialogTrigger asChild>
-                                            <Button
-                                                variant="outline"
-                                                size="lg"
-                                                className="bg-green-600/20 text-green-400 border-green-400/20 cursor-pointer"
-                                            >
-                                                <Camera className="h-5 w-5" />
-                                                Start Tracking
-                                            </Button>
-                                        </DialogTrigger>
-                                        <DialogContent className="bg-slate-800 border-white/10">
-                                            <DialogHeader>
-                                                <DialogTitle className="text-white">Start Tracking Playlist</DialogTitle>
-                                                <DialogDescription className="text-slate-300">
-                                                    Track changes to this playlist over time. We'll take weekly snapshots and show you how it
-                                                    evolves.
-                                                </DialogDescription>
-                                            </DialogHeader>
-                                            <div className="space-y-4">
-                                                <Alert className="border-purple-500/20 bg-purple-500/10">
-                                                    <Camera className="h-4 w-4 text-purple-400" />
-                                                    <AlertDescription className="text-purple-300">
-                                                        We'll automatically take snapshots every week and notify you of changes.
-                                                    </AlertDescription>
-                                                </Alert>
-                                                <div className="text-sm text-slate-400">
-                                                    <p>• Weekly snapshots of track changes</p>
-                                                    {/* <p>• Notifications for major updates</p> */}
-                                                    <p>• Historical trends and data</p>
-                                                    <p>• Export tracking data anytime</p>
-                                                </div>
-                                            </div>
-                                            <DialogFooter>
-                                                <Button variant="outline" onClick={() => setShowTrackingDialog(false)}>
-                                                    Cancel
-                                                </Button>
-                                                <Button
-                                                    onClick={handleTracker}
-                                                    disabled={snapshotsLoading}
-                                                    className="bg-purple-600 hover:bg-purple-500 cursor-pointer"
-                                                >
-                                                    {snapshotsLoading ? "Starting..." : "Start Tracking"}
-                                                </Button>
-                                            </DialogFooter>
-                                        </DialogContent>
-                                    </Dialog>
-                                )}
-                                {(isTracking && playlist.isTrackedBy === currUser?.id) && (
-                                    <Button
-                                        variant="outline"
-                                        size="lg"
-                                        onClick={handleTracker}
-                                        className='flex items-center gap-2 px-4 py-2 rounded-lg font-medium cursor-pointer transition-all duration-200 bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30'
-                                    >
-                                        <EyeOff className="w-5 h-5" />
-                                        Stop Tracking
-                                    </Button>
-                                )}
-                                <Button
-                                    className="text-white hover:text-white border-white/20 hover:bg-white/10 px-8 cursor-pointer"
-                                    variant="outline"
-                                    size="lg"
-                                >
-                                    Share {" "} <Share2 className="h-5 w-5" />
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </motion.div>
-
-                {/* Content Sections */}
+                {/* Content */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-8">
                         <div className={`flex items-center space-x-5 justify-between w-full ${!isTracking && "flex-row-reverse gap-4"}`}>
-                            {isTracking && (currUser?.id === playlist?.isTrackedBy) && featured.includes(playlist?.playlistId) && (
+                            {isTracking && (currUser?.id === isTrackedBy) && (
                                 <Select
                                     value={snapshotData?.id || ""}
                                     onValueChange={(snapshotId) => handleChangeSnapshot(snapshotId)}
@@ -333,7 +221,7 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                                     )))
                                 }
                                 {isTracking &&
-                                    (snapshotTracks?.map((track: SnapshotTrack) => (
+                                    (snapTracks?.map((track: SnapshotTrack) => (
                                         <div
                                             key={track.rank}
                                             className="flex items-center justify-between p-3 rounded-lg hover:bg-white/5 transition-colors"
@@ -363,55 +251,9 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                         </Card>
                     </div>
 
-                    {/* Sidebar */}
-                    <div className="space-y-6">
-                        <Card className="bg-white/5 backdrop-blur-md border border-white/10 py-6">
-                            <CardHeader>
-                                <CardTitle className="text-white text-lg">Playlist Stats</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="flex justify-between">
-                                    <span className="text-slate-400">Total Tracks</span>
-                                    <span className="text-white font-medium">{tracks.length}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-slate-400">Updated</span>
-                                    <span className="text-white font-medium">Weekly</span>
-                                </div>
-
-                                <div className="flex justify-between">
-                                    <span className="text-slate-400">Snapshots</span>
-                                    <span className="text-white font-medium">{allSnapshotsData?.data?.length}</span>
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        {/* Similar Playlists */}
-                        <Card className="bg-white/5 backdrop-blur-md border border-white/10 py-8">
-                            <CardHeader>
-                                <CardTitle className="text-white text-lg">Similar Playlists</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                {playlistsData.map((playlist: Playlist, index: number) => (
-                                    playlist.playlistId !== playlistData.data.playlistId && (
-                                        <Link key={index} href={`/playlists/${playlist.playlistId}`}>
-                                            <div className="flex items-center space-x-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors">
-                                                <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
-                                                    <Music className="h-6 w-6 text-white" />
-                                                </div>
-                                                <div className="flex-1">
-                                                    <p className="text-white font-medium">{playlist.name}</p>
-                                                    {/* <p className="text-sm text-slate-400">{playlist.tracks}</p> */}
-                                                </div>
-                                            </div>
-                                        </Link>
-                                    )
-                                ))}
-                            </CardContent>
-                        </Card>
-                    </div>
+                    <Sidebar playlistsData={playlistsData} playlistData={playlistData} tracks={tracks} allSnapshotsData={allSnapshotsData} />
                 </div>
             </div>
-        </div>
+        </div >
     )
 }

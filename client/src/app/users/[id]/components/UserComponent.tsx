@@ -133,7 +133,7 @@ const UserComponent = ({ user, playlistData, id }: UserTypeProps) => {
                                                     <Image
                                                         height={300}
                                                         width={300}
-                                                        src={playlist.image || "/placeholder.svg"}
+                                                        src={playlist?.image || "/placeholder.svg"}
                                                         alt={playlist.name}
                                                         className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                                                     />
