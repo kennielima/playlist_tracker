@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Playlist, Track, User } from '@/lib/types'
 import { motion } from 'framer-motion'
-import { Camera, EyeOff, Music, Play, Share2 } from 'lucide-react'
+import { Camera, EyeOff, Loader, Music, Play, Share2 } from 'lucide-react'
 import Image from 'next/image'
 import React from 'react'
 
@@ -17,10 +17,23 @@ export interface HeaderProps {
     showTrackingDialog: boolean;
     setShowTrackingDialog: React.Dispatch<React.SetStateAction<boolean>>;
     tracks: Track[];
-    snapshotsLoading: boolean;
     handleTracker: () => void;
+    startIsPending: boolean;
+    stopIsPending: boolean;
 }
-const PlaylistHeader = ({ playlist, isUserPlaylist, isTracking, currUser, isTrackedBy, showTrackingDialog, setShowTrackingDialog, tracks, snapshotsLoading, handleTracker }: HeaderProps) => {
+const PlaylistHeader = ({
+    playlist,
+    isUserPlaylist,
+    isTracking,
+    currUser,
+    isTrackedBy,
+    showTrackingDialog,
+    setShowTrackingDialog,
+    tracks,
+    handleTracker,
+    startIsPending,
+    stopIsPending
+}: HeaderProps) => {
     return (
         <motion.div
             className="flex flex-col lg:flex-row gap-8 mb-8"
@@ -112,10 +125,17 @@ const PlaylistHeader = ({ playlist, isUserPlaylist, isTracking, currUser, isTrac
                                         </Button>
                                         <Button
                                             onClick={handleTracker}
-                                            disabled={snapshotsLoading}
+                                            disabled={startIsPending}
                                             className="bg-purple-600 hover:bg-purple-500 cursor-pointer"
                                         >
-                                            {snapshotsLoading ? "Starting..." : "Start Tracking"}
+                                            {startIsPending ? (
+                                                <p className="flex items-center gap-1">
+                                                    <Loader className='animate-spin' />
+                                                    <span>Starting...</span>
+                                                </p>
+                                            ) :
+                                                "Start Tracking"
+                                            }
                                         </Button>
                                     </DialogFooter>
                                 </DialogContent>
@@ -126,10 +146,20 @@ const PlaylistHeader = ({ playlist, isUserPlaylist, isTracking, currUser, isTrac
                                 variant="outline"
                                 size="lg"
                                 onClick={handleTracker}
+                                disabled={stopIsPending}
                                 className='flex items-center gap-2 px-4 py-2 rounded-lg font-medium cursor-pointer transition-all duration-200 bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30'
                             >
-                                <EyeOff className="w-5 h-5" />
-                                Stop Tracking
+                                {startIsPending ? (
+                                    <p className="flex items-center gap-1">
+                                        <Loader className='animate-spin' />
+                                        <span>Stopping...</span>
+                                    </p>
+                                ) : (
+                                    <p className="flex items-center gap-1">
+                                        <EyeOff className="w-5 h-5" />
+                                        <span>Stop Tracking</span>
+                                    </p>
+                                )}
                             </Button>
                         )}
                         <Button

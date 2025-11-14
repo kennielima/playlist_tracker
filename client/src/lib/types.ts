@@ -43,6 +43,7 @@ export type Track = {
 export type SnapshotTrack = {
     id: string;
     snapshotId: string;
+    trackId: string;
     rank: number
     createdAt: string;
     track: Track;

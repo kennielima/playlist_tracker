@@ -17,6 +17,7 @@ import { getSnapshots, getSnapshotById } from "@/services/getSnapshots"
 import Sidebar from "./Sidebar"
 import PlaylistHeader from "./Header"
 import SearchPlaylistTrack from "./Search"
+import Link from "next/link"
 
 
 interface PlaylistDetailPageProps {
@@ -156,8 +157,9 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                     showTrackingDialog={showTrackingDialog}
                     setShowTrackingDialog={setShowTrackingDialog}
                     tracks={tracks}
-                    snapshotsLoading={snapshotsLoading}
                     handleTracker={handleTracker}
+                    startIsPending={startTrackerMutation.isPending}
+                    stopIsPending={stopTrackerMutation.isPending}
                 />
 
                 {/* Content */}
@@ -223,9 +225,14 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                                                     </p>
                                                 </div>
                                             </div>
-                                            <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white">
-                                                <Play className="h-4 w-4" />
-                                            </Button>
+                                            <Link
+                                                href={`${process.env.NEXT_PUBLIC_SPOTIFY_URL}/track/${track.trackId}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-slate-400 hover:text-white"
+                                            >
+                                                <Play className="h-5 w-5" />
+                                            </Link>
                                         </div>
                                     )))
                                 }
@@ -251,9 +258,14 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                                                     </p>
                                                 </div>
                                             </div>
-                                            <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white">
-                                                <Play className="h-4 w-4" />
-                                            </Button>
+                                            <Link
+                                                href={`${process.env.NEXT_PUBLIC_SPOTIFY_URL}/track/${track?.trackId}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-slate-400 hover:text-white"
+                                            >
+                                                <Play className="h-5 w-5" />
+                                            </Link>
                                         </div>
                                     )))}
                             </CardContent>
@@ -263,6 +275,6 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                     <Sidebar playlistsData={playlistsData} playlistData={playlistData} tracks={tracks} allSnapshotsData={allSnapshotsData} />
                 </div>
             </div>
-        </div >
+        </div>
     )
 }
