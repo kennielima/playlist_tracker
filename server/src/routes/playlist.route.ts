@@ -1,15 +1,10 @@
 import express from "express";
 import ensureSpotifyToken from "../middlewares/ensureSpotifyToken";
-import { getFeaturedPlaylists, getPlaylist, getPlaylistSnapshots, getSnapshotById, stopTracker, startTracker } from "../controllers/playlist.controller";
-import authenticate from "../middlewares/authenticate";
+import { getFeaturedPlaylists, getPlaylist } from "../controllers/playlist.controller";
 
 const router = express.Router();
 
 router.get("/get-featured", ensureSpotifyToken, getFeaturedPlaylists);
 router.get("/:id", ensureSpotifyToken, getPlaylist);
-router.get("/:id/startTracker", authenticate, ensureSpotifyToken, startTracker);
-router.get("/:id/stopTracker", authenticate, ensureSpotifyToken, stopTracker);
-router.get("/:id/getSnapshots", getPlaylistSnapshots);
-router.get("/:id/getSnapshots/:snapId", getSnapshotById);
 
 export default router;

@@ -11,7 +11,7 @@ export const GET = async (req: Request, { params }: { params: { id: string } }) 
     }
 
     try {
-        const response = await fetch(`${process.env.API_URL}/api/playlists/${id}/stopTracker`, {
+        const response = await fetch(`${process.env.API_URL}/api/tracker/${id}/stopTracker`, {
             method: 'GET',
             headers: {
                 'authorization': `Bearer ${token}`,

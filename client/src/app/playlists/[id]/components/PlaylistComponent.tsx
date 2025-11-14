@@ -9,10 +9,9 @@ import {
 } from "lucide-react"
 import { Playlist, Snapshot, SnapshotTrack, Track, User } from "@/lib/types"
 import { formatDate } from "@/lib/utils"
-import { startTracker, stopTracker } from "@/services/trackPlaylist"
+import { startTracker, stopTracker } from "@/services/startStopTracker"
 import { useRouter } from "next/navigation"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import Search from "@/components/Search"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { getSnapshots, getSnapshotById } from "@/services/getSnapshots"
 import Sidebar from "./Sidebar"
@@ -57,17 +56,6 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
     const [snapshotTracks, setSnapshotTracks] = useState<SnapshotTrack[]>([]);
     const [searchKeyword, setSearchKeyword] = useState<string>("");
 
-    // Filter tracks based on search
-    const filteredSnapTracks = snapTracks.filter(track =>
-        track.name.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-        track.artists.some(artist => artist.toLowerCase().includes(searchKeyword.toLowerCase()))
-    );
-
-    const filteredSnapshotTracks = snapshotTracks.filter(st =>
-        st.track.name.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-        st.track.artists.some(artist => artist.toLowerCase().includes(searchKeyword.toLowerCase()))
-    );
-
     // render initial snapdata and date if tracking
     useEffect(() => {
         if (formattedFirstSnapDate && snapshotDate === '') {
@@ -97,7 +85,6 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
     const startTrackerMutation = useMutation({
         mutationFn: (playlistId: string) => startTracker(playlistId),
         onSuccess: (data) => {
-            console.log('Start tracker success:', data);
             setIsTracking(true);
             setShowTrackingDialog(false);
 
@@ -106,8 +93,6 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                 setSnapshotDate(formatDate(data.snapshot.createdAt));
                 // setCurrPlaylist(data.updatedPlaylist);
                 setIsTrackedBy(data.isTrackedBy);
-            } else {
-                console.log('No snapshot in response');
             }
             // Invalidate queries to refetch snapshots list
             queryClient.invalidateQueries({ queryKey: ['snapshots', playlist.playlistId] });
@@ -148,6 +133,16 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
             queryClient.invalidateQueries({ queryKey: ['snapshot', playlist?.playlistId, selectedSnapshot.id] });
         }
     }
+
+    const filteredSnapTracks = snapTracks.filter(track =>
+        track.name.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+        track.artists.some(artist => artist.toLowerCase().includes(searchKeyword.toLowerCase()))
+    );
+
+    const filteredSnapshotTracks = snapshotTracks.filter(st =>
+        st.track.name.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+        st.track.artists.some(artist => artist.toLowerCase().includes(searchKeyword.toLowerCase()))
+    );
 
     return (
         <div>

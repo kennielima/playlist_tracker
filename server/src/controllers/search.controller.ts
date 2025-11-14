@@ -1,19 +1,6 @@
 import express, { Request, Response } from "express";
 import { TokenRequest } from "../middlewares/ensureSpotifyToken";
 
-async function searchFn(q: string, accessToken: string) {
-    const responseData = await fetch(`${process.env.SPOTIFY_URL}/search?q=${encodeURIComponent(q)}&type=playlist&limit=50`, {
-        method: 'GET',
-        headers: { 'Authorization': 'Bearer ' + accessToken },
-    });
-    if (!responseData.ok) {
-        const errorBody = await responseData.text();
-        return { error: errorBody };
-    }
-    const fetchedPlaylists = await responseData.json();
-    return fetchedPlaylists;
-}
-
 async function searchPlaylists(req: TokenRequest, res: Response) {
     const accessToken = req.access_token;
     let query = req.query.q as string;
@@ -22,8 +9,15 @@ async function searchPlaylists(req: TokenRequest, res: Response) {
         if (!accessToken) {
             return res.status(401).json({ error: "Spotify access token is not available" });
         }
-        const fetchedPlaylists = await searchFn(query, accessToken);
-
+        const responseData = await fetch(`${process.env.SPOTIFY_URL}/search?q=${encodeURIComponent(query)}&type=playlist&limit=50`, {
+            method: 'GET',
+            headers: { 'Authorization': 'Bearer ' + accessToken },
+        });
+        if (!responseData.ok) {
+            const errorBody = await responseData.text();
+            return { error: errorBody };
+        }
+        const fetchedPlaylists = await responseData.json();
         if (fetchedPlaylists.error) {
             return res.status(500).json({ error: "Error searching playlists from Spotify", details: fetchedPlaylists.error });
         }
@@ -42,4 +36,4 @@ async function searchPlaylists(req: TokenRequest, res: Response) {
     }
 }
 
-export { searchFn, searchPlaylists };
+export { searchPlaylists };

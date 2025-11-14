@@ -1,7 +1,7 @@
 import cron from 'node-cron';
-import { fetchTracks, saveSnapshot } from './playlists';
 import prisma from '../lib/prisma';
 import { getSpotifyToken } from './SpotifyAuth';
+import { saveSnapshot } from './snapshot';
 
 const cronJob = cron.schedule('0 0 * * *', async () => { // Run daily at midnight
     const { access_token } = await getSpotifyToken();

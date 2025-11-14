@@ -3,6 +3,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import prisma from './lib/prisma.ts';
 import playlistRoutes from "./routes/playlist.route.ts";
+import trackerRoutes from "./routes/tracker.route.ts";
+import snapshotRoutes from "./routes/snapshot.route.ts";
 import authRoutes from "./routes/auth.route.ts";
 import userRoutes from "./routes/user.route.ts";
 import searchRoutes from "./routes/search.route.ts";
@@ -23,6 +25,8 @@ app.use(cors({
 app.use(cookieParser())
 
 app.use("/api/playlists", playlistRoutes);
+app.use("/api/tracker", trackerRoutes);
+app.use("/api/snapshots", snapshotRoutes);
 app.use("/api/spotify", searchRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
