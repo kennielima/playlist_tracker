@@ -48,3 +48,11 @@ const Search = ({ category }: { category: string }) => {
 }
 
 export default Search
+
+{/* {snapshotIsLoading || snapshotsLoading ? (
+                <div className='flex flex-col items-center gap-6 my-12'>
+                    <p>Loading...</p>
+                    <LoaderCircle className='h-16 w-16 animate-spin' />
+                    <p>Please wait...</p>
+                </div>
+            ) : ( */}

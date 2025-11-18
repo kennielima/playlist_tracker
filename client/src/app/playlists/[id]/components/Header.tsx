@@ -4,9 +4,10 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Playlist, Track, User } from '@/lib/types'
 import { motion } from 'framer-motion'
-import { Camera, EyeOff, Loader, Music, Play, Share2 } from 'lucide-react'
+import { Camera, EyeOff, Loader, Music, Play } from 'lucide-react'
 import Image from 'next/image'
 import React from 'react'
+import Share from './Share'
 
 export interface HeaderProps {
     playlist: Playlist;
@@ -66,7 +67,12 @@ const PlaylistHeader = ({
 
                     <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">{playlist.name}</h1>
 
-                    <p className="text-lg text-slate-300 leading-relaxed mb-6">{playlist.description}</p>
+                    <p
+                        className="text-lg text-slate-300 leading-relaxed mb-6"
+                        dangerouslySetInnerHTML={{
+                            __html: playlist?.description.replace(/<a[^>]*>(.*?)<\/a>/g, '$1')
+                        }}
+                    />
 
                     <div className="flex flex-wrap items-center gap-6 text-sm text-slate-400 mb-6">
                         <div className="flex items-center">
@@ -162,13 +168,7 @@ const PlaylistHeader = ({
                                 )}
                             </Button>
                         )}
-                        <Button
-                            className="text-white hover:text-white border-white/20 hover:bg-white/10 px-8 cursor-pointer"
-                            variant="outline"
-                            size="lg"
-                        >
-                            Share {" "} <Share2 className="h-5 w-5" />
-                        </Button>
+                        <Share id={playlist.playlistId} />
                     </div>
                 </div>
             </div>
