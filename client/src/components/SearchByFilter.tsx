@@ -1,9 +1,12 @@
 import React, { useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { useRouter } from 'next/navigation';
 
-const SearchPlaylistTrack = ({ searchKeyword, setSearchKeyword }: { searchKeyword: string; setSearchKeyword: (keyword: string) => void; }) => {
+const SearchByFilter = ({ searchKeyword, setSearchKeyword, placeholder }: {
+    searchKeyword: string;
+    setSearchKeyword: (keyword: string) => void;
+    placeholder: string;
+}) => {
     const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchKeyword(e.target.value);
     }
@@ -14,7 +17,7 @@ const SearchPlaylistTrack = ({ searchKeyword, setSearchKeyword }: { searchKeywor
         >
             <Input
                 type="search"
-                placeholder="Search for track or artist..."
+                placeholder={placeholder}
                 className="h-10"
                 value={searchKeyword}
                 onChange={changeHandler}
@@ -23,11 +26,11 @@ const SearchPlaylistTrack = ({ searchKeyword, setSearchKeyword }: { searchKeywor
                 type="submit"
                 variant="outline"
                 className={`h-10 bg-purple-600 hover:bg-purple-500 text-white cursor-pointer`}
-            // onClick={() => setSearchKeyword("")}
+                onClick={(e) => e.preventDefault()}
             >
                 Submit
             </Button>
         </form>)
 }
 
-export default SearchPlaylistTrack
+export default SearchByFilter

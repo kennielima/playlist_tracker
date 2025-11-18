@@ -3,7 +3,7 @@ import { Input } from './ui/input'
 import { Button } from './ui/button'
 import { useRouter } from 'next/navigation';
 
-const Search = ({ category }: { category: string }) => {
+const SearchByQuery = ({ category }: { category: string }) => {
     const router = useRouter();
     const [query, setQuery] = useState("");
 
@@ -47,12 +47,4 @@ const Search = ({ category }: { category: string }) => {
         </form>)
 }
 
-export default Search
-
-{/* {snapshotIsLoading || snapshotsLoading ? (
-                <div className='flex flex-col items-center gap-6 my-12'>
-                    <p>Loading...</p>
-                    <LoaderCircle className='h-16 w-16 animate-spin' />
-                    <p>Please wait...</p>
-                </div>
-            ) : ( */}
+export default SearchByQuery;

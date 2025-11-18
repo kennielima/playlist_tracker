@@ -1,7 +1,6 @@
 "use client"
 import { Fragment, useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import {
     Play,
     Music,
@@ -16,9 +15,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { getSnapshots, getSnapshotById } from "@/services/getSnapshots"
 import Sidebar from "./Sidebar"
 import PlaylistHeader from "./Header"
-import SearchPlaylistTrack from "./Search"
+import SearchByFilter from "../../../../components/SearchByFilter"
 import Link from "next/link"
-import { Skeleton } from "@/components/ui/skeleton"
+import SkeletonComponent from "@/components/SkeletonComponent"
 
 
 interface PlaylistDetailPageProps {
@@ -163,50 +162,10 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
     //     link.click();
     // };
 
-
     return (
         <Fragment>
             {snapshotsLoading || snapshotIsLoading ? (
-                <div className="flex flex-col gap-8 p-12">
-                    <div className="flex sm:flex-row flex-col gap-12">
-                        <Card className="bg-white/5 backdrop-blur-md border border-white/10 w-full sm:w-1/2 lg:w-1/3">
-                            <CardContent className="p-0">
-                                <Skeleton className="w-full h-64 rounded-t-lg" />
-                                <div className="p-6">
-                                    <Skeleton className="h-6 w-3/4 mb-2" />
-                                    <Skeleton className="h-4 w-full mb-4" />
-                                    <Skeleton className="h-4 w-1/2" />
-                                </div>
-                            </CardContent>
-                        </Card>
-                        <div className="flex flex-col justify-center">
-                            <div className="space-y-2">
-                                <Skeleton className="h-4 w-[350px]" />
-                                <Skeleton className="h-4 w-[300px]" />
-                            </div>
-                            <div className="py-6">
-                                <Skeleton className="h-6 w-3/4 mb-2" />
-                                <Skeleton className="h-4 w-full mb-4" />
-                                <Skeleton className="h-4 w-1/2" />
-                            </div>
-
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {[...Array(6)].map((_, i) => (
-                            <Card key={i} className="bg-white/5 backdrop-blur-md border border-white/10">
-                                <CardContent className="p-0">
-                                    <Skeleton className="w-full h-64 rounded-t-lg" />
-                                    <div className="p-6">
-                                        <Skeleton className="h-6 w-3/4 mb-2" />
-                                        <Skeleton className="h-4 w-full mb-4" />
-                                        <Skeleton className="h-4 w-1/2" />
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                </div>
+                <SkeletonComponent />
             ) : (
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <PlaylistHeader
@@ -254,7 +213,8 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                                     <Download className="h-4 w-4" />
                                     Export
                                 </Button> */}
-                                <SearchPlaylistTrack
+                                <SearchByFilter
+                                    placeholder="Search for track or artist..."
                                     searchKeyword={searchKeyword}
                                     setSearchKeyword={setSearchKeyword}
                                 />
@@ -271,12 +231,12 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                                     {!isTracking &&
                                         (filteredSnapTracks?.map((track: Track, index: number) => (
                                             <Link
+                                                key={track.rank}
                                                 href={`${process.env.NEXT_PUBLIC_SPOTIFY_URL}/track/${track.trackId}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                             >
                                                 <div
-                                                    key={index}
                                                     className="flex items-center justify-between p-3 rounded-lg hover:bg-white/5 transition-colors"
                                                 >
                                                     <div className="flex items-center space-x-3">
@@ -303,6 +263,7 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                                     {isTracking &&
                                         (filteredSnapshotTracks?.map((track: SnapshotTrack) => (
                                             <Link
+                                                key={track.rank}
                                                 href={`${process.env.NEXT_PUBLIC_SPOTIFY_URL}/track/${track.trackId}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"

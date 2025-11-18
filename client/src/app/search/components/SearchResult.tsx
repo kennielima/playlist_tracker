@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Playlist } from '@/lib/types'
 import { containerVariants, itemVariants } from '@/lib/utils'
 import { motion } from 'framer-motion'
-import { MoreHorizontal, Music, Play } from 'lucide-react'
+import { Music, Play } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
@@ -14,7 +14,7 @@ type SearchTypeProps = {
     query: string
 }
 
-const SearchComponent = ({ searchData, query }: SearchTypeProps) => {
+const SearchResult = ({ searchData, query }: SearchTypeProps) => {
     const playlists = searchData.data;
 
     return (
@@ -60,9 +60,10 @@ const SearchComponent = ({ searchData, query }: SearchTypeProps) => {
                                             <h3 className="font-semibold text-white truncate">
                                                 {playlist.name}
                                             </h3>
-                                            <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <span className='text-xs text-slate-400'>{searchData.data.length} tracks</span>
+                                            {/* <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <MoreHorizontal className="h-4 w-4" />
-                                            </Button>
+                                            </Button> */}
                                         </div>
                                         <p className="text-sm text-slate-300 mb-3 line-clamp-2">
                                             {playlist.description}
@@ -94,4 +95,4 @@ const SearchComponent = ({ searchData, query }: SearchTypeProps) => {
     )
 }
 
-export default SearchComponent
+export default SearchResult

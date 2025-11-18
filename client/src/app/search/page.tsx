@@ -1,6 +1,6 @@
 import searchSpotifyPlaylist from '@/services/searchPlaylist';
 import React from 'react'
-import SearchComponent from './components/SearchComponent';
+import SearchResult from './components/SearchResult';
 
 const page = async ({ searchParams }: { searchParams: { q: string } }) => {
     const query = await searchParams;
@@ -10,7 +10,7 @@ const page = async ({ searchParams }: { searchParams: { q: string } }) => {
     }
 
     return (
-        <SearchComponent searchData={searchData} query={query.q} />
+        <SearchResult searchData={searchData} query={query.q} />
     )
 }
 

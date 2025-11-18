@@ -17,24 +17,24 @@ import {
 import { Playlist, User } from "@/lib/types"
 import Link from "next/link"
 import Image from "next/image"
-import Search from "./Search"
+import SearchByQuery from "./SearchByQuery"
 import { containerVariants, itemVariants } from "@/lib/utils"
-import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { useQuery } from "@tanstack/react-query"
 import fetchSpotifyPlaylist from "@/services/getSpotifyPlaylist"
 
 interface HomepageProps {
-    // playlistData?: Playlist[]
+    playlistData?: Playlist[]
     user?: User
 }
 
-const Homepage = ({ user }: HomepageProps) => {
+const Homepage = ({ playlistData, user }: HomepageProps) => {
     const [hoveredPlaylist, setHoveredPlaylist] = useState<string | null>(null)
 
-    const { data: allPlaylists, isLoading: playlistsLoading } = useQuery({
-        queryKey: ['playlists'],
-        queryFn: () => fetchSpotifyPlaylist(),
-    })
-    const playlists = allPlaylists?.data || [];
+    // const { data: allPlaylists, isLoading: playlistsLoading } = useQuery({
+    //     queryKey: ['playlists'],
+    //     queryFn: () => fetchSpotifyPlaylist(),
+    // })
+    const playlists = playlistData || [];
 
     const heroVariants = {
         hidden: { opacity: 0, y: 50 },
@@ -92,7 +92,7 @@ const Homepage = ({ user }: HomepageProps) => {
                         >
                             Track any Spotify playlist and rediscover the songs you loved, exactly as they were
                         </motion.p>
-                        <Search category={'playlist'} />
+                        <SearchByQuery category={'playlist'} />
                     </div>
                 </div>
             </motion.div>
@@ -146,7 +146,7 @@ const Homepage = ({ user }: HomepageProps) => {
                         </p>
                     </motion.div>
 
-                    {playlistsLoading ? (
+                    {!playlistData ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {[...Array(6)].map((_, i) => (
                                 <Card key={i} className="bg-white/5 backdrop-blur-md border border-white/10">
