@@ -6,34 +6,35 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-
 import {
     Music,
     Play,
     TrendingUp,
-    Users,
-    ExternalLink,
     Star,
     ChevronRight,
-    Headphones,
-    Radio,
-    Heart,
+    Headphones
 } from "lucide-react"
 import { Playlist, User } from "@/lib/types"
 import Link from "next/link"
 import Image from "next/image"
 import Search from "./Search"
 import { containerVariants, itemVariants } from "@/lib/utils"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
+import fetchSpotifyPlaylist from "@/services/getSpotifyPlaylist"
 
 interface HomepageProps {
-    playlistData?: Playlist[]
+    // playlistData?: Playlist[]
     user?: User
 }
 
-const Homepage = ({ playlistData, user }: HomepageProps) => {
+const Homepage = ({ user }: HomepageProps) => {
     const [hoveredPlaylist, setHoveredPlaylist] = useState<string | null>(null)
 
-    const playlists = playlistData
+    const { data: allPlaylists, isLoading: playlistsLoading } = useQuery({
+        queryKey: ['playlists'],
+        queryFn: () => fetchSpotifyPlaylist(),
+    })
+    const playlists = allPlaylists?.data || [];
 
     const heroVariants = {
         hidden: { opacity: 0, y: 50 },
@@ -145,7 +146,7 @@ const Homepage = ({ playlistData, user }: HomepageProps) => {
                         </p>
                     </motion.div>
 
-                    {/* {isLoading ? (
+                    {playlistsLoading ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {[...Array(6)].map((_, i) => (
                                 <Card key={i} className="bg-white/5 backdrop-blur-md border border-white/10">
@@ -160,95 +161,95 @@ const Homepage = ({ playlistData, user }: HomepageProps) => {
                                 </Card>
                             ))}
                         </div>
-                        ) : error ? (
-                            <div className="text-center py-12">
-                                <Radio className="h-12 w-12 mx-auto text-slate-400 mb-4" />
-                                <h3 className="text-lg font-semibold text-white mb-2">Unable to load charts</h3>
-                                <p className="text-slate-300 mb-4">Please try again later</p>
-                                <Button variant="outline">Retry</Button>
-                            </div>
-                    ) : ( */}
-                    <motion.div
-                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-                        variants={containerVariants}
-                        initial="hidden"
-                        whileInView="visible"
-                        viewport={{ once: true }}
-                    >
-                        {playlists?.map((playlist) => (
-                            <motion.div
-                                key={playlist.playlistId}
-                                variants={itemVariants}
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                                onHoverStart={() => setHoveredPlaylist(playlist.playlistId)}
-                                onHoverEnd={() => setHoveredPlaylist(null)}
-                            >
-                                <Link href={`/playlists/${playlist?.playlistId}`}>
-                                    <Card className="group cursor-pointer bg-white/5 backdrop-blur-md border border-white/10 shadow-xl hover:shadow-2xl hover:bg-white/10 transition-all duration-300 overflow-hidden">
-                                        <CardContent className="p-0">
-                                            <div className="relative overflow-hidden">
-                                                <Image
-                                                    height={300}
-                                                    width={300}
-                                                    src={playlist.image}
-                                                    alt={playlist.name}
-                                                    className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
-                                                />
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
-                                                    <motion.div
-                                                        initial={{ scale: 0, opacity: 0 }}
-                                                        animate={{
-                                                            scale: hoveredPlaylist === playlist.playlistId ? 1 : 0,
-                                                            opacity: hoveredPlaylist === playlist.playlistId ? 1 : 0,
-                                                        }}
-                                                        transition={{ duration: 0.2 }}
-                                                    >
-                                                        <Button
-                                                            size="icon"
-                                                            className="bg-purple-600 hover:bg-purple-500 text-white shadow-lg h-14 w-14"
+                        // ) : error ? (
+                        //     <div className="text-center py-12">
+                        //         <Radio className="h-12 w-12 mx-auto text-slate-400 mb-4" />
+                        //         <h3 className="text-lg font-semibold text-white mb-2">Unable to load charts</h3>
+                        //         <p className="text-slate-300 mb-4">Please try again later</p>
+                        //         <Button variant="outline">Retry</Button>
+                        //     </div>
+                    ) : (
+                        <motion.div
+                            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+                            variants={containerVariants}
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true }}
+                        >
+                            {playlists?.map((playlist: any) => (
+                                <motion.div
+                                    key={playlist.playlistId}
+                                    variants={itemVariants}
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    onHoverStart={() => setHoveredPlaylist(playlist.playlistId)}
+                                    onHoverEnd={() => setHoveredPlaylist(null)}
+                                >
+                                    <Link href={`/playlists/${playlist?.playlistId}`}>
+                                        <Card className="group cursor-pointer bg-white/5 backdrop-blur-md border border-white/10 shadow-xl hover:shadow-2xl hover:bg-white/10 transition-all duration-300 overflow-hidden">
+                                            <CardContent className="p-0">
+                                                <div className="relative overflow-hidden">
+                                                    <Image
+                                                        height={300}
+                                                        width={300}
+                                                        src={playlist.image}
+                                                        alt={playlist.name}
+                                                        className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
+                                                    />
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+                                                        <motion.div
+                                                            initial={{ scale: 0, opacity: 0 }}
+                                                            animate={{
+                                                                scale: hoveredPlaylist === playlist.playlistId ? 1 : 0,
+                                                                opacity: hoveredPlaylist === playlist.playlistId ? 1 : 0,
+                                                            }}
+                                                            transition={{ duration: 0.2 }}
                                                         >
-                                                            <Play className="h-6 w-6" />
-                                                        </Button>
-                                                    </motion.div>
-                                                </div>
-                                                <div className="absolute top-4 right-4">
-                                                    <Badge className="bg-black/50 text-white border-0">
-                                                        <Star className="h-3 w-3 mr-1" />
-                                                        Popular
-                                                    </Badge>
-                                                </div>
-                                            </div>
-
-                                            <div className="p-6">
-                                                <div className="flex items-start justify-between mb-3">
-                                                    <h3 className="font-bold text-white text-lg group-hover:text-purple-300 transition-colors line-clamp-1">
-                                                        {playlist.name}
-                                                    </h3>
-                                                </div>
-                                                <p
-                                                    className="text-sm text-slate-300 mb-4 line-clamp-2"
-                                                    dangerouslySetInnerHTML={{
-                                                        __html: playlist?.description.replace(/<a[^>]*>(.*?)<\/a>/g, '$1')
-                                                    }}
-                                                />
-                                                <div className="flex items-center justify-between">
-                                                    <div className="flex items-center space-x-4 text-xs text-slate-400">
-                                                        <span className="flex items-center">
-                                                            <Music className="h-3 w-3 mr-1" />
-                                                            Chart
-                                                        </span>
+                                                            <Button
+                                                                size="icon"
+                                                                className="bg-purple-600 hover:bg-purple-500 text-white shadow-lg h-14 w-14"
+                                                            >
+                                                                <Play className="h-6 w-6" />
+                                                            </Button>
+                                                        </motion.div>
+                                                    </div>
+                                                    <div className="absolute top-4 right-4">
+                                                        <Badge className="bg-black/50 text-white border-0">
+                                                            <Star className="h-3 w-3 mr-1" />
+                                                            Popular
+                                                        </Badge>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                </Link>
-                            </motion.div>
-                        ))}
-                    </motion.div>
 
+                                                <div className="p-6">
+                                                    <div className="flex items-start justify-between mb-3">
+                                                        <h3 className="font-bold text-white text-lg group-hover:text-purple-300 transition-colors line-clamp-1">
+                                                            {playlist.name}
+                                                        </h3>
+                                                    </div>
+                                                    <p
+                                                        className="text-sm text-slate-300 mb-4 line-clamp-2"
+                                                        dangerouslySetInnerHTML={{
+                                                            __html: playlist?.description.replace(/<a[^>]*>(.*?)<\/a>/g, '$1')
+                                                        }}
+                                                    />
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex items-center space-x-4 text-xs text-slate-400">
+                                                            <span className="flex items-center">
+                                                                <Music className="h-3 w-3 mr-1" />
+                                                                Chart
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    </Link>
+                                </motion.div>
+                            ))}
+                        </motion.div>
+                    )}
                     {playlists && playlists.length > 6 && (
                         <motion.div
                             className="text-center mt-12"
