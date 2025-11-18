@@ -104,7 +104,7 @@ async function logout(req: Request, res: Response) {
             httpOnly: true,
             sameSite: 'strict'
         })
-        res.status(200).json({ message: "Logged out successfully" });
+        return res.status(200).json({ message: "Logged out successfully" });
     }
     catch (error) {
         return res.status(500).json({ message: 'Logout error: ' + error })

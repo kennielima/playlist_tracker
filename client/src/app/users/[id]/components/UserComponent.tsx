@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from '@/components/ui/input'
 import { Playlist, User } from '@/lib/types'
 import { containerVariants, getInitials, itemVariants } from '@/lib/utils'
+import logout from '@/services/logout'
 import { motion } from 'framer-motion'
 import { Music, Heart, Grid3X3, List, Play, MoreHorizontal, LoaderCircle } from 'lucide-react'
 import Image from 'next/image'
@@ -23,10 +24,9 @@ const UserComponent = ({ user, playlistData, id }: UserTypeProps) => {
     const [searchKeyword, setSearchKeyword] = useState<string>("");
 
     const playlists = playlistData?.data;
-    const filteredPlaylists = playlists.filter(playlist =>
-        playlist.name.toLowerCase().includes(searchKeyword.toLowerCase())
+    const filteredPlaylists = playlists?.filter(playlist =>
+        playlist?.name.toLowerCase().includes(searchKeyword.toLowerCase())
     );
-    console.log(user)
     // const { data: allPlaylists, isLoading: playlistsLoading } = useQuery({
     //     queryKey: ['playlists'],
     //     queryFn: () => getMyPlaylists(),
@@ -59,7 +59,7 @@ const UserComponent = ({ user, playlistData, id }: UserTypeProps) => {
                                 <Button
                                     size="lg"
                                     className="bg-purple-600 hover:bg-purple-500 text-white px-4 cursor-pointer"
-                                // onClick={ }
+                                    onClick={logout}
                                 >
                                     Logout
                                 </Button>

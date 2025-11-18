@@ -272,49 +272,49 @@ const Homepage = ({ playlistData, user }: HomepageProps) => {
             </section>
 
             {/* CTA Section */}
-            {!user && (
-                <motion.section
-                    className="py-20 bg-gradient-to-r from-purple-600/20 to-purple-600/20"
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    transition={{ duration: 0.8 }}
-                    viewport={{ once: true }}
-                >
-                    <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-                        <motion.h2
-                            className="text-3xl md:text-4xl font-bold text-white mb-6"
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6 }}
-                            viewport={{ once: true }}
-                        >
-                            Ready to Track Your Music?
-                        </motion.h2>
-                        <motion.p
-                            className="text-xl text-slate-300 mb-8"
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: 0.1 }}
-                            viewport={{ once: true }}
-                        >
-                            Join thousands of music lovers tracking their favorite playlists and discovering new trends
-                        </motion.p>
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: 0.2 }}
-                            viewport={{ once: true }}
-                        >
-                            <Link href='/login'>
-                                <Button size="lg" className="cursor-pointer bg-purple-600 hover:bg-purple-500 text-white px-8 py-3">
-                                    <Music className="mr-2 h-5 w-5" />
-                                    Start Tracking Now
-                                </Button>
-                            </Link>
-                        </motion.div>
-                    </div>
-                </motion.section>
-            )}
+            {/* {!user && ( */}
+            <motion.section
+                className="py-20 bg-gradient-to-r from-purple-600/20 to-purple-600/20"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+            >
+                <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+                    <motion.h2
+                        className="text-3xl md:text-4xl font-bold text-white mb-6"
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6 }}
+                        viewport={{ once: true }}
+                    >
+                        Ready to Track Your Music?
+                    </motion.h2>
+                    <motion.p
+                        className="text-xl text-slate-300 mb-8"
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.1 }}
+                        viewport={{ once: true }}
+                    >
+                        Join thousands of music lovers tracking their favorite playlists and discovering new trends
+                    </motion.p>
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.2 }}
+                        viewport={{ once: true }}
+                    >
+                        <Link href={!user ? '/login' : '/users/me'}>
+                            <Button size="lg" className="cursor-pointer bg-purple-600 hover:bg-purple-500 text-white px-8 py-3">
+                                <Music className="mr-2 h-5 w-5" />
+                                Start Tracking Now
+                            </Button>
+                        </Link>
+                    </motion.div>
+                </div>
+            </motion.section>
+            {/* )} */}
         </div>
     )
 }
