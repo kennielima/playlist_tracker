@@ -26,6 +26,9 @@ export type Playlist = {
     snapshotId: string
     isTracked: boolean
     isTrackedBy: string | null
+    trackingStartDate?: string | null
+    tracks?: Track[]
+    snapshots?: Snapshot[]
 }
 
 export type Track = {
@@ -51,7 +54,7 @@ export type SnapshotTrack = {
 
 export type Snapshot = {
     id: string
-    playlist: string;
+    playlist: Playlist;
     playlistId: string;
     createdAt: string
     updatedAt: string

@@ -57,27 +57,21 @@ async function callback(req: Request, res: Response) {
             }
         })
         const userData = await userResponse.json();
-        const existingUser = await prisma.user.findUnique({
+        let user = await prisma.user.upsert({
             where: {
+                spotifyId: userData.id
+            },
+            update: {},
+            create: {
                 spotifyId: userData.id,
-                email: userData.email
+                name: userData.display_name,
+                email: userData.email,
+                userImage: userData.images[0],
+                spotifyaccessToken: tokenData.access_token,
+                spotifyrefreshToken: tokenData.refresh_token,
+                tokenExpiry: tokenData.expires_in
             }
         })
-        let newUser;
-        if (!existingUser) {
-            newUser = await prisma.user.create({
-                data: {
-                    spotifyId: userData.id,
-                    name: userData.display_name,
-                    email: userData.email,
-                    userImage: userData.images[0],
-                    spotifyaccessToken: tokenData.access_token,
-                    spotifyrefreshToken: tokenData.refresh_token,
-                    tokenExpiry: tokenData.expires_in
-                }
-            })
-        }
-        let user = existingUser || newUser;
         const token = jwt.sign({
             id: user?.id,
         },

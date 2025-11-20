@@ -1,5 +1,6 @@
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Playlist, Snapshot, Track } from '@/lib/types'
+import { formatDate } from '@/lib/utils'
 import { Music } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
@@ -11,10 +12,13 @@ interface SidebarProps {
     },
     tracks: Track[],
     playlistsData: Playlist[],
-    allSnapshotsData: { data: Snapshot[] }
+    allSnapshotsData: { data: Snapshot[] },
+    userId: string | null
 }
 
-const Sidebar = ({ playlistsData, playlistData, tracks, allSnapshotsData }: SidebarProps) => {
+const Sidebar = ({ playlistsData, playlistData, tracks, allSnapshotsData, userId }: SidebarProps) => {
+    const playlist = playlistData.data;
+
     return (
         <div className="space-y-6">
             <Card className="bg-white/5 backdrop-blur-md border border-white/10 py-6">
@@ -33,8 +37,14 @@ const Sidebar = ({ playlistsData, playlistData, tracks, allSnapshotsData }: Side
 
                     <div className="flex justify-between">
                         <span className="text-slate-400">Snapshots</span>
-                        <span className="text-white font-medium">{allSnapshotsData?.data?.length || 0}</span>
+                        <span className="text-white font-medium">{playlist.isTrackedBy === userId ? allSnapshotsData?.data?.length : 0}</span>
                     </div>
+                    {playlist.isTracked &&
+                        <div className="flex justify-between">
+                            <span className="text-slate-400">Tracking Start Date</span>
+                            <span className="text-white font-medium">{playlist.trackingStartDate && formatDate(playlist.trackingStartDate)}</span>
+                        </div>
+                    }
                 </CardContent>
             </Card>
 
@@ -45,7 +55,7 @@ const Sidebar = ({ playlistsData, playlistData, tracks, allSnapshotsData }: Side
                 </CardHeader>
                 <CardContent className="space-y-4">
                     {playlistsData.map((playlist: Playlist, index: number) => (
-                        playlist.playlistId !== playlistData.data.playlistId && (
+                        playlist.playlistId !== playlist.playlistId && (
                             <Link key={index} href={`/playlists/${playlist.playlistId}`}>
                                 <div className="flex items-center space-x-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors">
                                     <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
@@ -53,7 +63,6 @@ const Sidebar = ({ playlistsData, playlistData, tracks, allSnapshotsData }: Side
                                     </div>
                                     <div className="flex-1">
                                         <p className="text-white font-medium">{playlist.name}</p>
-                                        {/* <p className="text-sm text-slate-400">{playlist.tracks}</p> */}
                                     </div>
                                 </div>
                             </Link>

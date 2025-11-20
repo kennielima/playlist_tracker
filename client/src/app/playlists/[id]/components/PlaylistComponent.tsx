@@ -296,7 +296,7 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                             </Card>
                         </div>
 
-                        <Sidebar playlistsData={playlistsData} playlistData={playlistData} tracks={tracks} allSnapshotsData={allSnapshotsData} />
+                        <Sidebar playlistsData={playlistsData} playlistData={playlistData} tracks={tracks} allSnapshotsData={allSnapshotsData} userId={currUser?.id} />
                     </div>
                 </div>
             )

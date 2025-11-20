@@ -27,30 +27,23 @@ async function saveSnapshot(
             artistArr.push(artist.name)
         }
 
-        const existingTrack = await prisma.track.findFirst({
+        const addedTrack = await prisma.track.upsert({
             where: {
+                id: track.id
+            },
+            update: {},
+            create: {
                 id: track.id,
+                name: track.name,
+                album: track.album.name,
+                imageUrl: track.album.images[0]?.url,
+                artists: artistArr,
+                Playlist: {
+                    connect: { playlistId: id }
+                },
             }
         });
-
-        if (!existingTrack) {
-            const addedTrack = await prisma.track.create({
-                data: {
-                    id: track.id,
-                    name: track.name,
-                    album: track.album.name,
-                    imageUrl: track.album.images[0]?.url,
-                    artists: artistArr,
-                    Playlist: {
-                        connect: { playlistId: id }
-                    },
-                }
-            });
-            trackdata.push({ ...addedTrack, rank: i + 1 });
-        }
-        else {
-            trackdata.push({ ...existingTrack, rank: i + 1 });
-        }
+        trackdata.push({ ...addedTrack, rank: i + 1 });
     }
 
     let snapshot: Snapshot;
@@ -58,13 +51,9 @@ async function saveSnapshot(
         if (!snapshotExists) {
             snapshot = await prisma.snapshot.create({
                 data: {
-                    // id: playlist.data.snapshot_id,
                     playlist: {
                         connect: { playlistId: id }
                     },
-                    // tracks: {
-                    //     connect: snapshotTrackData.map(snaptrack => ({ id: snaptrack.id }))
-                    // },
                     user: {
                         connect: { id: userId }
                     },

@@ -4,33 +4,32 @@ import SkeletonComponent from '@/components/SkeletonComponent'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from "@/components/ui/card"
-import { Input } from '@/components/ui/input'
-import { Playlist, User } from '@/lib/types'
+import { Playlist, Snapshot, User } from '@/lib/types'
 import { containerVariants, getInitials, itemVariants } from '@/lib/utils'
 import logout from '@/services/logout'
 import { motion } from 'framer-motion'
-import { Music, Heart, Grid3X3, List, Play, MoreHorizontal, LoaderCircle } from 'lucide-react'
+import { Music, Heart, Grid3X3, List, Play, User as User2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { Fragment, useState } from 'react'
 
 type UserTypeProps = {
     user: User
-    playlistData: { data: Playlist[] }
+    playlistData: { data: Playlist[] },
+    userSnapshots: Snapshot[] | null,
     id: string
 }
-const UserComponent = ({ user, playlistData, id }: UserTypeProps) => {
+const UserComponent = ({ user, playlistData, userSnapshots, id }: UserTypeProps) => {
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+    const [currView, setCurrView] = useState<"playlists" | "snapshots">("playlists");
     const [searchKeyword, setSearchKeyword] = useState<string>("");
 
     const playlists = playlistData?.data;
     const filteredPlaylists = playlists?.filter(playlist =>
         playlist?.name.toLowerCase().includes(searchKeyword.toLowerCase())
     );
-    // const { data: allPlaylists, isLoading: playlistsLoading } = useQuery({
-    //     queryKey: ['playlists'],
-    //     queryFn: () => getMyPlaylists(),
-    // })
+
+    let playlistsToShow = currView === "playlists" ? filteredPlaylists : userSnapshots?.map(snapshot => snapshot.playlist);
 
     return (
         <Fragment>
@@ -75,8 +74,11 @@ const UserComponent = ({ user, playlistData, id }: UserTypeProps) => {
                             initial="hidden"
                             animate="visible"
                         >
-                            <motion.div variants={itemVariants}>
-                                <Card className="bg-white/5 backdrop-blur-md border border-white/10 shadow-xl">
+                            <motion.div
+                                variants={itemVariants}
+                                onClick={() => setCurrView("playlists")}
+                            >
+                                <Card className="bg-white/5 backdrop-blur-md border border-white/10 shadow-xl hover:scale-105 transition-transform duration-200 cursor-pointer hover:border-2">
                                     <CardContent className="p-4 text-center">
                                         <Music className="h-6 w-6 mx-auto mb-2 text-purple-400" />
                                         <div className="text-2xl font-bold text-white">
@@ -87,14 +89,16 @@ const UserComponent = ({ user, playlistData, id }: UserTypeProps) => {
                                         </div>
                                     </CardContent>
                                 </Card>
-
                             </motion.div>
-                            <motion.div variants={itemVariants}>
-                                <Card className="bg-white/5 backdrop-blur-md border border-white/10 shadow-xl">
+                            <motion.div
+                                variants={itemVariants}
+                                onClick={() => setCurrView("snapshots")}
+                            >
+                                <Card className="bg-white/5 backdrop-blur-md border border-white/10 shadow-xl hover:scale-105 transition-transform duration-200 cursor-pointer hover:border-2">
                                     <CardContent className="p-4 text-center">
                                         <Music className="h-6 w-6 mx-auto mb-2 text-purple-400" />
                                         <div className="text-2xl font-bold text-white">
-                                            0
+                                            {userSnapshots ? userSnapshots.length : 0}
                                         </div>
                                         <div className="text-sm text-slate-300">
                                             Tracked Playlists
@@ -110,15 +114,6 @@ const UserComponent = ({ user, playlistData, id }: UserTypeProps) => {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
                         >
-                            {/* <div className="relative flex-1">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
-                                <Input
-                                    placeholder="Search your playlists..."
-                                    value={searchQuery}
-                                    onChange={(e) => handleSearch(e.target.value)}
-                                    className="pl-10 bg-white/5 backdrop-blur-md border border-white/10 text-white placeholder:text-slate-400"
-                                />
-                            </div> */}
                             <SearchByFilter
                                 placeholder="Search your playlists..."
                                 searchKeyword={searchKeyword}
@@ -135,6 +130,7 @@ const UserComponent = ({ user, playlistData, id }: UserTypeProps) => {
                                     <Button
                                         variant={viewMode === "grid" ? "default" : "outline"}
                                         size="sm"
+                                        className={`cursor-pointer ${viewMode === "grid" ? "bg-white/90 text-black" : "bg-black/90 border-black text-white"}`}
                                         onClick={() => setViewMode("list")}
                                     >
                                         <List className="h-4 w-4" />
@@ -142,6 +138,7 @@ const UserComponent = ({ user, playlistData, id }: UserTypeProps) => {
                                     <Button
                                         variant={viewMode === "list" ? "default" : "outline"}
                                         size="sm"
+                                        className={`cursor-pointer ${viewMode === "grid" ? "bg-black/90 border-black text-white" : "bg-white/90 text-black"}`}
                                         onClick={() => setViewMode("grid")}
                                     >
                                         <Grid3X3 className="h-4 w-4" />
@@ -149,6 +146,7 @@ const UserComponent = ({ user, playlistData, id }: UserTypeProps) => {
                                 </div>
                             </motion.div>
                         </motion.div>
+                        <p className='text-xl font-semibold mt-10 mb-4'>{currView === "playlists" ? "Your Personal Playlists" : "Your Tracked Playlists"}</p>
                         {/* Playlists Grid */}
                         <motion.div
                             className={`grid gap-6 ${viewMode === "grid"
@@ -159,7 +157,7 @@ const UserComponent = ({ user, playlistData, id }: UserTypeProps) => {
                             initial="hidden"
                             animate="visible"
                         >
-                            {filteredPlaylists?.map((playlist: Playlist) => (
+                            {playlistsToShow?.map((playlist: Playlist) => (
                                 <motion.div
                                     key={playlist.playlistId}
                                     variants={itemVariants}
@@ -199,12 +197,26 @@ const UserComponent = ({ user, playlistData, id }: UserTypeProps) => {
                                                                 </Button> */}
                                                             </div>
                                                             <div className=''>
-                                                                <p className="text-sm text-slate-300 mb-3 line-clamp-2">
-                                                                    {playlist.description}
-                                                                </p>
-                                                                {/* <div className="flex items-center justify-between ">
-                                                                    <span>{playlist.duration}</span>
-                                                                </div> */}
+                                                                {currView === "playlists" ? (
+                                                                    <p className="text-sm text-slate-300 mb-3 line-clamp-2">
+                                                                        {playlist.description}
+                                                                    </p>
+                                                                ) : (
+                                                                    <p
+                                                                        className="text-sm text-slate-300 mb-4 line-clamp-2"
+                                                                        dangerouslySetInnerHTML={{
+                                                                            __html: playlist?.description.replace(/<a[^>]*>(.*?)<\/a>/g, '$1')
+                                                                        }}
+                                                                    />
+                                                                )}
+                                                                {playlist.userId !== null && (
+                                                                    <div className="flex items-center space-x-4 text-xs text-slate-400">
+                                                                        <span className="flex items-center">
+                                                                            <User2 className="h-3 w-3 mr-1" />
+                                                                            User Playlist
+                                                                        </span>
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -231,10 +243,15 @@ const UserComponent = ({ user, playlistData, id }: UserTypeProps) => {
                                                             </p>
                                                             <div className="flex items-center space-x-4 mt-1 text-xs text-slate-400">
                                                                 <span>{playlistData.data.length} tracks</span>
-                                                                {/* <span>{playlist.duration}</span>
-                                                    <Badge variant={playlist.isPublic ? "default" : "secondary"} className="text-xs">
-                                                        {playlist.isPublic ? "Public" : "Private"}
-                                                    </Badge> */}
+                                                                {/* <span>{playlist.duration}</span> */}
+                                                                {playlist.userId !== null && (
+                                                                    <div className="flex items-center space-x-4 text-xs text-slate-400">
+                                                                        <span className="flex items-center">
+                                                                            <User2 className="h-3 w-3 mr-1" />
+                                                                            User Playlist
+                                                                        </span>
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         </div>
                                                         <div className="flex items-center space-x-2">
@@ -258,7 +275,6 @@ const UserComponent = ({ user, playlistData, id }: UserTypeProps) => {
                             ))}
                         </motion.div>
 
-                        {/* Empty State */}
                         {playlists && playlists.length === 0 && (
                             <motion.div
                                 className="text-center py-12"

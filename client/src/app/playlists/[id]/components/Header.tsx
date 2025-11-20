@@ -155,7 +155,7 @@ const PlaylistHeader = ({
                                 disabled={stopIsPending}
                                 className='flex items-center gap-2 px-4 py-2 rounded-lg font-medium cursor-pointer transition-all duration-200 bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30'
                             >
-                                {startIsPending ? (
+                                {stopIsPending ? (
                                     <p className="flex items-center gap-1">
                                         <Loader className='animate-spin' />
                                         <span>Stopping...</span>

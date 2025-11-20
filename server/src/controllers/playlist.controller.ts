@@ -15,26 +15,21 @@ async function getFeaturedPlaylists(req: TokenRequest, res: Response) {
             const validated = await fetchPlaylistById(seed.id, accessToken);
             if (validated && validated.valid) {
                 const data = validated.data;
-                const exists = await prisma.playlist.findUnique({
+                let featuredPlaylist = await prisma.playlist.upsert({
                     where: {
                         playlistId: data.id,
+                    },
+                    update: {},
+                    create: {
+                        playlistId: data.id,
+                        name: data.name,
+                        description: data.description,
+                        image: data.images[0].url,
+                        url: data.external_urls.spotify,
+                        snapshotId: data.snapshot_id,
                     }
                 })
-                let featuredPlaylist;
-                if (!exists) {
-                    featuredPlaylist = await prisma.playlist.create({
-                        data: {
-                            playlistId: data.id,
-                            name: data.name,
-                            description: data.description,
-                            image: data.images[0].url,
-                            url: data.external_urls.spotify,
-                            snapshotId: data.snapshot_id,
-                        }
-                    })
-                    playlists.push(featuredPlaylist);
-                }
-                playlists.push(exists);
+                playlists.push(featuredPlaylist);
             } else {
                 console.error("Error fetching playlist:", validated);
             }
