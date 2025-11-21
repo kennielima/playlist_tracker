@@ -55,3 +55,20 @@ export const itemVariants = {
     },
   },
 }
+
+const exportFn = (data: any[]) => {
+  const csv = [
+    Object.keys(data[0]).join(","),
+    ...data.map(item =>
+      Object.values(item).map(val =>
+        Array.isArray(val) ? `"${val.join(" | ")}"` : `"${val}"`
+      ).join(",")
+    )
+  ].join("\n");
+
+  const blob = new Blob([csv], { type: "text/csv" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "export.csv";
+  link.click();
+};

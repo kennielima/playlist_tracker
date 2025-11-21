@@ -4,12 +4,16 @@ import { cookies } from "next/headers";
 const fetchSpotifyPlaylist = async () => {
     const cookie = await cookies();
     const cookieHeader = cookie.toString();
+    const token = cookie.get('token')?.value;
 
-    const fetchSpotifyPlaylist = await fetch(`${process.env.BASE_URL}/api/getspotifyplaylists`, {
+    const fetchSpotifyPlaylist = await fetch(`${process.env.API_URL}/api/playlists/get-featured`, {
         method: "GET",
         headers: {
-            cookie: cookieHeader
-        }
+            cookie: cookieHeader,
+            'Authorization': `Bearer ${token}`,
+            'Cookies': `token=${token}`
+        },
+        credentials: "include"
     });
 
     if (!fetchSpotifyPlaylist.ok) {

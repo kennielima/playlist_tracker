@@ -33,18 +33,20 @@ interface PlaylistDetailPageProps {
 export default function PlaylistPage({ playlistData, playlistsData, currUser }: PlaylistDetailPageProps) {
     const router = useRouter();
     const queryClient = useQueryClient();
-    const { data: playlist, tracks } = playlistData;
-    const isUserPlaylist = playlist.userId !== null;
+    const playlist = playlistData?.data;
+    const tracks = playlistData?.tracks;
 
-    const [isTracking, setIsTracking] = useState(playlist.isTracked);
-    const [isTrackedBy, setIsTrackedBy] = useState(playlist.isTrackedBy);
+    const isUserPlaylist = playlist?.userId !== null;
+
+    const [isTracking, setIsTracking] = useState(playlist?.isTracked);
+    const [isTrackedBy, setIsTrackedBy] = useState(playlist?.isTrackedBy);
     const [showTrackingDialog, setShowTrackingDialog] = useState(false);
 
     //fetch snapshots if tracking
     const { data: allSnapshotsData, isLoading: snapshotsLoading } = useQuery({
-        queryKey: ['snapshots', playlist.playlistId],
-        queryFn: () => getSnapshots(playlist.playlistId),
-        enabled: !!playlist.playlistId,
+        queryKey: ['snapshots', playlist?.playlistId],
+        queryFn: () => getSnapshots(playlist?.playlistId),
+        enabled: !!playlist?.playlistId,
     })
 
     // set initial snapdata snd date if tracking
@@ -96,7 +98,7 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                 setIsTrackedBy(data.isTrackedBy);
             }
             // Invalidate queries to refetch snapshots list
-            queryClient.invalidateQueries({ queryKey: ['snapshots', playlist.playlistId] });
+            queryClient.invalidateQueries({ queryKey: ['snapshots', playlist?.playlistId] });
         },
         onError: (error) => {
             console.error('Start tracker error:', error);
@@ -107,7 +109,7 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
         mutationFn: (playlistId: string) => stopTracker(playlistId),
         onSuccess: () => {
             setIsTracking(false);
-            queryClient.invalidateQueries({ queryKey: ['snapshots', playlist.playlistId] });
+            queryClient.invalidateQueries({ queryKey: ['snapshots', playlist?.playlistId] });
         },
         onError: (error) => {
             console.error('Stop tracker error:', error);
@@ -120,9 +122,9 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
             return;
         }
         if (!isTracking) {
-            startTrackerMutation.mutate(playlist.playlistId);
+            startTrackerMutation.mutate(playlist?.playlistId);
         } else {
-            stopTrackerMutation.mutate(playlist.playlistId);
+            stopTrackerMutation.mutate(playlist?.playlistId);
         }
     }
 
@@ -135,7 +137,7 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
         }
     }
 
-    const filteredSnapTracks = snapTracks.filter(track =>
+    const filteredSnapTracks = snapTracks?.filter(track =>
         track.name.toLowerCase().includes(searchKeyword.toLowerCase()) ||
         track.artists.some(artist => artist.toLowerCase().includes(searchKeyword.toLowerCase()))
     );
@@ -144,23 +146,6 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
         st.track.name.toLowerCase().includes(searchKeyword.toLowerCase()) ||
         st.track.artists.some(artist => artist.toLowerCase().includes(searchKeyword.toLowerCase()))
     );
-
-    // const exportFn = (data: any[]) => {
-    //     const csv = [
-    //         Object.keys(data[0]).join(","),
-    //         ...data.map(item =>
-    //             Object.values(item).map(val =>
-    //                 Array.isArray(val) ? `"${val.join(" | ")}"` : `"${val}"`
-    //             ).join(",")
-    //         )
-    //     ].join("\n");
-
-    //     const blob = new Blob([csv], { type: "text/csv" });
-    //     const link = document.createElement("a");
-    //     link.href = URL.createObjectURL(blob);
-    //     link.download = "export.csv";
-    //     link.click();
-    // };
 
     return (
         <Fragment>

@@ -3,8 +3,7 @@ import fetchCurrentUser from "@/services/getMe";
 import fetchSpotifyPlaylist from "@/services/getSpotifyPlaylist";
 
 export default async function Home() {
-  const data = await fetchSpotifyPlaylist();
-  const playlistData = data?.data || [];
+  const playlistData = await fetchSpotifyPlaylist();
   const user = await fetchCurrentUser();
 
   return (

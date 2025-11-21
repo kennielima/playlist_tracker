@@ -46,8 +46,8 @@ const PlaylistHeader = ({
                 <Image
                     height={600}
                     width={600}
-                    src={playlist.image || "/placeholder.svg"}
-                    alt={playlist.name || 'playlistimg'}
+                    src={playlist?.image || "/placeholder.svg"}
+                    alt={playlist?.name || 'playlistimg'}
                     className="w-80 h-80 object-cover rounded-lg shadow-2xl"
                 />
             </div>
@@ -65,7 +65,7 @@ const PlaylistHeader = ({
                         )}
                     </div>
 
-                    <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">{playlist.name}</h1>
+                    <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">{playlist?.name}</h1>
 
                     <p
                         className="text-lg text-slate-300 leading-relaxed mb-6"
@@ -77,7 +77,7 @@ const PlaylistHeader = ({
                     <div className="flex flex-wrap items-center gap-6 text-sm text-slate-400 mb-6">
                         <div className="flex items-center">
                             <Music className="h-4 w-4 mr-2" />
-                            {tracks.length} tracks
+                            {tracks?.length} tracks
                         </div>
                     </div>
 
@@ -85,7 +85,7 @@ const PlaylistHeader = ({
                         <Button
                             size="lg"
                             className="bg-purple-600 hover:bg-purple-500 text-white px-8 cursor-pointer"
-                            onClick={() => window.open(playlist.url, "_blank")}
+                            onClick={() => window.open(playlist?.url, "_blank")}
                         >
                             <Play className="h-5 w-5" />
                             Play on Spotify
@@ -168,7 +168,7 @@ const PlaylistHeader = ({
                                 )}
                             </Button>
                         )}
-                        <Share id={playlist.playlistId} />
+                        <Share id={playlist?.playlistId} />
                     </div>
                 </div>
             </div>

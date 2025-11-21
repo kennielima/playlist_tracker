@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import CallbackPage from './components/CallbackPage';
-import { cookies } from 'next/headers';
 import fetchCurrentUser from '@/services/getMe';
 
 const page = async () => {
