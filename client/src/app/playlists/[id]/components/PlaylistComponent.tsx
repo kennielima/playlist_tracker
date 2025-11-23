@@ -156,6 +156,7 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <PlaylistHeader
                         playlist={playlist}
+                        playlistId={playlistId}
                         isUserPlaylist={isUserPlaylist}
                         isTracking={isTracking}
                         currUser={currUser}

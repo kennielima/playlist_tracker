@@ -8,6 +8,7 @@ import { Camera, EyeOff, Loader, Music, Play } from 'lucide-react'
 import Image from 'next/image'
 import React from 'react'
 import Share from './Share'
+import { FEATURED_PLAYLIST_IDS } from '@/lib/constants'
 
 export interface HeaderProps {
     playlist: Playlist;
@@ -21,6 +22,7 @@ export interface HeaderProps {
     handleTracker: () => void;
     startIsPending: boolean;
     stopIsPending: boolean;
+    playlistId: string
 }
 const PlaylistHeader = ({
     playlist,
@@ -33,7 +35,8 @@ const PlaylistHeader = ({
     tracks,
     handleTracker,
     startIsPending,
-    stopIsPending
+    stopIsPending,
+    playlistId
 }: HeaderProps) => {
     return (
         <motion.div
@@ -55,7 +58,7 @@ const PlaylistHeader = ({
                 <div>
                     <div className="flex items-center gap-2 mb-2">
                         <Badge variant="secondary" className="bg-purple-600/20 text-purple-300">
-                            {isUserPlaylist ? "User Playlist" : "Chart"}
+                            {isUserPlaylist ? "User Playlist" : (FEATURED_PLAYLIST_IDS.includes(playlistId) ? "Chart" : "Playlist")}
                         </Badge>
                         {isTracking && (
                             <Badge variant="secondary" className="bg-green-600/20 text-green-300">
@@ -168,7 +171,7 @@ const PlaylistHeader = ({
                                 )}
                             </Button>
                         )}
-                        <Share id={playlist?.playlistId} />
+                        <Share id={playlistId} />
                     </div>
                 </div>
             </div>

@@ -69,7 +69,8 @@ async function fetchUserSnapshots(req: TokenRequest, res: Response) {
             },
             include: {
                 playlist: true
-            }
+            },
+            orderBy: [{ createdAt: 'desc' }]
         });
         return res.status(200).json({ snapshots });
     } catch (error) {

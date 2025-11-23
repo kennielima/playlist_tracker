@@ -198,25 +198,31 @@ const UserComponent = ({ user, playlistData, userSnapshots, id }: UserTypeProps)
                                                             </div>
                                                             <div className=''>
                                                                 {currView === "playlists" ? (
-                                                                    <p className="text-sm text-slate-300 mb-3 line-clamp-2">
-                                                                        {playlist.description}
+                                                                    <p className="text-sm text-slate-300 h-10 mb-3 line-clamp-2">
+                                                                        {playlist.description || playlist.name}
                                                                     </p>
                                                                 ) : (
                                                                     <p
-                                                                        className="text-sm text-slate-300 mb-4 line-clamp-2"
+                                                                        className="text-sm text-slate-300 h-10 mb-4 line-clamp-2"
                                                                         dangerouslySetInnerHTML={{
-                                                                            __html: playlist?.description.replace(/<a[^>]*>(.*?)<\/a>/g, '$1')
+                                                                            __html: (playlist?.description || playlist.name).replace(/<a[^>]*>(.*?)<\/a>/g, '$1')
                                                                         }}
                                                                     />
                                                                 )}
-                                                                {playlist.userId !== null && (
-                                                                    <div className="flex items-center space-x-4 text-xs text-slate-400">
+
+                                                                <div className="flex items-center space-x-4 text-xs text-slate-400">
+                                                                    {playlist.userId !== null ? (
                                                                         <span className="flex items-center">
                                                                             <User2 className="h-3 w-3 mr-1" />
                                                                             User Playlist
                                                                         </span>
-                                                                    </div>
-                                                                )}
+                                                                    ) : (
+                                                                        <span className="flex items-center">
+                                                                            <Music className="h-3 w-3 mr-1" />
+                                                                            Tracked Playlist
+                                                                        </span>
+                                                                    )}
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
