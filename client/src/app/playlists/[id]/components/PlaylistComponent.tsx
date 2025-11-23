@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
     Play,
     Music,
-    Download,
 } from "lucide-react"
 import { Playlist, Snapshot, SnapshotTrack, Track, User } from "@/lib/types"
 import { formatDate } from "@/lib/utils"
@@ -37,6 +36,7 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
     const tracks = playlistData?.tracks;
 
     const isUserPlaylist = playlist?.userId !== null;
+    const playlistId = playlist?.playlistId || playlist?.id;
 
     const [isTracking, setIsTracking] = useState(playlist?.isTracked);
     const [isTrackedBy, setIsTrackedBy] = useState(playlist?.isTrackedBy);
@@ -44,9 +44,9 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
 
     //fetch snapshots if tracking
     const { data: allSnapshotsData, isLoading: snapshotsLoading } = useQuery({
-        queryKey: ['snapshots', playlist?.playlistId],
-        queryFn: () => getSnapshots(playlist?.playlistId),
-        enabled: !!playlist?.playlistId,
+        queryKey: ['snapshots', playlistId],
+        queryFn: () => getSnapshots(playlistId),
+        enabled: !!playlistId,
     })
 
     // set initial snapdata snd date if tracking
@@ -73,12 +73,13 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
     }, [formattedFirstSnapData, snapshotData]);
 
     const { data: snapshotDetails, isLoading: snapshotIsLoading } = useQuery({
-        queryKey: ['snapshot', playlist?.playlistId, snapshotData?.id],
-        queryFn: () => getSnapshotById(playlist?.playlistId, snapshotData?.id),
+        queryKey: ['snapshot', playlistId, snapshotData?.id],
+        queryFn: () => getSnapshotById(playlistId, snapshotData?.id),
         enabled: !!snapshotData,
         refetchOnMount: true,
         // staleTime: 0
     })
+
     useEffect(() => {
         if (snapshotDetails?.data?.tracks) {
             setSnapshotTracks(snapshotDetails.data.tracks);
@@ -98,7 +99,7 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                 setIsTrackedBy(data.isTrackedBy);
             }
             // Invalidate queries to refetch snapshots list
-            queryClient.invalidateQueries({ queryKey: ['snapshots', playlist?.playlistId] });
+            queryClient.invalidateQueries({ queryKey: ['snapshots', playlistId] });
         },
         onError: (error) => {
             console.error('Start tracker error:', error);
@@ -109,7 +110,7 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
         mutationFn: (playlistId: string) => stopTracker(playlistId),
         onSuccess: () => {
             setIsTracking(false);
-            queryClient.invalidateQueries({ queryKey: ['snapshots', playlist?.playlistId] });
+            queryClient.invalidateQueries({ queryKey: ['snapshots', playlistId] });
         },
         onError: (error) => {
             console.error('Stop tracker error:', error);
@@ -122,9 +123,9 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
             return;
         }
         if (!isTracking) {
-            startTrackerMutation.mutate(playlist?.playlistId);
+            startTrackerMutation.mutate(playlistId);
         } else {
-            stopTrackerMutation.mutate(playlist?.playlistId);
+            stopTrackerMutation.mutate(playlistId);
         }
     }
 
@@ -133,7 +134,7 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
         if (selectedSnapshot) {
             setSnapshotDate(formatDate(selectedSnapshot.createdAt));
             setSnapshotData(selectedSnapshot);
-            queryClient.invalidateQueries({ queryKey: ['snapshot', playlist?.playlistId, selectedSnapshot.id] });
+            queryClient.invalidateQueries({ queryKey: ['snapshot', playlistId, selectedSnapshot.id] });
         }
     }
 

@@ -39,7 +39,17 @@ async function saveSnapshot(
                 imageUrl: track.album.images[0]?.url,
                 artists: artistArr,
                 Playlist: {
-                    connect: { playlistId: id }
+                    connectOrCreate: {
+                        where: { playlistId: id },
+                        create: {
+                            playlistId: id,
+                            name: playlist.data.name,
+                            description: playlist.data.description || '',
+                            image: playlist.data.images?.[0]?.url || '',
+                            url: playlist.data.external_urls?.spotify || '',
+                            snapshotId: playlist.data.snapshot_id,
+                        }
+                    }
                 },
             }
         });

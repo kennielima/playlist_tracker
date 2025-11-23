@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import { Request, Response } from "express";
 import prisma from "../lib/prisma"
 import { TokenRequest } from "../middlewares/ensureSpotifyToken";
 import { fetchPlaylistById, fetchTracks } from "../services/playlists";
@@ -102,8 +102,6 @@ async function getPlaylist(req: TokenRequest, res: Response) {
         return res.status(500).json({ error: "Internal server error while fetching playlist:" + error });
     }
 }
-
-
 
 export {
     getFeaturedPlaylists,

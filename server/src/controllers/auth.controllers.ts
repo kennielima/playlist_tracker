@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import { Request, Response } from "express";
 import { generateRandomString } from "../lib/utils";
 import queryString from "query-string";
 import prisma from "../lib/prisma";

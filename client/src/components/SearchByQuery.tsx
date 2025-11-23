@@ -22,9 +22,9 @@ const SearchByQuery = ({ category, user }: { category: string, user: User | unde
     }
     let placeholder;
     if (category === 'playlist') {
-        placeholder = "Search for playlist"
+        placeholder = "Search for any playlist"
     } else if (category === 'track') {
-        placeholder = "Search for track"
+        placeholder = "Search for any track"
     }
 
     return (

@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import { Request, Response } from "express";
 import { TokenRequest } from "../middlewares/ensureSpotifyToken";
 
 async function searchPlaylists(req: TokenRequest, res: Response) {

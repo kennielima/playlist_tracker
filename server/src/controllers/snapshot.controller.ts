@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import { Request, Response } from "express";
 import { TokenRequest } from "../middlewares/ensureSpotifyToken";
 import prisma from "../lib/prisma";
 
