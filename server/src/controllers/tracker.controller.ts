@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import prisma from "../lib/prisma";
 import { saveSnapshot } from "../services/snapshot";
 import { TokenRequest } from "../middlewares/ensureSpotifyToken";
+import { updatePlaylistCache } from "../services/cache";
 
 async function startTracker(req: TokenRequest, res: Response) {
     const accessToken = req.access_token;
@@ -13,7 +14,7 @@ async function startTracker(req: TokenRequest, res: Response) {
             return res.status(401).json({ error: "Spotify access token or user id is not available" });
         }
 
-        const sevendaysago = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+        const sevendaysago = new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) //temp 1 day ago
         const initialSnapshotExists = await prisma.snapshot.findFirst({
             where: {
                 playlistId,
@@ -26,15 +27,20 @@ async function startTracker(req: TokenRequest, res: Response) {
 
         const snapshot = await saveSnapshot(playlistId, userId, accessToken, initialSnapshotExists || null)
 
+        const trackingStartDate = new Date()
         const updatedPlaylist = await prisma.playlist.update({
             data: {
                 isTracked: true,
                 isTrackedBy: userId,
-                trackingStartDate: new Date()
+                trackingStartDate: trackingStartDate
             },
             where: { playlistId }
         })
-
+        await updatePlaylistCache(playlistId, {
+            isTracked: true,
+            isTrackedBy: userId,
+            trackingStartDate: trackingStartDate
+        });
         return res.status(200).json({
             isTracking: true,
             isTrackedBy: userId,
@@ -63,7 +69,9 @@ async function stopTracker(req: TokenRequest, res: Response) {
             },
             where: { playlistId }
         })
-
+        await updatePlaylistCache(playlistId, {
+            isTracked: false,
+        });
         return res.status(200).json({
             isTracking: false,
             // isTrackedBy: null,

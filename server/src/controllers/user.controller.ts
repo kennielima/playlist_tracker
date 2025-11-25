@@ -1,6 +1,7 @@
 import { Request, Response } from "express"
 import { TokenRequest } from "../middlewares/ensureSpotifyToken";
 import prisma from "../lib/prisma";
+import { redis } from "../lib/redis"
 
 async function getMe(req: Request, res: Response) {
     const user = req.user;
@@ -20,10 +21,18 @@ async function fetchCurrentUserPlaylists(req: TokenRequest, res: Response) {
     const tokenExpiry = req.token_expiresIn;
     const user = req.user;
 
+    const cacheKey = `userplaylists:${user?.id}`;
+    const cached = await redis.get(cacheKey);
+
     try {
         if (!accessToken) {
             return res.status(401).json({ error: "Spotify access token is not available" });
         }
+
+        if (cached) {
+            return res.status(200).json(JSON.parse(cached));
+        }
+
         const response = await fetch(`${process.env.SPOTIFY_URL}/me/playlists`, {
             method: 'GET',
             headers: { 'Authorization': 'Bearer ' + accessToken },
@@ -50,6 +59,8 @@ async function fetchCurrentUserPlaylists(req: TokenRequest, res: Response) {
             })
             fetchedPlaylists.push(newPlaylist)
         }
+        await redis.set(cacheKey, JSON.stringify({ data: fetchedPlaylists }), "EX", 86400);
+
         return res.status(200).json({ data: fetchedPlaylists });
 
     } catch (error) {
@@ -59,10 +70,18 @@ async function fetchCurrentUserPlaylists(req: TokenRequest, res: Response) {
 }
 async function fetchUserSnapshots(req: TokenRequest, res: Response) {
     const user = req.user;
+    const cacheKey = `usersnapshots:${user?.id}`;
+    const cached = await redis.get(cacheKey);
+
     try {
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
+
+        if (cached) {
+            return res.status(200).json(JSON.parse(cached));
+        }
+
         const snapshots = await prisma.snapshot.findMany({
             where: {
                 userId: user.id
@@ -72,6 +91,8 @@ async function fetchUserSnapshots(req: TokenRequest, res: Response) {
             },
             orderBy: [{ createdAt: 'desc' }]
         });
+        await redis.set(cacheKey, JSON.stringify({ snapshots }), "EX", 86400);
+
         return res.status(200).json({ snapshots });
     } catch (error) {
         console.error("Error fetching user snapshot:", error);

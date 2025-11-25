@@ -3,13 +3,22 @@ import prisma from "../lib/prisma"
 import { TokenRequest } from "../middlewares/ensureSpotifyToken";
 import { fetchPlaylistById, fetchTracks } from "../services/playlists";
 import { featuredPlaylists } from "../lib/seededPlaylists";
+import { redis } from "../lib/redis"
 
 async function getFeaturedPlaylists(req: TokenRequest, res: Response) {
     const accessToken = req.access_token;
+    const cacheKey = `featured-playlists`;
+    const cached = await redis.get(cacheKey);
+
     try {
         if (!accessToken) {
             return res.status(401).json({ error: "Spotify access token is not available" });
         }
+
+        if (cached) {
+            return res.status(200).json(JSON.parse(cached));
+        }
+
         let playlists = [];
         for (let seed of featuredPlaylists) {
             const validated = await fetchPlaylistById(seed.id, accessToken);
@@ -35,6 +44,8 @@ async function getFeaturedPlaylists(req: TokenRequest, res: Response) {
             }
         }
 
+        await redis.set(cacheKey, JSON.stringify({ data: playlists }), "EX", 86400);
+
         return res.status(200).json({ data: playlists });
 
     } catch (error) {
@@ -46,11 +57,18 @@ async function getFeaturedPlaylists(req: TokenRequest, res: Response) {
 async function getPlaylist(req: TokenRequest, res: Response) {
     const accessToken = req.access_token;
     const id = req.params.id;
+    const cacheKey = `playlist:${id}`;
+    const cached = await redis.get(cacheKey);
 
     try {
         if (!accessToken) {
             return res.status(401).json({ error: "Spotify access token is not available" });
         }
+
+        if (cached) {
+            return res.status(200).json(JSON.parse(cached));
+        }
+
         let playlist;
         const fetchFromDb = await prisma.playlist.findUnique({
             where: {
@@ -96,7 +114,12 @@ async function getPlaylist(req: TokenRequest, res: Response) {
                 album: track.album.name
             })
         }
-        return res.status(200).json({ data: playlist, tracks: trackdata });
+
+        const response = { data: playlist, tracks: trackdata };
+
+        await redis.set(cacheKey, JSON.stringify(response), "EX", 86400);
+        return res.status(200).json(response);
+
     } catch (error) {
         console.error("Error fetching playlist:", error);
         return res.status(500).json({ error: "Internal server error while fetching playlist:" + error });
