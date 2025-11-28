@@ -10,14 +10,15 @@ import userRoutes from "./routes/user.route.ts";
 import searchRoutes from "./routes/search.route.ts";
 import cookieParser from "cookie-parser";
 import cronJob from "./services/cronjob.ts";
+import { BASE_URL, PORT } from "./lib/config.ts";
 
 const app = express();
-const PORT = process.env.PORT || 4001;
+const port = PORT || 4001;
 dotenv.config();
 
 app.use(express.json());
 app.use(cors({
-    origin: process.env.BASE_URL,
+    origin: BASE_URL,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
 }));
@@ -42,6 +43,6 @@ main()
         await prisma.$disconnect()
     })
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
 })

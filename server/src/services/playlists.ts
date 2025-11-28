@@ -1,5 +1,7 @@
+import { SPOTIFY_URL } from "../lib/config";
+
 async function fetchPlaylistById(id: string, accessToken: string) {
-    const responseData = await fetch(`${process.env.SPOTIFY_URL}/playlists/${id}`, {
+    const responseData = await fetch(`${SPOTIFY_URL}/playlists/${id}`, {
         method: 'GET',
         headers: { 'Authorization': 'Bearer ' + accessToken },
     });
@@ -15,7 +17,7 @@ async function fetchPlaylistById(id: string, accessToken: string) {
 }
 
 async function fetchTracks(id: string, accessToken: string) {
-    const responseData = await fetch(`${process.env.SPOTIFY_URL}/playlists/${id}/tracks?offset=0&locale=*`, {
+    const responseData = await fetch(`${SPOTIFY_URL}/playlists/${id}/tracks?offset=0&locale=*`, {
         method: 'GET',
         headers: { 'Authorization': 'Bearer ' + accessToken },
     });

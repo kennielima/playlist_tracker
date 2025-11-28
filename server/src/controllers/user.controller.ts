@@ -2,6 +2,7 @@ import { Request, Response } from "express"
 import { TokenRequest } from "../middlewares/ensureSpotifyToken";
 import prisma from "../lib/prisma";
 import { redis } from "../lib/redis"
+import { SPOTIFY_URL } from "../lib/config";
 
 async function getMe(req: Request, res: Response) {
     const user = req.user;
@@ -33,7 +34,7 @@ async function fetchCurrentUserPlaylists(req: TokenRequest, res: Response) {
             return res.status(200).json(JSON.parse(cached));
         }
 
-        const response = await fetch(`${process.env.SPOTIFY_URL}/me/playlists`, {
+        const response = await fetch(`${SPOTIFY_URL}/me/playlists`, {
             method: 'GET',
             headers: { 'Authorization': 'Bearer ' + accessToken },
         })

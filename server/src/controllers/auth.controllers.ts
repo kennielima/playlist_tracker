@@ -3,6 +3,7 @@ import { generateRandomString } from "../lib/utils";
 import queryString from "query-string";
 import prisma from "../lib/prisma";
 import jwt from 'jsonwebtoken';
+import { SPOTIFY_CLIENT_ID, SPOTIFY_REDIRECT_URI, SPOTIFY_AUTH_URI, TOKEN_API, SPOTIFY_CLIENT_SECRET, SPOTIFY_URL, JWT_SECRET, BASE_URL } from "../lib/config";
 
 async function login(req: Request, res: Response) {
     let state = generateRandomString(16);
@@ -10,12 +11,12 @@ async function login(req: Request, res: Response) {
 
     const params = queryString.stringify({
         response_type: 'code',
-        client_id: process.env.SPOTIFY_CLIENT_ID!,
+        client_id: SPOTIFY_CLIENT_ID!,
         scope: scope,
-        redirect_uri: process.env.SPOTIFY_REDIRECT_URI!,
+        redirect_uri: SPOTIFY_REDIRECT_URI!,
         state: state
     })
-    res.redirect(`${process.env.SPOTIFY_AUTH_URI}?${params}`);
+    res.redirect(`${SPOTIFY_AUTH_URI}?${params}`);
 };
 
 async function callback(req: Request, res: Response) {
@@ -30,16 +31,16 @@ async function callback(req: Request, res: Response) {
     }
 
     try {
-        const tokenResponse = await fetch(`${process.env.TOKEN_API}`, {
+        const tokenResponse = await fetch(`${TOKEN_API}`, {
             method: 'POST',
             body: queryString.stringify({
                 code: code as string,
-                redirect_uri: process.env.SPOTIFY_REDIRECT_URI!,
+                redirect_uri: SPOTIFY_REDIRECT_URI!,
                 grant_type: 'authorization_code'
             }),
             headers: {
                 'content-type': 'application/x-www-form-urlencoded',
-                'Authorization': 'Basic ' + Buffer.from(process.env.SPOTIFY_CLIENT_ID + ':' + process.env.SPOTIFY_CLIENT_SECRET).toString('base64')
+                'Authorization': 'Basic ' + Buffer.from(SPOTIFY_CLIENT_ID + ':' + SPOTIFY_CLIENT_SECRET).toString('base64')
             }
         })
 
@@ -50,7 +51,7 @@ async function callback(req: Request, res: Response) {
         }
         const tokenData = await tokenResponse.json();
 
-        const userResponse = await fetch(`${process.env.SPOTIFY_URL}/me`, {
+        const userResponse = await fetch(`${SPOTIFY_URL}/me`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${tokenData.access_token}`
@@ -75,7 +76,7 @@ async function callback(req: Request, res: Response) {
         const token = jwt.sign({
             id: user?.id,
         },
-            process.env.JWT_SECRET!,
+            JWT_SECRET!,
             { expiresIn: '1d' }
         )
         res.cookie("token", token, {
@@ -84,7 +85,7 @@ async function callback(req: Request, res: Response) {
             sameSite: 'strict',
             maxAge: 24 * 60 * 60 * 1000
         })
-        res.redirect(`${process.env.BASE_URL}/spotify/callback`);
+        res.redirect(`${BASE_URL}/spotify/callback`);
     } catch (error) {
         console.error("Error fetching Spotify token:", error);
         return res.status(500).json({ error: "Internal server error while fetching Spotify token" });

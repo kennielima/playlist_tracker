@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { User } from "../../generated/prisma";
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import prisma from "../lib/prisma";
+import { JWT_SECRET } from "../lib/config";
 
 declare global {
     namespace Express {
@@ -18,7 +19,7 @@ async function authenticate(req: Request, res: Response, next: NextFunction) {
     if (!token) {
         return res.status(401).json({ error: "Unauthorized" });
     }
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+    const decoded = jwt.verify(token, JWT_SECRET!) as JwtPayload;
 
     if (!decoded) {
         return res.status(401).json({ error: "Invalid token" });

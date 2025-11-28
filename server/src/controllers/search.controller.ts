@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { TokenRequest } from "../middlewares/ensureSpotifyToken";
+import { SPOTIFY_URL } from "../lib/config";
 
 async function searchPlaylists(req: TokenRequest, res: Response) {
     const accessToken = req.access_token;
@@ -9,7 +10,7 @@ async function searchPlaylists(req: TokenRequest, res: Response) {
         if (!accessToken) {
             return res.status(401).json({ error: "Spotify access token is not available" });
         }
-        const responseData = await fetch(`${process.env.SPOTIFY_URL}/search?q=${encodeURIComponent(query)}&type=playlist&limit=50`, {
+        const responseData = await fetch(`${SPOTIFY_URL}/search?q=${encodeURIComponent(query)}&type=playlist&limit=50`, {
             method: 'GET',
             headers: { 'Authorization': 'Bearer ' + accessToken },
         });
