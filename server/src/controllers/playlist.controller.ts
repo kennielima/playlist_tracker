@@ -4,6 +4,7 @@ import { TokenRequest } from "../middlewares/ensureSpotifyToken";
 import { fetchPlaylistById, fetchTracks } from "../services/playlists";
 import { featuredPlaylists } from "../lib/seededPlaylists";
 import { redis } from "../lib/redis"
+import logger from "../lib/logger";
 
 async function getFeaturedPlaylists(req: TokenRequest, res: Response) {
     const accessToken = req.access_token;
@@ -40,7 +41,7 @@ async function getFeaturedPlaylists(req: TokenRequest, res: Response) {
                 })
                 playlists.push(featuredPlaylist);
             } else {
-                console.error("Error fetching playlist:", validated);
+                logger.error("Error fetching playlist:", validated);
             }
         }
 
@@ -49,7 +50,7 @@ async function getFeaturedPlaylists(req: TokenRequest, res: Response) {
         return res.status(200).json({ data: playlists });
 
     } catch (error) {
-        console.error("Error fetching featured playlists:", error);
+        logger.error("Error fetching featured playlists:", error);
         return res.status(500).json({ error: "Internal server error while fetching featured playlists" });
     }
 }
@@ -121,7 +122,7 @@ async function getPlaylist(req: TokenRequest, res: Response) {
         return res.status(200).json(response);
 
     } catch (error) {
-        console.error("Error fetching playlist:", error);
+        logger.error("Error fetching playlist:", error);
         return res.status(500).json({ error: "Internal server error while fetching playlist:" + error });
     }
 }

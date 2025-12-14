@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { TokenRequest } from "../middlewares/ensureSpotifyToken";
 import { SPOTIFY_URL } from "../lib/config";
+import logger from "../lib/logger";
 
 async function searchPlaylists(req: TokenRequest, res: Response) {
     const accessToken = req.access_token;
@@ -32,7 +33,7 @@ async function searchPlaylists(req: TokenRequest, res: Response) {
         return res.status(200).json({ data: playlists });
 
     } catch (error) {
-        console.error("Error searching:", error);
+        logger.error("Error searching:", error);
         return res.status(500).json({ error: "Internal server error while searching" });
     }
 }

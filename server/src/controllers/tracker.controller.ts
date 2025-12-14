@@ -3,6 +3,7 @@ import prisma from "../lib/prisma";
 import { saveSnapshot } from "../services/snapshot";
 import { TokenRequest } from "../middlewares/ensureSpotifyToken";
 import { updatePlaylistCache } from "../services/cache";
+import logger from "../lib/logger";
 
 async function startTracker(req: TokenRequest, res: Response) {
     const accessToken = req.access_token;
@@ -48,7 +49,7 @@ async function startTracker(req: TokenRequest, res: Response) {
             updatedPlaylist: updatedPlaylist
         });
     } catch (error) {
-        console.error("Error tracking playlist:", error);
+        logger.error("Error tracking playlist:", error);
         return res.status(500).json({ error: "Internal server error while tracking playlist:" + error });
     }
 }
@@ -77,7 +78,7 @@ async function stopTracker(req: TokenRequest, res: Response) {
             // isTrackedBy: null,
         });
     } catch (error) {
-        console.error("Error stopping playlist tracker:", error);
+        logger.error("Error stopping playlist tracker:", error);
         return res.status(500).json({ error: "Internal server error while stopping playlist tracker:" + error });
     }
 }

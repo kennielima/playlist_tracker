@@ -22,7 +22,8 @@
     "ioredis": "^5.8.2",
     "jsonwebtoken": "^9.0.2",
     "node-cron": "^4.2.1",
-    "query-string": "^9.2.2"
+    "query-string": "^9.2.2",
+    "winston": "^3.19.0"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.9",

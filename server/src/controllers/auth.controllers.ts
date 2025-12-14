@@ -4,6 +4,7 @@ import queryString from "query-string";
 import prisma from "../lib/prisma";
 import jwt from 'jsonwebtoken';
 import { SPOTIFY_CLIENT_ID, SPOTIFY_REDIRECT_URI, SPOTIFY_AUTH_URI, TOKEN_API, SPOTIFY_CLIENT_SECRET, SPOTIFY_URL, JWT_SECRET, BASE_URL } from "../lib/config";
+import logger from "../lib/logger";
 
 async function login(req: Request, res: Response) {
     let state = generateRandomString(16);
@@ -46,7 +47,7 @@ async function callback(req: Request, res: Response) {
 
         if (!tokenResponse.ok) {
             const errorData = await tokenResponse.text();
-            console.error('Token exchange failed:', errorData);
+            logger.error('Token exchange failed:', errorData);
             return res.status(400).json({ error: 'token_exchange_failed' + errorData });
         }
         const tokenData = await tokenResponse.json();
@@ -87,7 +88,7 @@ async function callback(req: Request, res: Response) {
         })
         res.redirect(`${BASE_URL}/spotify/callback`);
     } catch (error) {
-        console.error("Error fetching Spotify token:", error);
+        logger.error("Error fetching Spotify token:", error);
         return res.status(500).json({ error: "Internal server error while fetching Spotify token" });
     }
 };

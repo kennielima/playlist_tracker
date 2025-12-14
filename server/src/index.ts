@@ -11,6 +11,7 @@ import searchRoutes from "./routes/search.route.ts";
 import cookieParser from "cookie-parser";
 import cronJob from "./services/cronjob.ts";
 import { BASE_URL, PORT } from "./lib/config.ts";
+import logger from "./lib/logger";
 
 const app = express();
 const port = PORT || 4001;
@@ -35,14 +36,14 @@ app.use("/api/search", searchRoutes);
 
 cronJob.start();
 
-async function main() { console.log("Prisma Client initialized") }
+async function main() { logger.info("Prisma Client initialized") }
 main()
     .then(async () => await prisma.$disconnect())
     .catch(async (e) => {
-        console.error(e)
+        logger.error(e)
         await prisma.$disconnect()
     })
 
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+    logger.info(`Server is running on port ${port}`);
 })

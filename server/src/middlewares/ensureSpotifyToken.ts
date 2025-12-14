@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { getRefreshToken, getSpotifyToken } from "../services/SpotifyAuth";
 import prisma from "../lib/prisma";
+import logger from "../lib/logger";
 
 export interface TokenRequest extends Request {
     access_token?: string;
@@ -54,7 +55,7 @@ const ensureSpotifyToken = async (req: TokenRequest, res: Response, next: NextFu
         next();
 
     } catch (error) {
-        console.error("Error fetching Spotify token:", error);
+        logger.error("Error fetching Spotify token:", error);
         return res.status(500).json({ error: "Internal server error while fetching Spotify token" });
     }
 };

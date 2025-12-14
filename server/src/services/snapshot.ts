@@ -1,4 +1,5 @@
 import { Snapshot } from "../../generated/prisma";
+import logger from "../lib/logger";
 import prisma from "../lib/prisma";
 import { fetchTracks, fetchPlaylistById } from "./playlists";
 
@@ -83,7 +84,7 @@ async function saveSnapshot(
         }
         return snapshot;
     } catch (error) {
-        console.error("Error saving snapshot:", error);
+        logger.error("Error saving snapshot:", error);
         throw new Error("Error saving snapshot:" + error);
     }
 

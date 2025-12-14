@@ -2,6 +2,7 @@ import cron from 'node-cron';
 import prisma from '../lib/prisma';
 import { getSpotifyToken } from './SpotifyAuth';
 import { saveSnapshot } from './snapshot';
+import logger from '../lib/logger';
 
 const cronJob = cron.schedule('0 0 * * *', async () => { // Run daily at midnight
     const { access_token } = await getSpotifyToken();
@@ -24,7 +25,7 @@ const cronJob = cron.schedule('0 0 * * *', async () => { // Run daily at midnigh
             try {
                 const snapshot = await saveSnapshot(playlist.playlistId, tracker, access_token, null);
             } catch (err) {
-                console.error(`Error tracking ${playlist.id}:`, err);
+                logger.error(`Error tracking ${playlist.id}:`, err);
             }
         }
     }

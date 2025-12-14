@@ -3,6 +3,7 @@ import { TokenRequest } from "../middlewares/ensureSpotifyToken";
 import prisma from "../lib/prisma";
 import { redis } from "../lib/redis"
 import { SPOTIFY_URL } from "../lib/config";
+import logger from "../lib/logger";
 
 async function getMe(req: Request, res: Response) {
     const user = req.user;
@@ -12,7 +13,7 @@ async function getMe(req: Request, res: Response) {
         }
         return res.status(200).json({ user });
     } catch (error) {
-        console.error("Error fetching user:", error);
+        logger.error("Error fetching user:", error);
         return res.status(500).json({ error: "Internal server error" });
     }
 }
@@ -65,7 +66,7 @@ async function fetchCurrentUserPlaylists(req: TokenRequest, res: Response) {
         return res.status(200).json({ data: fetchedPlaylists });
 
     } catch (error) {
-        console.error("Error fetching user playlist:", error);
+        logger.error("Error fetching user playlist:", error);
         return res.status(500).json({ error: "Internal server error while fetching user playlist" });
     }
 }
@@ -96,7 +97,7 @@ async function fetchUserSnapshots(req: TokenRequest, res: Response) {
 
         return res.status(200).json({ snapshots });
     } catch (error) {
-        console.error("Error fetching user snapshot:", error);
+        logger.error("Error fetching user snapshot:", error);
         return res.status(500).json({ error: "Internal server error while fetching user snapshots" });
     }
 }
