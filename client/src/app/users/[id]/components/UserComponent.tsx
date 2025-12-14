@@ -157,9 +157,9 @@ const UserComponent = ({ user, playlistData, userSnapshots, id }: UserTypeProps)
                             initial="hidden"
                             animate="visible"
                         >
-                            {playlistsToShow?.map((playlist: Playlist) => (
+                            {playlistsToShow?.map((playlist: Playlist, index: number) => (
                                 <motion.div
-                                    key={playlist.playlistId}
+                                    key={index}
                                     variants={itemVariants}
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}

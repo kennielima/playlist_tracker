@@ -16,7 +16,7 @@ const page = () => {
                     </div>
                     {/* Spotify Login Button */}
                     <a
-                        href={`${process.env.API_URL}/api/auth/spotify/login`}
+                        href={`/api/auth/spotify/login`}
                         className="w-full"
                     >
                         <div
