@@ -19,8 +19,7 @@ const cronJob = cron.schedule('0 0 * * *', async () => { // Run daily at midnigh
         const trackingStartDate = new Date(playlist.trackingStartDate!);
         const daysSinceStart = Math.floor((now.getTime() - trackingStartDate.getTime()) / (1000 * 60 * 60 * 24));
 
-        //temporarily create snapshot everyday
-        if (daysSinceStart > 0 && daysSinceStart % 1 === 0) {
+        if (daysSinceStart > 0 && daysSinceStart % 7 === 0) {
             const tracker = playlist.isTrackedBy || '';
             try {
                 const snapshot = await saveSnapshot(playlist.playlistId, tracker, access_token, null);

@@ -4,7 +4,7 @@ import SkeletonComponent from '@/components/SkeletonComponent'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from "@/components/ui/card"
-import { Playlist, Snapshot, User } from '@/lib/types'
+import { Playlist, User } from '@/lib/types'
 import { containerVariants, getInitials, itemVariants } from '@/lib/utils'
 import logout from '@/services/logout'
 import { motion } from 'framer-motion'
@@ -16,10 +16,10 @@ import React, { Fragment, useState } from 'react'
 type UserTypeProps = {
     user: User
     playlistData: { data: Playlist[] },
-    userSnapshots: Snapshot[] | null,
+    trackedPlaylists: Playlist[],
     id: string
 }
-const UserComponent = ({ user, playlistData, userSnapshots, id }: UserTypeProps) => {
+const UserComponent = ({ user, playlistData, trackedPlaylists, id }: UserTypeProps) => {
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [currView, setCurrView] = useState<"playlists" | "snapshots">("playlists");
     const [searchKeyword, setSearchKeyword] = useState<string>("");
@@ -29,7 +29,7 @@ const UserComponent = ({ user, playlistData, userSnapshots, id }: UserTypeProps)
         playlist?.name.toLowerCase().includes(searchKeyword.toLowerCase())
     );
 
-    let playlistsToShow = currView === "playlists" ? filteredPlaylists : userSnapshots?.map(snapshot => snapshot.playlist);
+    let playlistsToShow = currView === "playlists" ? filteredPlaylists : trackedPlaylists;
 
     return (
         <Fragment>
@@ -98,7 +98,7 @@ const UserComponent = ({ user, playlistData, userSnapshots, id }: UserTypeProps)
                                     <CardContent className="p-4 text-center">
                                         <Music className="h-6 w-6 mx-auto mb-2 text-purple-400" />
                                         <div className="text-2xl font-bold text-white">
-                                            {userSnapshots ? userSnapshots.length : 0}
+                                            {trackedPlaylists ? trackedPlaylists.length : 0}
                                         </div>
                                         <div className="text-sm text-slate-300">
                                             Tracked Playlists

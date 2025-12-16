@@ -84,18 +84,18 @@ async function fetchUserSnapshots(req: TokenRequest, res: Response) {
             return res.status(200).json(JSON.parse(cached));
         }
 
-        const snapshots = await prisma.snapshot.findMany({
+        const playlists = await prisma.playlist.findMany({
             where: {
-                userId: user.id
+                isTracked: true,
+                isTrackedBy: user.id
             },
             include: {
-                playlist: true
-            },
-            orderBy: [{ createdAt: 'desc' }]
+                Snapshot: true
+            }
         });
-        await redis.set(cacheKey, JSON.stringify({ snapshots }), "EX", 86400);
 
-        return res.status(200).json({ snapshots });
+        await redis.set(cacheKey, JSON.stringify({ playlists }), "EX", 86400);
+        return res.status(200).json({ playlists });
     } catch (error) {
         logger.error("Error fetching user snapshot:", error);
         return res.status(500).json({ error: "Internal server error while fetching user snapshots" });

@@ -15,7 +15,7 @@ async function startTracker(req: TokenRequest, res: Response) {
             return res.status(401).json({ error: "Spotify access token or user id is not available" });
         }
 
-        const sevendaysago = new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) //temp 1 day ago
+        const sevendaysago = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
         const initialSnapshotExists = await prisma.snapshot.findFirst({
             where: {
                 playlistId,
