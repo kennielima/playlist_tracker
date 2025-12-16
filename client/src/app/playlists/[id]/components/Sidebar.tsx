@@ -39,12 +39,12 @@ const Sidebar = ({ playlistsData, playlistData, tracks, allSnapshotsData, userId
                         <span className="text-slate-400">Snapshots</span>
                         <span className="text-white font-medium">{currPlaylist?.isTrackedBy === userId ? allSnapshotsData?.data?.length : 0}</span>
                     </div>
-                    {currPlaylist?.isTracked &&
+                    {currPlaylist?.isTracked && currPlaylist?.isTrackedBy === userId && (
                         <div className="flex justify-between">
                             <span className="text-slate-400">Tracking Start Date</span>
                             <span className="text-white font-medium">{currPlaylist?.trackingStartDate && formatDate(currPlaylist?.trackingStartDate)}</span>
                         </div>
-                    }
+                    )}
                 </CardContent>
             </Card>
 
