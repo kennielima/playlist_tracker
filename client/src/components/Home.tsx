@@ -288,7 +288,7 @@ const Homepage = ({ playlistData, user }: HomepageProps) => {
                         transition={{ duration: 0.6 }}
                         viewport={{ once: true }}
                     >
-                        Ready to Track Your Music?
+                        Ready to Start Tracking Your Music?
                     </motion.h2>
                     <motion.p
                         className="text-xl text-slate-300 mb-8"
@@ -297,7 +297,7 @@ const Homepage = ({ playlistData, user }: HomepageProps) => {
                         transition={{ duration: 0.6, delay: 0.1 }}
                         viewport={{ once: true }}
                     >
-                        Join thousands of music lovers tracking their favorite playlists and discovering new trends
+                        Join other music lovers tracking their favorite playlists and discovering new trends
                     </motion.p>
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}

@@ -29,7 +29,7 @@ const Share = ({ id }: { id: string }) => {
                         Share {" "} <Share2 className="h-5 w-5" />
                     </Button>
                 </DialogTrigger>
-                <DialogContent className="bg-slate-800 border-white/10">
+                <DialogContent className="bg-slate-700 border-white/10">
                     <DialogHeader>
                         <DialogTitle className="text-white">Copy or share link</DialogTitle>
                     </DialogHeader>

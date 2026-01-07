@@ -17,13 +17,13 @@ const CallbackPage = ({ user }: { user: User }) => {
     useEffect(() => {
         const timer = setInterval(() => {
             setProgress(prev => {
-                if (prev >= 100) {
+                if (prev >= 80) {
                     clearInterval(timer);
                     return 100;
                 }
                 return prev + 10;
             });
-        }, 200);
+        }, 150);
     }, [])
 
     if (!user) {

@@ -8,7 +8,6 @@ import { Camera, EyeOff, Loader, Music, Play } from 'lucide-react'
 import Image from 'next/image'
 import React from 'react'
 import Share from './Share'
-import { FEATURED_PLAYLIST_IDS } from '@/lib/constants'
 
 export interface HeaderProps {
     playlist: Playlist;
@@ -22,7 +21,8 @@ export interface HeaderProps {
     handleTracker: () => void;
     startIsPending: boolean;
     stopIsPending: boolean;
-    playlistId: string
+    playlistId: string,
+    isFeatured: boolean;
 }
 const PlaylistHeader = ({
     playlist,
@@ -36,7 +36,8 @@ const PlaylistHeader = ({
     handleTracker,
     startIsPending,
     stopIsPending,
-    playlistId
+    playlistId,
+    isFeatured
 }: HeaderProps) => {
     return (
         <motion.div
@@ -58,7 +59,9 @@ const PlaylistHeader = ({
                 <div>
                     <div className="flex items-center gap-2 mb-2">
                         <Badge variant="secondary" className="bg-purple-600/20 text-purple-300">
-                            {isUserPlaylist ? "User Playlist" : (FEATURED_PLAYLIST_IDS.includes(playlistId) ? "Chart" : "Playlist")}
+                            {(isUserPlaylist && !isFeatured) && "User Playlist"}
+                            {!isUserPlaylist && !isFeatured && "Playlist"}
+                            {isFeatured && "Chart"}
                         </Badge>
                         {isTracking && (
                             <Badge variant="secondary" className="bg-green-600/20 text-green-300">
@@ -94,69 +97,71 @@ const PlaylistHeader = ({
                             Play on Spotify
                         </Button>
 
-                        {(!isTracking || !currUser || (currUser && isTrackedBy !== currUser.id)) && (
-                            <Dialog open={showTrackingDialog} onOpenChange={setShowTrackingDialog}>
-                                <DialogTrigger asChild>
-                                    <Button
-                                        variant="outline"
-                                        size="lg"
-                                        className="bg-green-600/20 text-green-400 border-green-400/20 cursor-pointer"
-                                    >
-                                        <Camera className="h-5 w-5" />
-                                        Start Tracking
-                                    </Button>
-                                </DialogTrigger>
-                                <DialogContent className="bg-slate-800 border-white/10">
-                                    <DialogHeader>
-                                        <DialogTitle className="text-white">Start Tracking Playlist</DialogTitle>
-                                        <DialogDescription className="text-slate-300">
-                                            Track changes to this playlist over time. We'll take weekly snapshots and show you how it
-                                            evolves.
-                                        </DialogDescription>
-                                    </DialogHeader>
-                                    <div className="space-y-4">
-                                        <Alert className="border-purple-500/20 bg-purple-500/10">
-                                            <Camera className="h-4 w-4 text-purple-400" />
-                                            <AlertDescription className="text-purple-300">
-                                                We'll automatically take snapshots every week and notify you of changes.
-                                            </AlertDescription>
-                                        </Alert>
-                                        <div className="text-sm text-slate-400">
-                                            <p>• Weekly snapshots of track changes</p>
-                                            {/* <p>• Notifications for major updates</p> */}
-                                            <p>• Historical trends and data</p>
-                                            <p>• Export tracking data anytime</p>
-                                        </div>
-                                    </div>
-                                    <DialogFooter>
-                                        <Button variant="outline" onClick={() => setShowTrackingDialog(false)}>
-                                            Cancel
-                                        </Button>
+                        {(!isTracking ||
+                            (!isFeatured && !currUser) ||
+                            (currUser && isTrackedBy !== currUser.id && !isFeatured)) && (
+                                <Dialog open={showTrackingDialog} onOpenChange={setShowTrackingDialog}>
+                                    <DialogTrigger asChild>
                                         <Button
-                                            onClick={handleTracker}
-                                            disabled={startIsPending}
-                                            className="bg-purple-600 hover:bg-purple-500 cursor-pointer"
+                                            variant="outline"
+                                            size="lg"
+                                            className="bg-green-600/20 text-green-400 border-green-400/20 cursor-pointer"
                                         >
-                                            {startIsPending ? (
-                                                <p className="flex items-center gap-1">
-                                                    <Loader className='animate-spin' />
-                                                    <span>Starting...</span>
-                                                </p>
-                                            ) :
-                                                "Start Tracking"
-                                            }
+                                            <Camera className="h-5 w-5" />
+                                            Start Tracking
                                         </Button>
-                                    </DialogFooter>
-                                </DialogContent>
-                            </Dialog>
-                        )}
-                        {(isTracking && isTrackedBy === currUser?.id) && (
+                                    </DialogTrigger>
+                                    <DialogContent className="bg-slate-800 border-white/10">
+                                        <DialogHeader>
+                                            <DialogTitle className="text-white">Start Tracking Playlist</DialogTitle>
+                                            <DialogDescription className="text-slate-300">
+                                                Track changes to this playlist over time. We'll take weekly snapshots and show you how it
+                                                evolves.
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <div className="space-y-4">
+                                            <Alert className="border-purple-500/20 bg-purple-500/10">
+                                                <Camera className="h-4 w-4 text-purple-400" />
+                                                <AlertDescription className="text-purple-300">
+                                                    We'll automatically take snapshots every week and notify you of changes.
+                                                </AlertDescription>
+                                            </Alert>
+                                            <div className="text-sm text-slate-400">
+                                                <p>• Weekly snapshots of track changes</p>
+                                                {/* <p>• Notifications for major updates</p> */}
+                                                <p>• Historical trends and data</p>
+                                                <p>• Export tracking data anytime</p>
+                                            </div>
+                                        </div>
+                                        <DialogFooter>
+                                            <Button variant="outline" onClick={() => setShowTrackingDialog(false)} className='cursor-pointer'>
+                                                Cancel
+                                            </Button>
+                                            <Button
+                                                onClick={handleTracker}
+                                                disabled={startIsPending}
+                                                className={`${isFeatured && "hover:cursor-not-allowed"} bg-purple-600 hover:bg-purple-500 cursor-pointer`}
+                                            >
+                                                {startIsPending ? (
+                                                    <p className="flex items-center gap-1">
+                                                        <Loader className='animate-spin' />
+                                                        <span>Starting...</span>
+                                                    </p>
+                                                ) :
+                                                    "Start Tracking"
+                                                }
+                                            </Button>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
+                            )}
+                        {(isTracking && (isTrackedBy === currUser?.id || isFeatured)) && (
                             <Button
                                 variant="outline"
                                 size="lg"
                                 onClick={handleTracker}
                                 disabled={stopIsPending}
-                                className='flex items-center gap-2 px-4 py-2 rounded-lg font-medium cursor-pointer transition-all duration-200 bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30'
+                                className={`${(isFeatured && isTrackedBy !== currUser?.id) ? "hover:cursor-not-allowed" : "hover:bg-red-500/30"} flex items-center gap-2 px-4 py-2 rounded-lg font-medium cursor-pointer transition-all duration-200 bg-red-500/20 text-red-400 border border-red-500/30`}
                             >
                                 {stopIsPending ? (
                                     <p className="flex items-center gap-1">

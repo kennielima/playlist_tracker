@@ -5,6 +5,9 @@ import { fetchPlaylistById, fetchTracks } from "../services/playlists";
 import { featuredPlaylists } from "../lib/seededPlaylists";
 import { redis } from "../lib/redis"
 import logger from "../lib/logger";
+import { updatePlaylistCache } from "../services/cache";
+import { saveSnapshot } from "../services/snapshot";
+import { SYS_ADMIN_EMAIL } from "../lib/config";
 
 async function getFeaturedPlaylists(req: TokenRequest, res: Response) {
     const accessToken = req.access_token;
@@ -15,9 +18,18 @@ async function getFeaturedPlaylists(req: TokenRequest, res: Response) {
         if (!accessToken) {
             return res.status(401).json({ error: "Spotify access token is not available" });
         }
-
         if (cached) {
             return res.status(200).json(JSON.parse(cached));
+        }
+        const sysAdmin = await prisma.user.findUnique({
+            where: { email: SYS_ADMIN_EMAIL }
+        })
+
+        let systemTrackingQuery = {
+            isTracked: true,
+            trackingStartDate: new Date(),
+            isTrackedBy: sysAdmin ? sysAdmin?.id : null,
+            userId: sysAdmin ? sysAdmin?.id : null
         }
 
         let playlists = [];
@@ -29,7 +41,7 @@ async function getFeaturedPlaylists(req: TokenRequest, res: Response) {
                     where: {
                         playlistId: data.id,
                     },
-                    update: {},
+                    update: sysAdmin ? systemTrackingQuery : {},
                     create: {
                         playlistId: data.id,
                         name: data.name,
@@ -37,9 +49,30 @@ async function getFeaturedPlaylists(req: TokenRequest, res: Response) {
                         image: data.images[0].url,
                         url: data.external_urls.spotify,
                         snapshotId: data.snapshot_id,
+                        ...(sysAdmin ? systemTrackingQuery : {})
                     }
                 })
                 playlists.push(featuredPlaylist);
+
+                if (sysAdmin) {
+                    const sevendaysago = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+                    const initialSnapshotExists = await prisma.snapshot.findFirst({
+                        where: {
+                            playlistId: data.id,
+                            userId: sysAdmin.id,
+                            createdAt: {
+                                gte: sevendaysago
+                            }
+                        }
+                    })
+                    await saveSnapshot(data.id, sysAdmin.id, accessToken, initialSnapshotExists || null)
+
+                    await updatePlaylistCache(data.id, {
+                        isTracked: true,
+                        isTrackedBy: sysAdmin.id,
+                        trackingStartDate: systemTrackingQuery.trackingStartDate
+                    })
+                }
             } else {
                 logger.error("Error fetching playlist:", validated);
             }

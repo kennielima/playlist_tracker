@@ -48,6 +48,7 @@ model Playlist {
   url               String
   playlistId        String     @unique
   snapshotId        String
+  // isFeatured        Boolean    @default(false)
 
   @@map("Playlists")
 }
