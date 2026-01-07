@@ -7,14 +7,7 @@ import logger from "../lib/logger";
 async function getPlaylistSnapshots(req: TokenRequest, res: Response) {
     const playlistId = req.params.id;
 
-    const cacheKey = `playlist:${playlistId}/snapshots`;
-    const cached = await redis.get(cacheKey);
-
     try {
-        if (cached) {
-            return res.status(200).json(JSON.parse(cached));
-        }
-
         const snapshots = await prisma.snapshot.findMany({
             where: {
                 playlistId
@@ -23,7 +16,6 @@ async function getPlaylistSnapshots(req: TokenRequest, res: Response) {
                 createdAt: 'desc'
             }]
         })
-        await redis.set(cacheKey, JSON.stringify({ data: snapshots }), "EX", 86400);
 
         return res.status(200).json({ data: snapshots });
     } catch (error) {
