@@ -14,7 +14,13 @@ async function startTracker(req: TokenRequest, res: Response) {
         if (!accessToken || !userId) {
             return res.status(401).json({ error: "Spotify access token or user id is not available" });
         }
+        const playlist = await prisma.playlist.findUnique({
+            where: { playlistId }
+        });
 
+        if (playlist?.isFeatured) {
+            return res.status(400).json({ error: "Cannot track a featured playlist." });
+        }
         const sevendaysago = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
         const initialSnapshotExists = await prisma.snapshot.findFirst({
             where: {
@@ -63,6 +69,15 @@ async function stopTracker(req: TokenRequest, res: Response) {
         if (!accessToken || !userId) {
             return res.status(401).json({ error: "Spotify access token or user id is not available" });
         }
+
+        const isFeaturedPlaylist = await prisma.playlist.findUnique({
+            where: { playlistId }
+        });
+
+        if (isFeaturedPlaylist?.isFeatured) {
+            return res.status(400).json({ error: "Cannot track a featured playlist." });
+        }
+
         const playlist = await prisma.playlist.update({
             data: {
                 isTracked: false,

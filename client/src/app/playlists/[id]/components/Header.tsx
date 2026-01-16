@@ -22,7 +22,6 @@ export interface HeaderProps {
     startIsPending: boolean;
     stopIsPending: boolean;
     playlistId: string,
-    isFeatured: boolean;
 }
 const PlaylistHeader = ({
     playlist,
@@ -37,7 +36,6 @@ const PlaylistHeader = ({
     startIsPending,
     stopIsPending,
     playlistId,
-    isFeatured
 }: HeaderProps) => {
     return (
         <motion.div
@@ -59,9 +57,9 @@ const PlaylistHeader = ({
                 <div>
                     <div className="flex items-center gap-2 mb-2">
                         <Badge variant="secondary" className="bg-purple-600/20 text-purple-300">
-                            {(isUserPlaylist && !isFeatured) && "User Playlist"}
-                            {!isUserPlaylist && !isFeatured && "Playlist"}
-                            {isFeatured && "Chart"}
+                            {(isUserPlaylist && !playlist?.isFeatured) && "User Playlist"}
+                            {!isUserPlaylist && !playlist?.isFeatured && "Playlist"}
+                            {playlist?.isFeatured && "Chart"}
                         </Badge>
                         {isTracking && (
                             <Badge variant="secondary" className="bg-green-600/20 text-green-300">
@@ -98,8 +96,8 @@ const PlaylistHeader = ({
                         </Button>
 
                         {(!isTracking ||
-                            (!isFeatured && !currUser) ||
-                            (currUser && isTrackedBy !== currUser.id && !isFeatured)) && (
+                            (!playlist?.isFeatured && !currUser) ||
+                            (currUser && isTrackedBy !== currUser.id && !playlist?.isFeatured)) && (
                                 <Dialog open={showTrackingDialog} onOpenChange={setShowTrackingDialog}>
                                     <DialogTrigger asChild>
                                         <Button
@@ -140,7 +138,7 @@ const PlaylistHeader = ({
                                             <Button
                                                 onClick={handleTracker}
                                                 disabled={startIsPending}
-                                                className={`${isFeatured && "hover:cursor-not-allowed"} bg-purple-600 hover:bg-purple-500 cursor-pointer`}
+                                                className={`${playlist?.isFeatured && "hover:cursor-not-allowed"} bg-purple-600 hover:bg-purple-500 cursor-pointer`}
                                             >
                                                 {startIsPending ? (
                                                     <p className="flex items-center gap-1">
@@ -155,13 +153,15 @@ const PlaylistHeader = ({
                                     </DialogContent>
                                 </Dialog>
                             )}
-                        {(isTracking && (isTrackedBy === currUser?.id || isFeatured)) && (
+                        {(isTracking && (isTrackedBy === currUser?.id || playlist?.isFeatured)) && (
                             <Button
                                 variant="outline"
                                 size="lg"
                                 onClick={handleTracker}
                                 disabled={stopIsPending}
-                                className={`${(isFeatured && isTrackedBy !== currUser?.id) ? "hover:cursor-not-allowed" : "hover:bg-red-500/30"} flex items-center gap-2 px-4 py-2 rounded-lg font-medium cursor-pointer transition-all duration-200 bg-red-500/20 text-red-400 border border-red-500/30`}
+                                className={`${(playlist?.isFeatured
+                                    //  && isTrackedBy !== currUser?.id
+                                ) ? "hover:cursor-not-allowed" : "hover:bg-red-500/30"} flex items-center gap-2 px-4 py-2 rounded-lg font-medium cursor-pointer transition-all duration-200 bg-red-500/20 text-red-400 border border-red-500/30`}
                             >
                                 {stopIsPending ? (
                                     <p className="flex items-center gap-1">

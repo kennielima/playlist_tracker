@@ -27,6 +27,7 @@ export type Playlist = {
     isTracked: boolean
     isTrackedBy: string | null
     trackingStartDate?: string | null
+    isFeatured: boolean
     tracks?: { href: string, total: number }
     snapshots?: Snapshot[]
 }

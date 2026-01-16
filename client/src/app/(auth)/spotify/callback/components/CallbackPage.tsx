@@ -17,7 +17,7 @@ const CallbackPage = ({ user }: { user: User }) => {
     useEffect(() => {
         const timer = setInterval(() => {
             setProgress(prev => {
-                if (prev >= 80) {
+                if (prev >= 100) {
                     clearInterval(timer);
                     return 100;
                 }

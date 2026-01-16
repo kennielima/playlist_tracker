@@ -7,7 +7,7 @@ import { redis } from "../lib/redis"
 import logger from "../lib/logger";
 import { updatePlaylistCache } from "../services/cache";
 import { saveSnapshot } from "../services/snapshot";
-import { SYS_ADMIN_EMAIL } from "../lib/config";
+import { getSysAdmin } from "../services/sysAdmin";
 
 async function getFeaturedPlaylists(req: TokenRequest, res: Response) {
     const accessToken = req.access_token;
@@ -21,15 +21,18 @@ async function getFeaturedPlaylists(req: TokenRequest, res: Response) {
         if (cached) {
             return res.status(200).json(JSON.parse(cached));
         }
-        const sysAdmin = await prisma.user.findUnique({
-            where: { email: SYS_ADMIN_EMAIL }
-        })
+        const sysAdmin = await getSysAdmin();
+
+        if (!sysAdmin) {
+            res.redirect('/login')
+        }
 
         let systemTrackingQuery = {
             isTracked: true,
             trackingStartDate: new Date(),
-            isTrackedBy: sysAdmin ? sysAdmin?.id : null,
-            userId: sysAdmin ? sysAdmin?.id : null
+            isTrackedBy: sysAdmin?.id,
+            userId: sysAdmin?.id,
+            isFeatured: true
         }
 
         let playlists = [];
@@ -54,6 +57,7 @@ async function getFeaturedPlaylists(req: TokenRequest, res: Response) {
                 })
                 playlists.push(featuredPlaylist);
 
+                //track featured playlists automatically
                 if (sysAdmin) {
                     const sevendaysago = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
                     const initialSnapshotExists = await prisma.snapshot.findFirst({
@@ -70,7 +74,8 @@ async function getFeaturedPlaylists(req: TokenRequest, res: Response) {
                     await updatePlaylistCache(data.id, {
                         isTracked: true,
                         isTrackedBy: sysAdmin.id,
-                        trackingStartDate: systemTrackingQuery.trackingStartDate
+                        trackingStartDate: systemTrackingQuery.trackingStartDate,
+                        isFeatured: true
                     })
                 }
             } else {

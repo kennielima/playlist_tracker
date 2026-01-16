@@ -11,6 +11,7 @@ export async function updatePlaylistCache(
         isTracked: boolean;
         isTrackedBy: string;
         trackingStartDate: Date;
+        isFeatured: boolean;
     }>
 ) {
     const key = `playlist:${playlistId}`;

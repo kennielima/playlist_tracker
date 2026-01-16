@@ -14,12 +14,11 @@ interface SidebarProps {
     playlistsData: Playlist[],
     allSnapshotsData: { data: Snapshot[] },
     userId: string | null
-    isFeatured: boolean;
 }
 
-const Sidebar = ({ playlistsData, playlistData, tracks, allSnapshotsData, userId, isFeatured }: SidebarProps) => {
+const Sidebar = ({ playlistsData, playlistData, tracks, allSnapshotsData, userId }: SidebarProps) => {
     const currPlaylist = playlistData.data;
-    console.log(currPlaylist.trackingStartDate, formatDate(currPlaylist.trackingStartDate!));
+
     return (
         <div className="space-y-6">
             <Card className="bg-white/5 backdrop-blur-md border border-white/10 py-6">
@@ -38,9 +37,9 @@ const Sidebar = ({ playlistsData, playlistData, tracks, allSnapshotsData, userId
 
                     <div className="flex justify-between">
                         <span className="text-slate-400">Snapshots</span>
-                        <span className="text-white font-medium">{(currPlaylist?.isTrackedBy === userId || isFeatured) ? allSnapshotsData?.data?.length : 0}</span>
+                        <span className="text-white font-medium">{(currPlaylist?.isTrackedBy === userId || currPlaylist?.isFeatured) ? allSnapshotsData?.data?.length : 0}</span>
                     </div>
-                    {currPlaylist?.isTracked && (currPlaylist?.isTrackedBy === userId || isFeatured) && (
+                    {currPlaylist?.isTracked && (currPlaylist?.isTrackedBy === userId || currPlaylist?.isFeatured) && (
                         <div className="flex justify-between">
                             <span className="text-slate-400">Tracking Start Date</span>
                             <span className="text-white font-medium">{currPlaylist?.trackingStartDate && formatDate(currPlaylist?.trackingStartDate)}</span>

@@ -17,7 +17,6 @@ import PlaylistHeader from "./Header"
 import SearchByFilter from "../../../../components/SearchByFilter"
 import Link from "next/link"
 import SkeletonComponent from "@/components/SkeletonComponent"
-import { FEATURED_PLAYLIST_IDS } from "@/lib/constants"
 
 
 interface PlaylistDetailPageProps {
@@ -38,7 +37,6 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
 
     const isUserPlaylist = playlist?.userId !== null;
     const playlistId = playlist?.playlistId || playlist?.id;
-    const isFeatured = FEATURED_PLAYLIST_IDS.includes(playlistId);
 
     const [isTracking, setIsTracking] = useState(playlist?.isTracked);
     const [isTrackedBy, setIsTrackedBy] = useState(playlist?.isTrackedBy);
@@ -103,9 +101,7 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
             // Invalidate queries to refetch snapshots list
             queryClient.invalidateQueries({ queryKey: ['snapshots', playlistId] });
         },
-        onError: (error) => {
-            console.error('Start tracker error:', error);
-        }
+        onError: (error) => { }
     });
 
     const stopTrackerMutation = useMutation({
@@ -114,13 +110,13 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
             setIsTracking(false);
             queryClient.invalidateQueries({ queryKey: ['snapshots', playlistId] });
         },
-        onError: (error) => {
-            console.error('Stop tracker error:', error);
-        }
+        onError: (error) => { }
     });
 
     const handleTracker = () => {
-        if (isFeatured && (currUser?.email !== playlist?.isTrackedBy)) {
+        if (playlist?.isFeatured
+            // && (currUser?.email !== playlist?.isTrackedBy)
+        ) {
             return;
         }
         if (!currUser) {
@@ -172,14 +168,13 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                         handleTracker={handleTracker}
                         startIsPending={startTrackerMutation.isPending}
                         stopIsPending={stopTrackerMutation.isPending}
-                        isFeatured={isFeatured}
                     />
 
                     {/* Content */}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         <div className="lg:col-span-2 space-y-8">
                             <div className={`flex items-center space-x-5 justify-between w-full ${(!isTracking && !allSnapshotsData) && "flex-row-reverse gap-4"}`}>
-                                {((isTracking || snapshotData) && (currUser?.id === isTrackedBy) || isFeatured) && (
+                                {((isTracking || snapshotData) && (currUser?.id === isTrackedBy) || playlist?.isFeatured) && (
                                     <Select
                                         value={snapshotData?.id || ""}
                                         onValueChange={(snapshotId) => handleChangeSnapshot(snapshotId)}
@@ -289,7 +284,13 @@ export default function PlaylistPage({ playlistData, playlistsData, currUser }: 
                             </Card>
                         </div>
 
-                        <Sidebar playlistsData={playlistsData} playlistData={playlistData} tracks={tracks} allSnapshotsData={allSnapshotsData} userId={currUser?.id} isFeatured={isFeatured} />
+                        <Sidebar
+                            playlistsData={playlistsData}
+                            playlistData={playlistData}
+                            tracks={tracks}
+                            allSnapshotsData={allSnapshotsData}
+                            userId={currUser?.id}
+                        />
                     </div>
                 </div>
             )
