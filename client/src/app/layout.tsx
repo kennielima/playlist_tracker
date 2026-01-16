@@ -32,6 +32,7 @@ export default function RootLayout({
         <QueryProvider>
           <Header />
           {children}
+          <div className="w-full h-8 justify-center items-center flex text-sm py-8 text-slate-300">©2025. Kennielima</div>
         </QueryProvider>
       </body>
     </html>

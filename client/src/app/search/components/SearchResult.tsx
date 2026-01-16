@@ -1,7 +1,8 @@
 "use client"
+import SearchByQuery from '@/components/SearchByQuery'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Playlist } from '@/lib/types'
+import { Playlist, User } from '@/lib/types'
 import { containerVariants, itemVariants } from '@/lib/utils'
 import { motion } from 'framer-motion'
 import { Music, Play } from 'lucide-react'
@@ -11,14 +12,18 @@ import React from 'react'
 
 type SearchTypeProps = {
     searchData: { data: Playlist[] },
-    query: string
+    query: string,
+    user?: User
 }
 
-const SearchResult = ({ searchData, query }: SearchTypeProps) => {
+const SearchResult = ({ searchData, query, user }: SearchTypeProps) => {
     const playlists = searchData.data;
 
     return (
-        <div className='m-12'>
+        <div className='m-12 px-20'>
+            <div className='flex items-center justify-center mb-6'>
+                <SearchByQuery category="playlist" user={user} />
+            </div>
             <h2 className='my-8 text-lg'>Showing <b>{playlists.length}</b> results for &apos;<u>{query}</u>&apos;</h2>
             {/* Playlists Grid */}
             <motion.div

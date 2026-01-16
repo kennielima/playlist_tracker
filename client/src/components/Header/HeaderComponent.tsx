@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 
 const HeaderComponent = ({ user }: { user: User }) => {
     return (
-        <div className='sticky top-0 z-10 w-full h-24 shadow-md flex items-center justify-between px-6 bg-purple-950'>
+        <div className='sticky top-0 z-10 w-full h-24 shadow-md flex items-center justify-between px-6 md:px-12 lg:px-24 bg-gradient-to-br from-slate-900 via-purple-800 to-slate-900'>
             {/* logo */}
             <Link href='/'>
                 <div className='flex gap-1 items-center justify-between'>

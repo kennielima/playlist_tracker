@@ -57,7 +57,7 @@ const Homepage = ({ playlistData, user }: HomepageProps) => {
                 variants={heroVariants}
             >
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-purple-600/20" />
-                <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
+                <div className="relative max-w-7xl mx-auto px-4 sm:px-10 lg:px-12 py-16 lg:py-20">
                     <div className="text-center">
                         <motion.div
                             initial={{ scale: 0.8, opacity: 0 }}
@@ -76,12 +76,12 @@ const Homepage = ({ playlistData, user }: HomepageProps) => {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.6, delay: 0.3 }}
                         >
-                            Discover the
+                            Playlists change. Your
                             <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
                                 {" "}
-                                Hottest{" "}
+                                memories{" "}
                             </span>
-                            Charts
+                            shouldn't.
                         </motion.h1>
 
                         <motion.p

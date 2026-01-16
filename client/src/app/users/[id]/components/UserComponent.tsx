@@ -8,7 +8,7 @@ import { Playlist, User } from '@/lib/types'
 import { containerVariants, getInitials, itemVariants } from '@/lib/utils'
 import logout from '@/services/logout'
 import { motion } from 'framer-motion'
-import { Music, Heart, Grid3X3, List, Play, User as User2 } from 'lucide-react'
+import { Music, Grid3X3, List, Play, User as User2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { Fragment, useState } from 'react'
@@ -46,13 +46,29 @@ const UserComponent = ({ user, playlistData, trackedPlaylists, id }: UserTypePro
                                         <AvatarImage src={user?.userImage || "/placeholder.svg"} alt={user?.name} />
                                         <AvatarFallback>{getInitials(user?.name)}</AvatarFallback>
                                     </Avatar>
-                                    <div>
+                                    <div className='flex flex-col justify-center'>
                                         <h1 className="text-xl font-bold text-white">
                                             {user?.name}
                                         </h1>
-                                        <p className="text-sm text-slate-300">
-                                            @{user?.name}
-                                        </p>
+                                        <div className='flex items-center space-x-1 mt-1'>
+                                            <span className='text-slate-200'>Link to </span>
+                                            <Image
+                                                height={300}
+                                                width={300}
+                                                src={"/iconn.svg"}
+                                                alt={'icon'}
+                                                className="w-6 h-6 rounded-lg object-cover mx-0"
+                                            />
+                                            <span className='text-slate-200 pl-[-4px]'>: @</span>
+                                            <Link
+                                                href={`${process.env.USER_URL}/${user?.spotifyId}`}
+                                                className="transition-all text-base text-slate-400 font-semibold hover:text-slate-300 pl-[-4px]"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                {user?.name}
+                                            </Link>
+                                        </div>
                                     </div>
                                 </div>
                                 <Button
@@ -128,20 +144,20 @@ const UserComponent = ({ user, playlistData, trackedPlaylists, id }: UserTypePro
                             >
                                 <div className="flex gap-2">
                                     <Button
-                                        variant={viewMode === "grid" ? "default" : "outline"}
-                                        size="sm"
-                                        className={`cursor-pointer ${viewMode === "grid" ? "bg-white/90 text-black" : "bg-black/90 border-black text-white"}`}
-                                        onClick={() => setViewMode("list")}
-                                    >
-                                        <List className="h-4 w-4" />
-                                    </Button>
-                                    <Button
                                         variant={viewMode === "list" ? "default" : "outline"}
                                         size="sm"
-                                        className={`cursor-pointer ${viewMode === "grid" ? "bg-black/90 border-black text-white" : "bg-white/90 text-black"}`}
+                                        className={`cursor-pointer ${viewMode === "grid" ? "bg-white/90 text-black" : "bg-black/90 border-black text-white"}`}
                                         onClick={() => setViewMode("grid")}
                                     >
                                         <Grid3X3 className="h-4 w-4" />
+                                    </Button>
+                                    <Button
+                                        variant={viewMode === "grid" ? "default" : "outline"}
+                                        size="sm"
+                                        className={`cursor-pointer ${viewMode === "grid" ? "bg-black/90 border-black text-white" : "bg-white/90 text-black"}`}
+                                        onClick={() => setViewMode("list")}
+                                    >
+                                        <List className="h-4 w-4" />
                                     </Button>
                                 </div>
                             </motion.div>
